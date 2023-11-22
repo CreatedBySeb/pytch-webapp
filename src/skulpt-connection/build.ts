@@ -1,6 +1,7 @@
 import { StoredProjectContent } from "../model/project";
 import { PytchProgramOps } from "../model/pytch-program";
 import { assetServer } from "./asset-server";
+import { deviceManager } from "./device-manager";
 import { ensureSoundManager } from "./sound-manager";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,6 +65,9 @@ export const build = async (
     ensureSoundManager();
     Sk.pytch.async_load_image = (name: string) => {
       return assetServer.loadImage(name);
+    };
+    Sk.pytch.get_active_device = () => {
+      return deviceManager.activeDevice;
     };
     const codeText = PytchProgramOps.flatCodeText(project.program);
     await Sk.pytchsupport.import_with_auto_configure(codeText);

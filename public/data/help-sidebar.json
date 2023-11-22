@@ -621,5 +621,51 @@
         "kind": "pure-python",
         "python": "stage_cls.the_only()",
         "help": "Give the only instance of the Stage class `stage_cls`.\n\n```\n# Say which backdrop the stage\n# is showing:\nthe_sky = Sky.the_only()\nself.say(the_sky.costume_name)\n```"
+    },
+
+    {
+        "kind": "heading",
+        "sectionSlug": "microbit",
+        "heading": "micro:bit"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_button_pressed(button)",
+        "scratch": "when (A v) button pressed",
+        "help": "Ask Pytch to run the method below whenever `button` is pressed on the micro:bit."
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_gesture_performed(gesture)",
+        "scratch": "when (moved v):: microbit",
+        "help": "Ask Pytch to run the method below whenever the `gesture` is performed with the micro:bit."
+    },
+    {
+        "kind": "block",
+        "python": "microbit.show_image(image)",
+        "scratch": "display ( v)",
+        "help": "Display `image` on the micro:bit's display.\n\nAn image is comprised of 5 rows of pixels, which can each have a brightness between 1 and 9, separated by colons. For example: `09090:90909:90009:09090:00900` create's the micro:bit's heart shape."
+    },
+    {
+        "kind": "block",
+        "python": "microbit.show_text(text)",
+        "scratch": "display text [Hi!]",
+        "help": "Display `text` on the micro:bit's display one character at a time."
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.scroll_message(message)",
+        "help": "Scroll `message` across the micro:bit's display."
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.set_pixel(x, y, brightness)",
+        "help": "Set the pixel at (`x`, `y`) to `brightness` on the micro:bit's display.\n\n(0,0) is the top-left corner of the micro:bit's display, and each pixel can have a brightness between 0 and 9."
+    },
+    {
+        "kind": "block",
+        "python": "microbit.clear_display()",
+        "scratch": "clear display",
+        "help": "Clear's the micro:bit's display."
     }
 ]

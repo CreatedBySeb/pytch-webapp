@@ -143,6 +143,11 @@ export type LinkedContentLoadingState =
   | { kind: "succeeded"; linkedContent: LinkedContent }
   | { kind: "failed" };
 
+interface IProjectImport {
+  as?: string;
+  module: string;
+}
+
 export interface IActiveProject {
   latestLoadRequest: ILoadSaveRequest;
   latestSaveRequest: ILoadSaveRequest;
@@ -168,6 +173,7 @@ export interface IActiveProject {
   tutorialNavigationSeqnum: number;
 
   haveProject: Computed<IActiveProject, boolean>;
+  imports: Computed<IActiveProject, IProjectImport[]>;
 
   initialiseContent: Action<IActiveProject, StoredProjectContent>;
   setAssets: Action<IActiveProject, Array<AssetPresentation>>;
@@ -205,6 +211,7 @@ export interface IActiveProject {
 
   setCodeText: Action<IActiveProject, string>;
   setCodeTextAndBuild: Thunk<IActiveProject, ISetCodeTextAndBuildPayload>;
+  addImport: Action<IActiveProject, IProjectImport>;
   requestSyncToStorage: Thunk<IActiveProject, void, void, IPytchAppModel>;
   noteCodeChange: Action<IActiveProject>;
   noteCodeSaved: Action<IActiveProject>;
@@ -288,6 +295,20 @@ export const activeProject: IActiveProject = {
 
   haveProject: computed((state) => state.project.id !== -1),
 
+  imports: computed((state) => {
+    return state.project.program.text
+      .split("\n")
+      .filter((line) => line.startsWith("import"))
+      .map((importLine) => {
+        const parts = importLine
+          .slice(6)
+          .split(" as ")
+          .map((part) => part.trim());
+
+        return { module: parts[0], as: parts[1] };
+      });
+  }),
+
   initialiseContent: action((state, content) => {
     state.project = content;
     state.editSeqNum += 1;
@@ -318,6 +339,17 @@ export const activeProject: IActiveProject = {
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
     await actions.build(payload.focusDestination);
+  }),
+
+  addImport: action((state, { as, module }) => {
+    const lines = state.project.program.text.split("\n"),
+      importStatement = `import ${module}` + ((as) ? ` as ${as}` : undefined),
+      firstNonImport = lines.findIndex((line) => !line.startsWith("import"));
+
+    if (firstNonImport < 1) lines.unshift(importStatement);
+    else lines.splice(firstNonImport, 0, importStatement);
+
+    state.project.program.text = lines.join("\n");
   }),
 
   syncDummyProject: action((state) => {

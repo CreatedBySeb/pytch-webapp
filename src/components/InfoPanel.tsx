@@ -7,6 +7,7 @@ import ErrorReportList from "./ErrorReportList";
 import ProjectAssetList from "./ProjectAssetList";
 import EditorWebSocketInfo from "./EditorWebSocketInfo";
 import { LayoutChooser } from "./LayoutChooser";
+import DevicesPane from "./DevicesPane";
 import { isEnabled as liveReloadEnabled } from "../model/live-reload";
 
 const StandardOutput = () => {
@@ -79,6 +80,9 @@ const InfoPanel = () => {
         </Tab>
         <Tab className="InfoPane" eventKey="errors" title="Errors">
           <Errors />
+        </Tab>
+        <Tab className="InfoPane" eventKey="devices" title="Devices">
+          <DevicesPane />
         </Tab>
         {liveReloadEnabled ? (
           <Tab

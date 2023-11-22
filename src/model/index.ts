@@ -37,6 +37,7 @@ import {
   GoogleDriveIntegration,
   googleDriveIntegration,
 } from "./google-drive-import-export";
+import { IDevices, devices } from "./devices";
 
 export interface IPytchAppModel {
   navigationRequestQueue: NavigationRequestQueue;
@@ -56,6 +57,7 @@ export interface IPytchAppModel {
   projectFromSpecimenFlow: ProjectFromSpecimenFlow;
   clipArtGallery: IClipArtGallery;
   googleDriveImportExport: GoogleDriveIntegration;
+  devices: IDevices;
 }
 
 export type PytchAppModelActions = Actions<IPytchAppModel>;
@@ -78,4 +80,5 @@ export const pytchAppModel: IPytchAppModel = {
   projectFromSpecimenFlow,
   clipArtGallery,
   googleDriveImportExport: googleDriveIntegration,
+  devices,
 };
