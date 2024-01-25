@@ -86,6 +86,12 @@ export class MicroBitDevice extends EventTarget {
   public async identify(): Promise<void> {
     await this.send("identify");
   }
+
+  public async reset(): Promise<void> {
+    await this.stop();
+    this.undrainedEvents = [];
+    await this.send("show_image", ["00000:00000:00000:00000:00000"]);
+  }
   
   public async send(command: string, args: string[] = []): Promise<string[] | MicroBitError> {
     await this.daplink.serialWrite([command, ...args].join("|") + "\n");
@@ -121,6 +127,7 @@ export class MicroBitDevice extends EventTarget {
         if (attempts > 4) {
           console.error(`MicroBit[${this.serialNumber}]: Failed to initialise after 5 attempts`);
           window.clearInterval(helloInterval);
+          return;
         }
 
         attempts++;
@@ -135,6 +142,10 @@ export class MicroBitDevice extends EventTarget {
       console.error(`MicroBit[${this.serialNumber}]: An error occurred during the setup process`);
       console.error(error);
     });
+  }
+
+  public async stop(): Promise<void> {
+    await this.send("stop_music");
   }
 
   protected handleData(value: string) {

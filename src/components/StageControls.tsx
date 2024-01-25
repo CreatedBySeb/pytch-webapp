@@ -7,6 +7,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
+import { deviceManager } from "../skulpt-connection/device-manager";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -57,6 +58,7 @@ const GreenFlag = () => {
 const RedStop = () => {
   const redStop = () => {
     Sk.pytch.current_live_project.on_red_stop_clicked();
+    deviceManager.activeDevice?.stop();
     focusStage();
   };
   return (
