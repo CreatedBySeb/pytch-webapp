@@ -644,7 +644,12 @@
         "kind": "block",
         "python": "microbit.show_image(image)",
         "scratch": "display ( v)",
-        "help": "Display `image` on the micro:bit's display.\n\nAn image is comprised of 5 rows of pixels, which can each have a brightness between 1 and 9, separated by colons. For example: `09090:90909:90009:09090:00900` create's the micro:bit's heart shape."
+        "help": "Display `image` on the micro:bit's display.\n\nYou can easily create an image using the `microbit.Image` class, for example:\n\n```\nimage = microbit.Image(\n  [0,9,0,9,0],\n  [9,0,9,0,9],\n  [9,0,0,0,9],\n  [0,9,0,9,0],\n  [0,0,9,0,0],\n)\n```\n\ncreates a heart shape. The numbers correspond to a brightness value for that pixel, between 0 and 9.\n\nYou can also use micro:bit image strings directly, for example: `09090:90909:90009:09090:00900`."
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.set_pixel(x, y, brightness)",
+        "help": "Set the pixel at (`x`, `y`) to `brightness` on the micro:bit's display.\n\n(0,0) is the top-left corner of the micro:bit's display, and each pixel can have a brightness between 0 and 9."
     },
     {
         "kind": "block",
@@ -658,14 +663,31 @@
         "help": "Scroll `message` across the micro:bit's display."
     },
     {
-        "kind": "pure-python",
-        "python": "microbit.set_pixel(x, y, brightness)",
-        "help": "Set the pixel at (`x`, `y`) to `brightness` on the micro:bit's display.\n\n(0,0) is the top-left corner of the micro:bit's display, and each pixel can have a brightness between 0 and 9."
-    },
-    {
         "kind": "block",
         "python": "microbit.clear_display()",
         "scratch": "clear display",
         "help": "Clear's the micro:bit's display."
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_gesture_performed(tilt)",
+        "scratch": "when tilted (left v)",
+        "help": "Ask Pytch to run the method below whenever the micro:bit is tilted `tilt`."
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_pin_high(pin)",
+        "scratch": "when pin (0 v) connected",
+        "help": "Ask Pytch to run the method below whenever pin `pin` on the micro:bit is high."
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.play_music(notes, tempo=120, loop=False)",
+        "help": "Play a list of `notes` written in micro:bit music notation.\n\nA note is written like `'b5:1'`, where `b` is the note, `5` is the octave and `1` is the duration in quarter notes. You can also set the tempo, for example using `tempo=60`, and make the music loop continuously until stopped using `loop=True`.\n\nPlay a ba-ding sound: `microbit.play_music(['b5:1', 'e6:2'])`"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.stop_music()",
+        "help": "Stops the music currently playing on the micro:bit."
     }
 ]
