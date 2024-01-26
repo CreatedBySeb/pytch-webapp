@@ -6,7 +6,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
 import Stack from "react-bootstrap/Stack";
-import { deviceManager, MicroBitDevice } from "../skulpt-connection/device-manager";
+import { deviceManager, MicroBitDevice, MicroBitStatus } from "../skulpt-connection/device-manager";
 import { useStoreActions, useStoreState } from "../store";
 
 interface DeviceItemProps {
@@ -18,19 +18,49 @@ interface DeviceItemProps {
 }
 
 const DeviceItem = ({ device, isActive, onDisconnect, onForget, onSetActive }: DeviceItemProps) => {
+  let badge: JSX.Element,
+    hint: string | undefined;
+
+  switch (device.status) {
+    case MicroBitStatus.Initialising:
+      badge = <Spinner animation="border" size="sm" role="status"><span className="visually-hidden">Connecting...</span></Spinner>;
+      break;
+
+    case MicroBitStatus.Ready:
+      badge = <Badge bg="secondary">v{ device.hardwareVersion?.join(".") ?? "?" }</Badge>;
+      break;
+
+    case MicroBitStatus.Failed:
+      badge = <Badge bg="danger">Failed to Connect</Badge>
+      hint = "Try disconnecting and reconnecting your micro:bit";
+      break;
+
+    case MicroBitStatus.AlreadyInUse:
+      badge = <Badge bg="warning">Already In Use</Badge>
+      hint = "Make sure you don't have Pytch or the micro:bit editor open in another tab";
+      break;
+
+    case MicroBitStatus.BadState:
+      badge = <Badge bg="danger">Not Responding</Badge>
+      hint = "Your micro:bit is not responding, try disconnecting and reconnecting it";
+      break;
+  }
+
   return <Stack direction="horizontal" as={ListGroup.Item}>
     <Stack direction="horizontal" gap={2}>
-      <span>{ `micro:bit (v${device.hardwareVersion?.join(".") ?? "?"})` }</span>
+      <span>micro:bit</span>
+      { badge }
       { (isActive) && <Badge bg="primary">Active</Badge> }
-      { (device.hardwareVersion === undefined) && <Spinner animation="border" size="sm" role="status"><span className="visually-hidden">Connecting...</span></Spinner>  }
     </Stack>
-    <ButtonGroup className="ms-auto" aria-label="Device Controls">
-      {/* TODO: Add a program/update button  */}
-      <Button variant="outline-primary" disabled={isActive} onClick={() => onSetActive(device)}>Set Active</Button>
-      <Button variant="outline-primary" onClick={() => device.identify()}>Identify</Button>
-      <Button variant="outline-danger" onClick={() => onDisconnect(device)}>Disconnect</Button>
-      <Button variant="outline-danger" onClick={() => onForget(device)}>Forget</Button>
-    </ButtonGroup>
+    { (device.status == MicroBitStatus.Ready) ?
+      <ButtonGroup className="ms-auto" aria-label="Device Controls">
+        {/* TODO: Add a program/update button  */}
+        <Button variant="outline-primary" disabled={isActive} onClick={() => onSetActive(device)}>Set Active</Button>
+        <Button variant="outline-primary" onClick={() => device.identify()}>Identify</Button>
+        <Button variant="outline-danger" onClick={() => onDisconnect(device)}>Disconnect</Button>
+        <Button variant="outline-danger" onClick={() => onForget(device)}>Forget</Button>
+      </ButtonGroup> :
+      (hint) && <span className="ms-auto ps-2 text-secondary">{ hint }</span> }
   </Stack>
 };
 
@@ -46,7 +76,7 @@ const DevicesPane = () => {
     addImport = useStoreActions((actions) => actions.activeProject.addImport),
     microBitImport = useMemo(() => imports.find(({ module }) => module == "pytch.microbit"), [imports]),
     addMicroBitImport = () => addImport({ module: "pytch.microbit", as: "microbit" });
-  
+
   const devices = useStoreState((state) => state.devices.devices),
     activeDevice = useStoreState((state) => state.devices.activeDevice);
 
@@ -57,7 +87,7 @@ const DevicesPane = () => {
       You are using the <code>pytch.microbit</code> module, but you do not have a micro:bit connected. micro:bit functions will throw an error and events will not trigger.
     </Alert>;
   } else if (!microBitImport && activeDevice) {
-    alert = <Alert className="m-2" variant="warning"> 
+    alert = <Alert className="m-2" variant="warning">
       <Stack direction="horizontal">
         You have a micro:bit attached, but have not imported the <code>pytch.microbit</code> module. micro:bit functions and events will not be available.
         <Button className="ms-auto" variant="outline-dark" onClick={addMicroBitImport}>Add Import</Button>
@@ -66,7 +96,7 @@ const DevicesPane = () => {
   } else if (!activeDevice) {
     alert = <Alert className="m-2" variant="secondary">No micro:bit connected</Alert>
   }
-  
+
   return <div className="p-2">
     { alert }
     {

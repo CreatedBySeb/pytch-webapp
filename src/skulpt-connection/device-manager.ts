@@ -22,6 +22,14 @@ export class MicroBitError extends Error {
   }
 }
 
+export enum MicroBitStatus {
+  Initialising,
+  Ready,
+  Failed,
+  AlreadyInUse,
+  BadState,
+}
+
 function oneOf<T>(value: T | undefined, options: T[]): boolean {
   return options.some((option) => option == value);
 }
@@ -48,6 +56,8 @@ export class MicroBitDevice extends EventTarget {
     return this.device.serialNumber!;
   }
 
+  public status: MicroBitStatus = MicroBitStatus.Initialising;
+
   protected boardInfo: BoardInfo | undefined;
   protected buffer = "";
   protected readonly daplink: DAPLink;
@@ -55,7 +65,7 @@ export class MicroBitDevice extends EventTarget {
   protected inflight: ((response: string[] | MicroBitError) => void)[] = [];
   protected initialising: (() => void) | undefined;
   protected undrainedEvents: string[] = [];
-  
+
   constructor(device: USBDevice) {
     super();
     this.device = device;
@@ -92,7 +102,7 @@ export class MicroBitDevice extends EventTarget {
     this.undrainedEvents = [];
     await this.send("show_image", ["00000:00000:00000:00000:00000"]);
   }
-  
+
   public async send(command: string, args: string[] = []): Promise<string[] | MicroBitError> {
     await this.daplink.serialWrite([command, ...args].join("|") + "\n");
 
@@ -100,13 +110,27 @@ export class MicroBitDevice extends EventTarget {
       this.inflight.push(resolve);
     });
   }
-  
+
   public async setup(): Promise<void> {
-    await this.daplink.connect();
+    try {
+      await this.daplink.connect();
+    } catch (error) {
+      if (error instanceof DOMException && error.message.includes("Unable to claim interface")) {
+        this.status = MicroBitStatus.AlreadyInUse;
+      } else if (error instanceof Error && error.message.includes("Bad response for")) {
+        this.status = MicroBitStatus.BadState;
+      } else {
+        console.error(`MicroBit[${this.serialNumber}]: Failed to connect to device.`)
+        console.error(error);
+        this.status = MicroBitStatus.Failed;
+      }
+
+      return;
+    }
 
     const currentBaudRate = await this.daplink.getSerialBaudrate();
     if (currentBaudRate != MicroBitDevice.BAUD_RATE) await this.daplink.setSerialBaudrate(MicroBitDevice.BAUD_RATE);
-    
+
     this.daplink.on(DAPLink.EVENT_SERIAL_DATA, (data) => this.handleData(data));
     this.daplink.startSerialRead(1);
 
@@ -138,9 +162,11 @@ export class MicroBitDevice extends EventTarget {
       window.clearInterval(helloInterval);
       this.initialising = undefined;
       this.dispatchEvent(new MicroBitEvent("ready"));
+      this.status = MicroBitStatus.Ready;
     }).catch((error) => {
       console.error(`MicroBit[${this.serialNumber}]: An error occurred during the setup process`);
       console.error(error);
+      this.status = MicroBitStatus.Failed;
     });
   }
 
@@ -155,10 +181,10 @@ export class MicroBitDevice extends EventTarget {
     while (breakIndex != -1) {
       const message = this.buffer.slice(0, breakIndex);
       this.buffer = this.buffer.slice(breakIndex + 1);
-      
+
       const [event, ...args] = message.split("|");
       console.log(`MicroBit[${this.serialNumber}]: Received event '${event}' (${args})`);
-  
+
       switch (event) {
         case "err":
         case "ok": {
@@ -189,7 +215,7 @@ export class MicroBitDevice extends EventTarget {
 
         case "hello": {
           if (args[0] != "microbit") throw new TypeError("Device identified as something other than a micro:bit");
-          
+
           const [hardwareVersion, firmwareVersion] = [args[1], args[2]].map((versionString) => {
             return versionString.split(" ")[1].split(".").map((part) => Number(part));
           }) as [[number, number, number], [number, number]];
@@ -254,14 +280,14 @@ export class DeviceManager extends EventTarget {
 
   public async disconnectDevice(device: MicroBitDevice | USBDevice): Promise<void> {
     let microbit: MicroBitDevice | undefined;
-    
+
     if (device instanceof MicroBitDevice) microbit = device;
     else microbit = this.devices.find((d) => d.serialNumber == device.serialNumber);
 
     if (!microbit) return;
 
     this.devices = this.devices.filter((d) => d != microbit);
-    store.getActions().devices.setDevices(this.devices);
+    store.getActions().devices.setDevices([...this.devices]);
 
     if (this.activeDevice == microbit) {
       this._activeDevice = (this.devices.length) ? this.devices[0] : null;
@@ -290,9 +316,9 @@ export class DeviceManager extends EventTarget {
     const microbit = new MicroBitDevice(device);
     microbit.addEventListener("ready", () => (!this._activeDevice) && this.makeActive(microbit));
     microbit.addEventListener("deviceUpdated", () => this.dispatchEvent(new DeviceManagerEvent("devicesChanged")));
-    await microbit.setup();
     this.devices.push(microbit);
     store.getActions().devices.setDevices(this.devices);
+    await microbit.setup();
     console.log(`DeviceManager: Registered new micro:bit (${microbit.serialNumber})`);
 
     return microbit;
