@@ -1,9 +1,6 @@
 import { DAPLink, WebUSB } from "dapjs";
 import store from "../store";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare let Sk: any;
-
 class DeviceManagerEvent extends Event {
   declare target: DeviceManager;
 }
@@ -53,6 +50,7 @@ export class MicroBitDevice extends EventTarget {
   }
 
   public get serialNumber() {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- micro:bits should always have a serial number
     return this.device.serialNumber!;
   }
 
