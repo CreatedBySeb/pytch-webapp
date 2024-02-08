@@ -194,7 +194,7 @@ export class MicroBitDevice extends EventTarget {
         }
 
         case "button": {
-          if (oneOf(args[0], ["a", "b"])) this.undrainedEvents.push("button:" + args[0]);
+          if (oneOf(args[0], ["a", "b", "logo"])) this.undrainedEvents.push("button:" + args[0]);
           else console.warn(`MicroBit[${this.serialNumber}]: Received malformed button event ('${args[0]}')`);
           break;
         }
