@@ -212,6 +212,12 @@ export class MicroBitDevice extends EventTarget {
           break;
         }
 
+        case "mic": {
+          if (oneOf(args[0], ["quiet", "loud"])) this.undrainedEvents.push(`mic:${args[0]}`);
+          else console.warn(`MicroBit[${this.serialNumber}]: Received malformed mic event (level: ${args[0]})`);
+          break;
+        }
+
         case "hello": {
           if (args[0] != "microbit") throw new TypeError("Device identified as something other than a micro:bit");
 
