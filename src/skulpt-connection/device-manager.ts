@@ -113,14 +113,15 @@ export class MicroBitDevice extends EventTarget {
     try {
       await this.daplink.connect();
     } catch (error) {
+      console.error(`MicroBit[${this.serialNumber}]: Failed to connect to device.`)
+      console.error(error);
+
       if (error instanceof DOMException && error.message.includes("Unable to claim interface")) {
-        this.status = MicroBitStatus.AlreadyInUse;
+        this.setStatus(MicroBitStatus.AlreadyInUse);
       } else if (error instanceof Error && error.message.includes("Bad response for")) {
-        this.status = MicroBitStatus.BadState;
+        this.setStatus(MicroBitStatus.BadState);
       } else {
-        console.error(`MicroBit[${this.serialNumber}]: Failed to connect to device.`)
-        console.error(error);
-        this.status = MicroBitStatus.Failed;
+        this.setStatus(MicroBitStatus.Failed);
       }
 
       return;
@@ -160,11 +161,11 @@ export class MicroBitDevice extends EventTarget {
       window.clearInterval(helloInterval);
       this.initialising = undefined;
       this.dispatchEvent(new MicroBitEvent("ready"));
-      this.status = MicroBitStatus.Ready;
+      this.setStatus(MicroBitStatus.Ready);
     }).catch((error) => {
       console.error(`MicroBit[${this.serialNumber}]: An error occurred during the setup process`);
       console.error(error);
-      this.status = MicroBitStatus.Failed;
+      this.setStatus(MicroBitStatus.Failed);
     });
   }
 
@@ -220,7 +221,7 @@ export class MicroBitDevice extends EventTarget {
 
           this.boardInfo = { hardwareVersion, firmwareVersion };
           if (this.initialising) this.initialising();
-          this.dispatchEvent(new MicroBitEvent("deviceUpdated"));
+          this.dispatchEvent(new MicroBitEvent("statusChanged"));
           break;
         }
 
@@ -231,6 +232,11 @@ export class MicroBitDevice extends EventTarget {
 
       breakIndex = this.buffer.indexOf("\n");
     }
+  }
+
+  protected setStatus(status: MicroBitStatus) {
+    this.status = status;
+    this.dispatchEvent(new MicroBitEvent("statusChanged"));
   }
 }
 
@@ -313,9 +319,9 @@ export class DeviceManager extends EventTarget {
 
     const microbit = new MicroBitDevice(device);
     microbit.addEventListener("ready", () => (!this._activeDevice) && this.makeActive(microbit));
-    microbit.addEventListener("deviceUpdated", () => this.dispatchEvent(new DeviceManagerEvent("devicesChanged")));
+    microbit.addEventListener("statusChanged", () => store.getActions().devices.setDevices([...this.devices]));
     this.devices.push(microbit);
-    store.getActions().devices.setDevices(this.devices);
+    store.getActions().devices.setDevices([...this.devices]);
     await microbit.setup();
     console.log(`DeviceManager: Registered new micro:bit (${microbit.serialNumber})`);
 
