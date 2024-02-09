@@ -62,6 +62,7 @@ export class MicroBitDevice extends EventTarget {
   protected readonly device: USBDevice;
   protected inflight: ((response: string[] | MicroBitError) => void)[] = [];
   protected initialising: (() => void) | undefined;
+  protected pendingMessages: string[] = [];
   protected undrainedEvents: string[] = [];
 
   constructor(device: USBDevice) {
@@ -91,6 +92,10 @@ export class MicroBitDevice extends EventTarget {
     await this.device.forget();
   }
 
+  public getNextMessage(): string | undefined {
+    return this.pendingMessages.shift();
+  }
+
   public async identify(): Promise<void> {
     await this.send("identify");
   }
@@ -98,6 +103,7 @@ export class MicroBitDevice extends EventTarget {
   public async reset(): Promise<void> {
     await this.stop();
     this.undrainedEvents = [];
+    this.pendingMessages = [];
     await this.send("show_image", ["00000:00000:00000:00000:00000"]);
   }
 
@@ -209,6 +215,12 @@ export class MicroBitDevice extends EventTarget {
           const pinLevel = (args[1] == "1") ? "high" : "low" as const;
           if (oneOf(args[0], ["0", "1", "2"])) this.undrainedEvents.push(`pin_${pinLevel}:${args[0]}`);
           else console.warn(`MicroBit[${this.serialNumber}]: Received malformed pin event (pin: ${args[0]}, level: ${args[1]})`);
+          break;
+        }
+
+        case "message": {
+          this.pendingMessages.push(args[0]);
+          this.undrainedEvents.push("message");
           break;
         }
 
