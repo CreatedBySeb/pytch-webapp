@@ -33,6 +33,9 @@ export const CreateProjectModal = () => {
   } = useStoreState(
     (state) => state.userConfirmations.createProjectInteraction
   );
+  const activeUiVersion = useStoreState(
+    (state) => state.versionOptIn.activeUiVersion
+  );
 
   const {
     dismiss,
@@ -44,15 +47,21 @@ export const CreateProjectModal = () => {
   } = useStoreActions(
     (actions) => actions.userConfirmations.createProjectInteraction
   );
+  const setActiveUiVersion = useStoreActions(
+    (actions) => actions.versionOptIn.setActiveUiVersion
+  );
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
   useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
 
-  const handleCreate = () =>
+  const handleCreate = () => {
+    const effectiveEditorKind = activeUiVersion === "v1" ? "flat" : editorKind;
+
     attempt({
       name,
-      template: templateKindFromComponents(whetherExample, editorKind),
+      template: templateKindFromComponents(whetherExample, effectiveEditorKind),
     });
+  };
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setName(evt.target.value);
@@ -65,6 +74,46 @@ export const CreateProjectModal = () => {
 
   const editorKindThumbnail =
     editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
+
+  const mEditingModeContent = activeUiVersion === "v2" && (
+    <>
+      <hr />
+      <Form.Group className="editor-kind">
+        <div className="option-buttons">
+          <EditorKindOption
+            thisOption="per-method"
+            activeOption={editorKind}
+            label="Edit as sprites and scripts"
+            setActive={setEditorKind}
+          />
+          <EditorKindOption
+            thisOption="flat"
+            activeOption={editorKind}
+            label="Edit as one big program"
+            setActive={setEditorKind}
+          />
+        </div>
+        <div className="editor-thumbnail">
+          <img src={editorKindThumbnail} />
+        </div>
+      </Form.Group>
+    </>
+  );
+
+  const wrapUiStyleText = (text: string, onClick: () => void) => (
+    <p className="change-ui-style">
+      <span onClick={onClick}>{text}</span>
+    </p>
+  );
+
+  const changeUiStyleLink =
+    activeUiVersion === "v1"
+      ? wrapUiStyleText("Try our new script-by-script editor!", () =>
+          setActiveUiVersion("v2")
+        )
+      : wrapUiStyleText("Go back to classic Pytch", () =>
+          setActiveUiVersion("v1")
+        );
 
   return (
     <Modal
@@ -95,39 +144,20 @@ export const CreateProjectModal = () => {
           <Form.Group className="whether-include-example">
             <div className="option-buttons">
               <WhetherExampleOption
-                thisOption="with-example"
-                activeOption={whetherExample}
-                label="With example code"
-                setActive={setWhetherExample}
-              />
-              <WhetherExampleOption
                 thisOption="without-example"
                 activeOption={whetherExample}
                 label="Without example code"
                 setActive={setWhetherExample}
               />
-            </div>
-          </Form.Group>
-          <hr />
-          <Form.Group className="editor-kind">
-            <div className="option-buttons">
-              <EditorKindOption
-                thisOption="per-method"
-                activeOption={editorKind}
-                label="Edit as sprites and scripts"
-                setActive={setEditorKind}
-              />
-              <EditorKindOption
-                thisOption="flat"
-                activeOption={editorKind}
-                label="Edit as one big program"
-                setActive={setEditorKind}
+              <WhetherExampleOption
+                thisOption="with-example"
+                activeOption={whetherExample}
+                label="With example code"
+                setActive={setWhetherExample}
               />
             </div>
-            <div className="editor-thumbnail">
-              <img src={editorKindThumbnail} />
-            </div>
           </Form.Group>
+          {mEditingModeContent}
         </Form>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Project created!"
@@ -136,6 +166,7 @@ export const CreateProjectModal = () => {
         />
       </Modal.Body>
       <Modal.Footer>
+        {changeUiStyleLink}
         <Button
           variant="secondary"
           onClick={handleClose}
