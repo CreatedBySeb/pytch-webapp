@@ -7,6 +7,8 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
+import { pathWithinApp } from "../env-utils";
+import { useNavigate } from "react-router-dom";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -108,6 +110,12 @@ const LaunchCoordsChooserDropdownItem: React.FC<EmptyProps> = () => {
   );
 };
 
+const GoToMyProjectsDropdownItem: React.FC<EmptyProps> = () => {
+  const navigate = useNavigate();
+  const goToMyProjects = () => navigate(pathWithinApp("/my-projects/"));
+  return <Dropdown.Item onClick={goToMyProjects}>My projects</Dropdown.Item>;
+};
+
 export const StageControls: React.FC<EmptyProps> = () => {
   const isFullScreen = useStoreState(
     (state) => state.ideLayout.fullScreenState.isFullScreen
@@ -158,10 +166,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
     });
 
   const mFullScreenButton = programKind === "per-method" && (
-    <Button
-      className="full-screen"
-      onClick={() => setIsFullScreen(true)}
-    >
+    <Button className="full-screen" onClick={() => setIsFullScreen(true)}>
       <FontAwesomeIcon className="fa-lg" icon="expand" />
     </Button>
   );
@@ -197,6 +202,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
         </Button>
       </Link>
       <DropdownButton align="end" title="⋮">
+        <GoToMyProjectsDropdownItem />
         <Dropdown.Item onClick={onScreenshot}>Screenshot</Dropdown.Item>
         <Dropdown.Item onClick={onCreateCopy}>Make a copy...</Dropdown.Item>
         <Dropdown.Item onClick={onDownload}>Download as zipfile</Dropdown.Item>
