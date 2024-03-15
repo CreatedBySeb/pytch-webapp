@@ -249,12 +249,16 @@ type NoteChangeAugArgs = {
   handleChangeId(id: number): void;
 };
 
+type LoadPhase = "booting" | "booted";
+
 export interface IActiveProject {
   changesManager: NotableChangesManager;
   _noteChange: Action<IActiveProject, NoteChangeAugArgs>;
   _deleteChange: Action<IActiveProject, number>;
   pulseNotableChange: Thunk<IActiveProject, NotableChange>;
 
+  loadPhase: LoadPhase;
+  setLoadPhase: Action<IActiveProject, LoadPhase>;
   latestLoadRequest: ILoadSaveRequest;
   latestSaveRequest: ILoadSaveRequest;
 
@@ -464,6 +468,9 @@ export const activeProject: IActiveProject = {
     await delaySeconds(0.6);
     actions._deleteChange(idCell.get());
   }),
+
+  loadPhase: "booting",
+  setLoadPhase: propSetterAction("loadPhase"),
 
   // Auto-increment ID is always positive, so "-1" will never compare
   // equal to a real project-id.
@@ -832,6 +839,9 @@ export const activeProject: IActiveProject = {
       // far as reporting to the user is concerned?
       console.log(`error loading project ${projectId}:`, err);
       actions.noteLoadRequestOutcome("failed");
+    } finally {
+      // One way or another, we're no longer booting.
+      actions.setLoadPhase("booted");
     }
 
     console.log("ensureSyncFromStorage(): leaving");

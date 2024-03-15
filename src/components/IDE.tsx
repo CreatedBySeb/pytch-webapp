@@ -62,9 +62,6 @@ function strictParseProjectId(s: string): ProjectId | null {
 
 const IDE: React.FC<EmptyProps> = () => {
   const projectIdString = useParams().projectIdString;
-  if (projectIdString == null) throw Error("missing projectId for IDE");
-
-  const projectId = strictParseProjectId(projectIdString);
 
   // syncState is a computed property, so the default equality predicate
   // always thinks the value is different, since we get a fresh object
@@ -75,9 +72,17 @@ const IDE: React.FC<EmptyProps> = () => {
     equalILoadSaveStatus
   );
 
+  const loadPhase = useStoreState((state) => state.activeProject.loadPhase);
+
   const { ensureSyncFromStorage } = useStoreActions(
     (actions) => actions.activeProject
   );
+
+  if (projectIdString == null) {
+    throw Error("missing projectId for IDE");
+  }
+
+  const projectId = strictParseProjectId(projectIdString);
 
   useEffect(() => {
     if (projectId == null) {
@@ -100,16 +105,19 @@ const IDE: React.FC<EmptyProps> = () => {
     return <ProjectLoadFailureScreen />;
   }
 
+  if (loadPhase === "booting" || syncState.loadState === "pending") {
+    return (
+      <DivSettingWindowTitle
+        className="load-project-not-success pending"
+        windowTitle="Pytch: ...loading project..."
+      >
+        <p>Loading project....</p>
+      </DivSettingWindowTitle>
+    );
+  }
+
   switch (syncState.loadState) {
-    case "pending":
-      return (
-        <DivSettingWindowTitle
-          className="load-project-not-success pending"
-          windowTitle="Pytch: ...loading project..."
-        >
-          <p>Loading project....</p>
-        </DivSettingWindowTitle>
-      );
+    // Case "pending" already handled by previous "if".
     case "failed":
       return <ProjectLoadFailureScreen />;
     case "succeeded": {
@@ -121,6 +129,8 @@ const IDE: React.FC<EmptyProps> = () => {
         </ErrorBoundary>
       );
     }
+    default:
+      return assertNever(syncState.loadState);
   }
 };
 
