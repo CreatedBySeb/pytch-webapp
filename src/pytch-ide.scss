@@ -72,7 +72,7 @@ $stage-controls-height: 37.6px;
   }
 
   &.failed p {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle);
   }
 
   &.pending p {

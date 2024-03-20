@@ -19,7 +19,7 @@ $project-display-side-margin: 3rem;
     justify-content: center;
 
     p {
-      background-color: #cfc;
+      background-color: $secondary-bg-color;
       padding: 2rem;
       border-radius: 8px;
       font-size: 1.25rem;
@@ -119,7 +119,7 @@ $project-display-side-margin: 3rem;
     align-items: center;
 
     &.some-selected {
-      background-color: #eee;
+      background-color: $secondary-bg-color;
 
       .intro {
         margin: 0px 1.5rem;

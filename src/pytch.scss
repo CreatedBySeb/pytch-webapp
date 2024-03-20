@@ -209,7 +209,7 @@ code {
 .unknown-route {
   max-width: 36rem;
   font-size: 1.25rem;
-  background-color: #faa;
+  background-color: var(--bs-danger-bg-subtle);
   color: black;
   padding: 2rem;
   border-radius: 8px;
@@ -253,9 +253,10 @@ $tutorial-mini-card-screenshot-width: 240px;
 $tutorial-mini-card-border-gap: 2px;
 $tutorial-mini-card-border-width: 3px;
 
-.TutorialMiniCard {
+.alert.TutorialMiniCard {
   margin: 1rem 0.5rem;
   position: relative;
+  background-color: $secondary-bg-color;
 
   p {
     max-width: calc(
@@ -354,7 +355,7 @@ $tutorial-display-side-margin: 3rem;
     }
   }
   .loading-error {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle);
     p {
       font-size: 1.25rem;
       color: black;
@@ -428,10 +429,10 @@ $tutorial-display-side-margin: 3rem;
 }
 
 .dropdown-item.danger {
-  background-color: #faa;
+  background-color: var(--bs-danger-bg-subtle);
 
   &:hover {
-    background-color: #d88;
+    background-color: var(--bs-danger-border-subtle);
   }
 }
 
@@ -495,7 +496,7 @@ button.awaiting-action {
       margin: 0px;
     }
     code {
-      color: #741f46;
+      color: $pytch-colour-main-blue;
     }
     font-size: 1rem;
   }
@@ -517,7 +518,7 @@ button.awaiting-action {
   @include full-center-middle();
 
   .content {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle);
 
     max-width: 36rem;
     font-size: 1.25rem;
