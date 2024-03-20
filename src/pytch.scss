@@ -348,7 +348,7 @@ $tutorial-display-side-margin: 3rem;
     }
   }
   .loading-placeholder {
-    background-color: #aaa;
+    background-color: $busy-overlay-bg-color;
     p {
       font-size: 1.5rem;
       color: white;
