@@ -174,10 +174,8 @@ $stage-controls-height: 37.6px;
         flex-direction: column;
         justify-content: center;
         .check-icon {
-          color: #007bff;
-          &:hover {
-            color: #0069d9;
-          }
+          cursor: pointer;
+          @include foreground-color-as-button($pytch-colour-main-blue);
         }
       }
     }
