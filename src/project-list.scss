@@ -97,7 +97,7 @@ $project-display-side-margin: 3rem;
         }
       }
       .ProjectCard:hover {
-        border: 1px solid black;
+        border: 1px solid $pytch-colour-main-blue;
       }
       div:after {
         content: "";
@@ -111,6 +111,7 @@ $project-display-side-margin: 3rem;
     width: 32rem;
     padding: 0.75rem 0px;
     margin: 1.5rem auto;
+    border: 1px solid transparent;
     border-radius: 8px;
 
     display: flex;
@@ -119,6 +120,7 @@ $project-display-side-margin: 3rem;
     align-items: center;
 
     &.some-selected {
+      border-color: $border-subdued-color;
       background-color: $secondary-bg-color;
 
       .intro {
@@ -166,6 +168,7 @@ $project-display-side-margin: 3rem;
 
 .alert.ProjectCard {
   background-color: $secondary-bg-color;
+  border-color: $border-subdued-color;
   cursor: pointer;
 }
 
