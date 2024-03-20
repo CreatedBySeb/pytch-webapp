@@ -5,7 +5,7 @@
 $project-display-side-margin: 3rem;
 
 .ProjectList {
-  overflow-y: auto;
+  overflow-y: scroll;
   flex-shrink: 1;
   flex-grow: 1;
   h1 {
