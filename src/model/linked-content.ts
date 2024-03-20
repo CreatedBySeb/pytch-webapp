@@ -12,6 +12,7 @@ import { useStoreState } from "../store";
 import {
   LinkedContentRef,
   LinkedNoContentRef,
+  LinkedSpecimenRef,
   SpecimenContentHash,
 } from "./linked-content-core";
 
@@ -80,6 +81,15 @@ export async function lessonDescriptorFromRelativePath(
   );
 
   return { specimenContentHash, project };
+}
+
+export async function dereferenceLinkedSpecimen(
+  ref: LinkedSpecimenRef
+): Promise<LinkedSpecimen> {
+  const contentHash = ref.specimenContentHash;
+  const relativePath = `_by_content_hash_/${contentHash}`;
+  const lesson = await lessonDescriptorFromRelativePath(relativePath);
+  return { kind: "specimen", lesson };
 }
 
 type LinkedContentLoadingStateSummary =
