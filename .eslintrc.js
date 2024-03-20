@@ -31,6 +31,8 @@ module.exports = {
     "prefer-const": 0,
     // It is no longer necessary to do _import React from "react"_.
     "react/react-in-jsx-scope": 0,
+    // Allow suitably-named args to be unused.
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
   settings: {
     react: {
