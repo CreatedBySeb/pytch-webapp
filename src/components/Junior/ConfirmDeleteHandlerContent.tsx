@@ -3,7 +3,6 @@ import { DeleteJuniorHandlerDescriptor } from "../../model/ui";
 import Modal from "react-bootstrap/Modal";
 
 export const confirmDeleteHandlerContent = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _descriptor: DeleteJuniorHandlerDescriptor
 ) => {
   return {
