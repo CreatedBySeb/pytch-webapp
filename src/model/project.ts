@@ -12,6 +12,8 @@ import {
   lessonDescriptorFromRelativePath,
   LinkedContentKind,
   LinkedContentOfKind,
+  dereferenceLinkedSpecimen,
+  dereferenceLinkedNoContent,
 } from "./linked-content";
 import {
   Action,
@@ -866,55 +868,29 @@ export const activeProject: IActiveProject = {
     });
 
     try {
-      switch (linkedContentRef.kind) {
-        case "none": {
-          actions.setLinkedContentLoadingState({
-            kind: "succeeded",
-            projectId,
-            content: { kind: "none" },
-          });
-          break;
+      const content = await (() => {
+        switch (linkedContentRef.kind) {
+          case "none":
+            return dereferenceLinkedNoContent(linkedContentRef);
+          case "jr-tutorial":
+            return dereferenceLinkedJrTutorial(linkedContentRef);
+          case "specimen":
+            return dereferenceLinkedSpecimen(linkedContentRef);
+          default:
+            return assertNever(linkedContentRef);
         }
-        case "jr-tutorial": {
-          const content = await dereferenceLinkedJrTutorial(linkedContentRef);
+      })();
 
-          const liveState = helpers.getState().linkedContentLoadingState;
-          const requestStillWanted =
-            liveState.kind === "pending" && liveState.projectId === projectId;
-          if (!requestStillWanted) {
-            break;
-          }
+      const liveState = helpers.getState().linkedContentLoadingState;
+      const requestStillWanted =
+        liveState.kind === "pending" && liveState.projectId === projectId;
 
-          actions.setLinkedContentLoadingState({
-            kind: "succeeded",
-            projectId,
-            content,
-          });
-
-          break;
-        }
-        case "specimen": {
-          const contentHash = linkedContentRef.specimenContentHash;
-          const relativePath = `_by_content_hash_/${contentHash}`;
-          const lesson = await lessonDescriptorFromRelativePath(relativePath);
-
-          const liveState = helpers.getState().linkedContentLoadingState;
-          const requestStillWanted =
-            liveState.kind === "pending" &&
-            eqLinkedContentRefs(liveState.contentRef, linkedContentRef);
-          if (!requestStillWanted) {
-            break;
-          }
-
-          actions.setLinkedContentLoadingState({
-            kind: "succeeded",
-            projectId,
-            content: { kind: "specimen", lesson },
-          });
-          break;
-        }
-        default:
-          assertNever(linkedContentRef);
+      if (requestStillWanted) {
+        actions.setLinkedContentLoadingState({
+          kind: "succeeded",
+          projectId,
+          content,
+        });
       }
     } catch (e) {
       console.error("doLinkedContentLoadTask():", e);
