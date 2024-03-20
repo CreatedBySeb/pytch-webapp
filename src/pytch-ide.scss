@@ -76,7 +76,7 @@ $stage-controls-height: 37.6px;
   }
 
   &.pending p {
-    background-color: #cfc;
+    background-color: $busy-panel-bg-color;
   }
 }
 
