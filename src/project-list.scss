@@ -82,14 +82,18 @@ $project-display-side-margin: 3rem;
       }
       .ProjectCard:hover .selection-check {
         visibility: visible;
-        color: #aaa;
+        color: $inactive-icon-option-color;
 
         &.selected,
         &.selected:hover {
           color: map.get($theme-colors, "primary");
         }
         &:hover {
-          color: mix(map.get($theme-colors, "primary"), #aaa, 50%);
+          color: mix(
+            map.get($theme-colors, "primary"),
+            $inactive-icon-option-color,
+            50%
+          );
         }
       }
       .ProjectCard:hover {
