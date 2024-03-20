@@ -3,7 +3,7 @@ import { IAssetInProject, AssetPresentation } from "./asset";
 import { ProjectId, ITrackedTutorial, StoredProjectData } from "./project-core";
 import {
   LinkedContentRef,
-  LinkedContentRefNone,
+  kLinkedContentRefNone,
   eqLinkedContentRefs,
   LinkedContentRefUpdate,
 } from "./linked-content-core";
@@ -414,7 +414,7 @@ const dummyProject: StoredProjectContent = {
   name: "...Loading project...",
   program: dummyPytchProgram,
   assets: [],
-  linkedContentRef: LinkedContentRefNone,
+  linkedContentRef: kLinkedContentRefNone,
 };
 
 const failIfDummy = (project: StoredProjectContent, label: string) => {

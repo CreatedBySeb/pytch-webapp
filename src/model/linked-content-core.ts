@@ -9,7 +9,7 @@ export type LinkedContentRef =
   | LinkedJrTutorialRef
   | { kind: "specimen"; specimenContentHash: SpecimenContentHash };
 
-export const LinkedContentRefNone: LinkedContentRef = { kind: "none" };
+export const kLinkedContentRefNone: LinkedContentRef = { kind: "none" };
 
 export type LinkedContentRefUpdate = {
   projectId: ProjectId;
