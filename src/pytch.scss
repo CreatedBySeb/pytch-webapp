@@ -68,7 +68,7 @@ code {
       margin-bottom: 0px;
       margin-left: 6px;
       a {
-        color: #aaa;
+        color: $text-very-subdued-color;
       }
     }
   }
@@ -268,7 +268,7 @@ $tutorial-mini-card-border-width: 3px;
     margin: 0.25rem 0rem 0.75rem;
     text-align: center;
     font-size: 1.5rem;
-    color: #111;
+    color: $text-main-color;
   }
 
   .screenshot {
