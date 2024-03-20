@@ -4,12 +4,10 @@ import { ProjectId, ITrackedTutorial, StoredProjectData } from "./project-core";
 import {
   LinkedContentRef,
   kLinkedContentRefNone,
-  eqLinkedContentRefs,
   LinkedContentRefUpdate,
 } from "./linked-content-core";
 import {
   LinkedContent,
-  lessonDescriptorFromRelativePath,
   LinkedContentKind,
   LinkedContentOfKind,
   dereferenceLinkedSpecimen,
