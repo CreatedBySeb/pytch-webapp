@@ -474,7 +474,7 @@ button.awaiting-action {
       margin-top: 1rem;
       text-align: center;
       img {
-        box-shadow: 0px 0px 6px 4px #bbb;
+        box-shadow: 0px 0px 6px 4px $box-shadow-color;
       }
     }
   }
@@ -536,5 +536,5 @@ button.awaiting-action {
 
 .EditorKindThumbnail {
   margin-right: 1.25rem;
-  box-shadow: 0px 0px 6px 4px #bbb;
+  box-shadow: 0px 0px 6px 4px $box-shadow-color;
 }
