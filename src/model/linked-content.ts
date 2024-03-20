@@ -16,10 +16,11 @@ export type LessonDescriptor = {
   project: StandaloneProjectDescriptor;
 };
 
-export type LinkedContent =
-  | { kind: "none" }
-  | LinkedJrTutorial
-  | { kind: "specimen"; lesson: LessonDescriptor };
+type LinkedNoContent = { kind: "none" };
+
+type LinkedSpecimen = { kind: "specimen"; lesson: LessonDescriptor };
+
+export type LinkedContent = LinkedNoContent | LinkedJrTutorial | LinkedSpecimen;
 
 export type LinkedContentKind = LinkedContent["kind"];
 
