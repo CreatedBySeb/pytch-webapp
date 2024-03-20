@@ -4,10 +4,17 @@ import { ProjectId } from "./project-core";
 
 export type SpecimenContentHash = string;
 
+export type LinkedNoContentRef = { kind: "none" };
+
+export type LinkedSpecimenRef = {
+  kind: "specimen";
+  specimenContentHash: SpecimenContentHash;
+};
+
 export type LinkedContentRef =
-  | { kind: "none" }
+  | LinkedNoContentRef
   | LinkedJrTutorialRef
-  | { kind: "specimen"; specimenContentHash: SpecimenContentHash };
+  | LinkedSpecimenRef;
 
 export const kLinkedContentRefNone: LinkedContentRef = { kind: "none" };
 
