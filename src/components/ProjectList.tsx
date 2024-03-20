@@ -120,7 +120,7 @@ const ProjectsLoadingFailed: React.FC = () => {
   return <div>Project loading FAILED oh no.</div>;
 };
 
-const ImportFromGoogleButton: React.FC<EmptyProps> = () => {
+const ImportFromGoogleButton: React.FC<{ key: React.Key }> = () => {
   const googleApiLoadStatus = useStoreState(
     (state) => state.googleDriveImportExport.apiBootStatus.kind
   );
@@ -169,12 +169,12 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
     return (
       <div className="buttons some-selected">
         <div className="intro">
-          <Button onClick={() => clearAllSelected()}>
+          <Button key="clear-selection" onClick={() => clearAllSelected()}>
             <FontAwesomeIcon icon="arrow-left" />
           </Button>
           <span>{nSelected}</span>
         </div>
-        <Button variant="danger" onClick={onDelete}>
+        <Button key="delete-selected" variant="danger" onClick={onDelete}>
           DELETE
         </Button>
       </div>
@@ -184,9 +184,13 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
     const showUploadModal = () => launchUpload();
     return (
       <div className="buttons">
-        <Button onClick={showCreateModal}>Create new</Button>
-        <Button onClick={showUploadModal}>Upload</Button>
-        <ImportFromGoogleButton />
+        <Button key="create-new" onClick={showCreateModal}>
+          Create new
+        </Button>
+        <Button key="upload" onClick={showUploadModal}>
+          Upload
+        </Button>
+        <ImportFromGoogleButton key="import-from-google" />
       </div>
     );
   }
