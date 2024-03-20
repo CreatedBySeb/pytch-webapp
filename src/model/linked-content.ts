@@ -9,7 +9,11 @@ import { LinkedJrTutorial } from "./junior/jr-tutorial";
 import { State } from "easy-peasy";
 import { IPytchAppModel } from ".";
 import { useStoreState } from "../store";
-import { LinkedContentRef, SpecimenContentHash } from "./linked-content-core";
+import {
+  LinkedContentRef,
+  LinkedNoContentRef,
+  SpecimenContentHash,
+} from "./linked-content-core";
 
 export type LessonDescriptor = {
   specimenContentHash: SpecimenContentHash;
@@ -17,6 +21,8 @@ export type LessonDescriptor = {
 };
 
 type LinkedNoContent = { kind: "none" };
+
+const kLinkedNoContent: LinkedNoContent = { kind: "none" };
 
 type LinkedSpecimen = { kind: "specimen"; lesson: LessonDescriptor };
 
@@ -46,6 +52,12 @@ export function linkedContentIsReferent(
     default:
       return assertNever(ref);
   }
+}
+
+export async function dereferenceLinkedNoContent(
+  _ref: LinkedNoContentRef
+): Promise<LinkedNoContent> {
+  return kLinkedNoContent;
 }
 
 const specimenUrl = (relativeUrl: string) => {
