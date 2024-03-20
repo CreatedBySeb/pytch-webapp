@@ -22,7 +22,7 @@ import { AddAssetDescriptorOps } from "../storage/zipfile";
 import {
   SpecimenContentHash,
   LinkedContentRef,
-  LinkedContentRefNone,
+  kLinkedContentRefNone,
   eqLinkedContentRefs,
   LinkedContentRefUpdate,
 } from "../model/linked-content-core";
@@ -74,7 +74,7 @@ const _defaultCreateProjectOptions: Required<CreateProjectOptions> = {
   program: _defaultNewProjectProgram,
   summary: null,
   trackedTutorialRef: null,
-  linkedContentRef: LinkedContentRefNone,
+  linkedContentRef: kLinkedContentRefNone,
   assets: [],
 };
 
@@ -180,7 +180,7 @@ async function dbUpgrade_V4_from_V3(txn: Transaction) {
 async function dbUpgrade_V5_from_V4(txn: Transaction) {
   console.log("upgrading to DBv5");
 
-  const linkedContentRef = LinkedContentRefNone;
+  const linkedContentRef = kLinkedContentRefNone;
   await txn
     .table("projectSummaries")
     .toCollection()

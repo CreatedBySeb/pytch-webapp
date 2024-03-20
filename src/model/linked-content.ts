@@ -9,17 +9,25 @@ import { LinkedJrTutorial } from "./junior/jr-tutorial";
 import { State } from "easy-peasy";
 import { IPytchAppModel } from ".";
 import { useStoreState } from "../store";
-import { LinkedContentRef, SpecimenContentHash } from "./linked-content-core";
+import {
+  LinkedContentRef,
+  LinkedNoContentRef,
+  LinkedSpecimenRef,
+  SpecimenContentHash,
+} from "./linked-content-core";
 
 export type LessonDescriptor = {
   specimenContentHash: SpecimenContentHash;
   project: StandaloneProjectDescriptor;
 };
 
-export type LinkedContent =
-  | { kind: "none" }
-  | LinkedJrTutorial
-  | { kind: "specimen"; lesson: LessonDescriptor };
+type LinkedNoContent = { kind: "none" };
+
+const kLinkedNoContent: LinkedNoContent = { kind: "none" };
+
+type LinkedSpecimen = { kind: "specimen"; lesson: LessonDescriptor };
+
+export type LinkedContent = LinkedNoContent | LinkedJrTutorial | LinkedSpecimen;
 
 export type LinkedContentKind = LinkedContent["kind"];
 
@@ -47,6 +55,12 @@ export function linkedContentIsReferent(
   }
 }
 
+export async function dereferenceLinkedNoContent(
+  _ref: LinkedNoContentRef
+): Promise<LinkedNoContent> {
+  return kLinkedNoContent;
+}
+
 const specimenUrl = (relativeUrl: string) => {
   const baseUrl = envVarOrFail("VITE_LESSON_SPECIMENS_BASE");
   return [baseUrl, relativeUrl].join("/");
@@ -67,6 +81,15 @@ export async function lessonDescriptorFromRelativePath(
   );
 
   return { specimenContentHash, project };
+}
+
+export async function dereferenceLinkedSpecimen(
+  ref: LinkedSpecimenRef
+): Promise<LinkedSpecimen> {
+  const contentHash = ref.specimenContentHash;
+  const relativePath = `_by_content_hash_/${contentHash}`;
+  const lesson = await lessonDescriptorFromRelativePath(relativePath);
+  return { kind: "specimen", lesson };
 }
 
 type LinkedContentLoadingStateSummary =
