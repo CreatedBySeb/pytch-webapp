@@ -123,4 +123,35 @@ context("Choice of UI version", () => {
     goToFrontPage();
     assertFrontPageIsV1();
   });
+
+  it("initially offers only classic tutorials for v1", () => {
+    goToTutorials();
+    assertTutorialsListIsV1();
+    chooseTutorialsV2();
+    assertTutorialsListIsV2();
+    chooseTutorialsV1();
+    assertTutorialsListIsV1();
+  });
+
+  it("initially offers all tutorials for v2", () => {
+    chooseFrontPageV2();
+    goToTutorials();
+    assertTutorialsListIsV2();
+    chooseTutorialsV1();
+    assertTutorialsListIsV1();
+    chooseTutorialsV2();
+    assertTutorialsListIsV2();
+  });
+
+  it("toggling version in tutorials is global", () => {
+    goToTutorials();
+    chooseTutorialsV2();
+    goToFrontPage();
+    assertFrontPageIsV2();
+
+    goToTutorials();
+    chooseTutorialsV1();
+    goToFrontPage();
+    assertFrontPageIsV1();
+  });
 });
