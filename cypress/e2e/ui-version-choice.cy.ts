@@ -65,4 +65,22 @@ context("Choice of UI version", () => {
   const chooseCreateNewV1 = () => getCreateNewChooseV1Link().click();
 
   const chooseCreateNewV2 = () => getCreateNewChooseV2Link().click();
+
+  const goToTutorials = () => cy.get(".NavBar").contains("Tutorials").click();
+
+  const assertTutorialVersionFun = (predicate: string) => () =>
+    cy
+      .get(".TutorialCard")
+      .contains("Script-by-script catch the apple")
+      .should(predicate);
+
+  const assertTutorialsListIsV1 = assertTutorialVersionFun("not.exist");
+
+  const assertTutorialsListIsV2 = assertTutorialVersionFun("be.visible");
+
+  const chooseTutorialsV1 = () =>
+    cy.get(".tutorials-change-ui-style").contains("just the classic").click();
+
+  const chooseTutorialsV2 = () =>
+    cy.get(".tutorials-change-ui-style").contains("Show our new").click();
 });
