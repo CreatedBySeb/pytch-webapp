@@ -31,4 +31,38 @@ context("Choice of UI version", () => {
   const chooseFrontPageV1 = () => getFrontPageChooseV1Link().click();
 
   const chooseFrontPageV2 = () => getFrontPageChooseV2Link().click();
+
+  function launchCreateNewProject() {
+    cy.get(".NavBar").contains("My projects").click();
+    cy.get("button").contains("Create new").click();
+    cy.get("button").contains("With example code");
+  }
+
+  const getCreateNewChooseV1Link = () =>
+    cy.get(".change-ui-style").contains("back to classic");
+
+  const getCreateNewChooseV2Link = () =>
+    cy.get(".change-ui-style").contains("new script-by-script");
+
+  function assertCreateNewIsV1() {
+    // Without/With sample code, plus cancel and OK.
+    cy.get(".modal button").should("have.length", 4);
+    cy.get("button").contains("Without example");
+    cy.get("button").contains("With example");
+    getCreateNewChooseV2Link();
+  }
+
+  function assertCreateNewIsV2() {
+    // Without/With sample code; flat/per-method; cancel and OK.
+    cy.get(".modal button").should("have.length", 6);
+    cy.get("button").contains("Without example");
+    cy.get("button").contains("With example");
+    cy.get("button").contains("one big");
+    cy.get("button").contains("sprites and scripts");
+    getCreateNewChooseV1Link();
+  }
+
+  const chooseCreateNewV1 = () => getCreateNewChooseV1Link().click();
+
+  const chooseCreateNewV2 = () => getCreateNewChooseV2Link().click();
 });
