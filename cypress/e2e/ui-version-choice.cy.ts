@@ -83,4 +83,13 @@ context("Choice of UI version", () => {
 
   const chooseTutorialsV2 = () =>
     cy.get(".tutorials-change-ui-style").contains("Show our new").click();
+
+  ////////////////////////////////////////////////////////////////////////
+
+  it("allows version toggling in front page", () => {
+    chooseFrontPageV2();
+    assertFrontPageIsV2();
+    chooseFrontPageV1();
+    assertFrontPageIsV1();
+  });
 });
