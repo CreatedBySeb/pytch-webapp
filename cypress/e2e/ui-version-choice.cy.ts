@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { settleModalDialog } from "./junior/utils";
+
 context("Choice of UI version", () => {
   // Some of this behaviour is already implicitly tested, in that we
   // have to (and do) choose v2 for most existing tests to work.
@@ -90,6 +92,35 @@ context("Choice of UI version", () => {
     chooseFrontPageV2();
     assertFrontPageIsV2();
     chooseFrontPageV1();
+    assertFrontPageIsV1();
+  });
+
+  it("initially offers simple create-project for v1", () => {
+    launchCreateNewProject();
+    assertCreateNewIsV1();
+    chooseCreateNewV2();
+    assertCreateNewIsV2();
+  });
+
+  it("initially offers full create-project for v2", () => {
+    chooseFrontPageV2();
+    launchCreateNewProject();
+    assertCreateNewIsV2();
+    chooseCreateNewV1();
+    assertCreateNewIsV1();
+  });
+
+  it("toggling version in create-project is global", () => {
+    launchCreateNewProject();
+    chooseCreateNewV2();
+    settleModalDialog("Cancel");
+    goToFrontPage();
+    assertFrontPageIsV2();
+
+    launchCreateNewProject();
+    chooseCreateNewV1();
+    settleModalDialog("Cancel");
+    goToFrontPage();
     assertFrontPageIsV1();
   });
 });
