@@ -24,14 +24,14 @@ export class BrowserKeyboard {
   }
 
   onKeyDown(e: KeyboardEvent) {
-    var key = canonicalKeyName(e);
+    const key = canonicalKeyName(e);
     this.keyIsDown.set(key, true);
     this.undrainedKeydownKeys.push(key);
     e.preventDefault();
   }
 
   onKeyUp(e: KeyboardEvent) {
-    var key = canonicalKeyName(e);
+    const key = canonicalKeyName(e);
     this.keyIsDown.set(key, false);
     e.preventDefault();
   }
