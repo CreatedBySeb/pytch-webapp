@@ -5,8 +5,8 @@ type KeyName = string;
 
 function canonicalKeyName(e: KeyboardEvent): string {
   const key = e.key;
-  //The vm expect LowerCase letters for key_pressed()
-  return (key.length === 1 && key.match(/[A-Z]/)) ? key.toLowerCase() : key;
+  // The vm expects lower-case letters for key-names.
+  return key.length === 1 && key.match(/[A-Z]/) ? key.toLowerCase() : key;
 }
 
 export class BrowserKeyboard {
