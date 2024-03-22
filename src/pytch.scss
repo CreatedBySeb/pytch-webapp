@@ -41,12 +41,12 @@ code {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  background-color: #ddf;
+  background-color: $main-bg-color;
   overflow-y: auto;
 }
 
 .NavBar {
-  background-color: #228;
+  background-color: $pytch-colour-main-blue;
   color: white;
   padding: 4px;
   display: flex;
@@ -68,7 +68,7 @@ code {
       margin-bottom: 0px;
       margin-left: 6px;
       a {
-        color: #aaa;
+        color: $text-very-subdued-color;
       }
     }
   }
@@ -81,8 +81,7 @@ code {
   }
   h1:hover,
   li:hover {
-    background-color: #44b;
-    border-radius: 4px;
+    color: $pytch-colour-main-yellow;
   }
   ul {
     margin: 0px;
@@ -210,7 +209,7 @@ code {
 .unknown-route {
   max-width: 36rem;
   font-size: 1.25rem;
-  background-color: #faa;
+  background-color: var(--bs-danger-bg-subtle);
   color: black;
   padding: 2rem;
   border-radius: 8px;
@@ -254,9 +253,10 @@ $tutorial-mini-card-screenshot-width: 240px;
 $tutorial-mini-card-border-gap: 2px;
 $tutorial-mini-card-border-width: 3px;
 
-.TutorialMiniCard {
+.alert.TutorialMiniCard {
   margin: 1rem 0.5rem;
   position: relative;
+  background-color: $secondary-bg-color;
 
   p {
     max-width: calc(
@@ -269,7 +269,7 @@ $tutorial-mini-card-border-width: 3px;
     margin: 0.25rem 0rem 0.75rem;
     text-align: center;
     font-size: 1.5rem;
-    color: #111;
+    color: $text-main-color;
   }
 
   .screenshot {
@@ -315,93 +315,13 @@ $tutorial-display-side-margin: 3rem;
         margin: 0px;
         padding: 1.25rem 0px;
         font-size: 1.125rem;
-
-        .project-description {
-          margin-right: 1rem;
-
-          .project-name {
-            font-weight: bold;
-          }
-
-          /* Temporary while developing: */
-          .project-id {
-            margin-right: 2rem;
-            color: #888;
-          }
-
-          .project-summary {
-            margin-left: 1rem;
-            font-style: italic;
-          }
-        }
       }
 
-      .ProjectCard .selection-check {
-        margin-right: 1rem;
-        visibility: hidden;
-
-        &.selected {
-          color: theme-color("primary");
-          visibility: visible;
-        }
-      }
-      .ProjectCard:hover .selection-check {
-        visibility: visible;
-        color: #aaa;
-
-        &.selected,
-        &.selected:hover {
-          color: theme-color("primary");
-        }
-        &:hover {
-          color: mix(map.get($theme-colors, "primary"), #aaa, 50%);
-        }
-      }
-
-      .ProjectCard:hover {
-        border: 1px solid black;
-      }
       div:after {
         content: "";
         clear: both;
         display: table;
       }
-    }
-  }
-  .buttons {
-    width: 28rem;
-    padding: 0.75rem 0px;
-    margin: 1.5rem auto;
-    border-radius: 8px;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    &.some-selected {
-      background-color: #eee;
-
-      .intro {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        button {
-          margin-right: 0.5rem;
-        }
-        span {
-          font-size: 1.25rem;
-          font-weight: bold;
-          width: 2rem;
-          margin: 0px 4rem 0px 0px;
-        }
-      }
-    }
-
-    text-align: center;
-
-    button {
-      margin: 0px 2rem;
     }
   }
   .image-container {
@@ -428,14 +348,14 @@ $tutorial-display-side-margin: 3rem;
     }
   }
   .loading-placeholder {
-    background-color: #aaa;
+    background-color: $busy-overlay-bg-color;
     p {
       font-size: 1.5rem;
       color: white;
     }
   }
   .loading-error {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle);
     p {
       font-size: 1.25rem;
       color: black;
@@ -447,7 +367,8 @@ $tutorial-display-side-margin: 3rem;
   }
 }
 
-.TutorialCard {
+.alert.TutorialCard {
+  background-color: $secondary-bg-color;
   position: relative;
   .info-badges {
     position: absolute;
@@ -508,10 +429,10 @@ $tutorial-display-side-margin: 3rem;
 }
 
 .dropdown-item.danger {
-  background-color: #faa;
+  background-color: var(--bs-danger-bg-subtle);
 
   &:hover {
-    background-color: #d88;
+    background-color: var(--bs-danger-border-subtle);
   }
 }
 
@@ -553,7 +474,7 @@ button.awaiting-action {
       margin-top: 1rem;
       text-align: center;
       img {
-        box-shadow: 0px 0px 6px 4px #bbb;
+        box-shadow: 0px 0px 6px 4px $box-shadow-color;
       }
     }
   }
@@ -575,7 +496,7 @@ button.awaiting-action {
       margin: 0px;
     }
     code {
-      color: #741f46;
+      color: $pytch-colour-main-blue;
     }
     font-size: 1rem;
   }
@@ -597,7 +518,7 @@ button.awaiting-action {
   @include full-center-middle();
 
   .content {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle);
 
     max-width: 36rem;
     font-size: 1.25rem;
@@ -615,5 +536,5 @@ button.awaiting-action {
 
 .EditorKindThumbnail {
   margin-right: 1.25rem;
-  box-shadow: 0px 0px 6px 4px #bbb;
+  box-shadow: 0px 0px 6px 4px $box-shadow-color;
 }

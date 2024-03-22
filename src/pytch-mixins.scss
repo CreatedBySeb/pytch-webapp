@@ -19,6 +19,14 @@
   transition: background-color 0.15s ease-in-out;
 }
 
+@mixin foreground-color-as-button($base-fg) {
+  color: $base-fg;
+  &:hover {
+    color: shade-color($base-fg, $btn-hover-bg-shade-amount);
+  }
+  transition: color 0.15s ease-in-out;
+}
+
 @mixin full-height-grid-center-center {
   height: 100%;
   display: grid;

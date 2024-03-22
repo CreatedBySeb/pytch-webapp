@@ -15,6 +15,7 @@ $help-sidebar-content-width: 26rem;
 
 ////////////////////////////////////////////////////////////////////////
 
+// TODO: "colour" or "color"?
 $pytch-colour-main-blue: #306998;
 $pytch-colour-main-yellow: #fff792;
 $pytch-colour-accent-flame: #ff5f38;
@@ -28,9 +29,18 @@ $pytch-colour-accent-lavender: #9097ff;
 
 $main-bg-color: #f8f8f8;
 $secondary-bg-color: #f0f0f0;
+$busy-overlay-bg-color: #aaaaaa;
+$busy-panel-bg-color: #e0e0e0;
+$box-shadow-color: #bbbbbb;
 $inactive-text-option-color: #666;
 $inactive-icon-option-color: #999;
 $panel-divider-color: mix($pytch-colour-main-blue, white, 70%);
+
+$border-subdued-color: mix($pytch-colour-main-blue, white, 50%);
+
+$text-main-color: #000;
+$text-subdued-color: #444;
+$text-very-subdued-color: #aaa;
 
 $min-lesson-column-width: 32rem;
 $min-actor-properties-width: 32rem;

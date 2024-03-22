@@ -5,7 +5,7 @@
 $project-display-side-margin: 3rem;
 
 .ProjectList {
-  overflow-y: auto;
+  overflow-y: scroll;
   flex-shrink: 1;
   flex-grow: 1;
   h1 {
@@ -19,7 +19,7 @@ $project-display-side-margin: 3rem;
     justify-content: center;
 
     p {
-      background-color: #cfc;
+      background-color: $secondary-bg-color;
       padding: 2rem;
       border-radius: 8px;
       font-size: 1.25rem;
@@ -56,7 +56,7 @@ $project-display-side-margin: 3rem;
         }
 
         .project-mtime {
-          color: #444;
+          color: $text-subdued-color;
           font-size: 1rem;
         }
 
@@ -82,18 +82,22 @@ $project-display-side-margin: 3rem;
       }
       .ProjectCard:hover .selection-check {
         visibility: visible;
-        color: #aaa;
+        color: $inactive-icon-option-color;
 
         &.selected,
         &.selected:hover {
           color: map.get($theme-colors, "primary");
         }
         &:hover {
-          color: mix(map.get($theme-colors, "primary"), #aaa, 50%);
+          color: mix(
+            map.get($theme-colors, "primary"),
+            $inactive-icon-option-color,
+            50%
+          );
         }
       }
       .ProjectCard:hover {
-        border: 1px solid black;
+        border: 1px solid $pytch-colour-main-blue;
       }
       div:after {
         content: "";
@@ -107,6 +111,7 @@ $project-display-side-margin: 3rem;
     width: 32rem;
     padding: 0.75rem 0px;
     margin: 1.5rem auto;
+    border: 1px solid transparent;
     border-radius: 8px;
 
     display: flex;
@@ -115,7 +120,8 @@ $project-display-side-margin: 3rem;
     align-items: center;
 
     &.some-selected {
-      background-color: #eee;
+      border-color: $border-subdued-color;
+      background-color: $secondary-bg-color;
 
       .intro {
         margin: 0px 1.5rem;
@@ -160,7 +166,9 @@ $project-display-side-margin: 3rem;
   outline: none;
 }
 
-.ProjectCard {
+.alert.ProjectCard {
+  background-color: $secondary-bg-color;
+  border-color: $border-subdued-color;
   cursor: pointer;
 }
 
