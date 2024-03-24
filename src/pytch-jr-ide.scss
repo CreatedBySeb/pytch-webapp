@@ -676,6 +676,12 @@
     }
   }
 
+  // Fixes Safari mis-rendering; see similar in pytch-ide.scss
+  // https://github.com/ajaxorg/ace/issues/3385
+  .ace_editor {
+    font-family: $monospace-fonts;
+  }
+
   &.isDragging {
     .drag-masked-editor .drag-mask {
       z-index: 5;
