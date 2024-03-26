@@ -17,6 +17,7 @@ import { AddSomethingSingleButton } from "./AddSomethingButton";
 import { EmptyProps, PYTCH_CYPRESS } from "../../utils";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { useNotableChanges } from "../hooks/notable-changes";
+import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 
 const AddHandlerButton: React.FC<EmptyProps> = () => {
   const focusedActorId = useJrEditState((s) => s.focusedActor);
@@ -66,6 +67,8 @@ const ScriptsEditor = () => {
   );
   const scriptWasJustAdded = scriptAddedEvents.length > 0;
 
+  const conjoinedResizeObserver = new ConjoinedResizeObserver(handlerIds);
+
   useEffect(() => {
     // Purge map entries for handlers not in this instantiation of editor.
     aceControllerMap.deleteExcept(handlerIds);
@@ -75,6 +78,10 @@ const ScriptsEditor = () => {
     if (scrollDiv != null && scriptWasJustAdded) {
       scrollDiv.scrollTo({ top: scrollDiv.scrollHeight });
     }
+
+    return () => {
+      conjoinedResizeObserver.disconnect();
+    };
   }, [handlerIds]);
 
   const nHandlers = handlerIds.length;
@@ -125,6 +132,7 @@ const ScriptsEditor = () => {
           handlerId={hid}
           prevHandlerId={handlerIds[idx - 1]}
           nextHandlerId={handlerIds[idx + 1]}
+          conjoinedResizeObserver={conjoinedResizeObserver}
         />
       ))}
     </>
