@@ -28,6 +28,7 @@ import {
 import PytchScriptPreview from "../../images/drag-preview-event-handler.png";
 import { DragPreviewImage } from "react-dnd";
 import { useNotableChanges } from "../hooks/notable-changes";
+import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -41,6 +42,7 @@ type PytchScriptEditorProps = {
   handlerId: Uuid;
   prevHandlerId: Uuid | null;
   nextHandlerId: Uuid | null;
+  conjoinedResizeObserver: ConjoinedResizeObserver;
 };
 export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   actorKind,
@@ -48,6 +50,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   handlerId,
   prevHandlerId,
   nextHandlerId,
+  conjoinedResizeObserver,
 }) => {
   const [dragProps, dragRef, preview] = usePytchScriptDrag(handlerId);
   const [dropProps, dropRef] = usePytchScriptDrop(actorId, handlerId);
