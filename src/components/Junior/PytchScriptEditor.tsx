@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AceEditor from "react-ace";
 import { PytchAceAutoCompleter } from "../../skulpt-connection/code-completion";
 
@@ -75,6 +75,33 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const updateCodeText = (code: string) => {
     setHandlerPythonCode({ actorId, handlerId, code });
   };
+
+  useEffect(() => {
+    const aceParentDiv = aceParentRef.current;
+    if (aceParentDiv == null) return;
+
+    if (!conjoinedResizeObserver.enabled) {
+      // If the "all have resized" event has already fired, we don't
+      // need to notify the conjoinedResizeObserver when we resize.
+      return;
+    }
+
+    let resizeObserver: ResizeObserver | null = null;
+
+    function disconnectObserver() {
+      resizeObserver?.disconnect();
+      resizeObserver = null;
+    }
+
+    resizeObserver = new ResizeObserver((_entries, _observer) => {
+      conjoinedResizeObserver.acceptConjunctResizeEvent(handlerId);
+      disconnectObserver();
+    });
+
+    resizeObserver.observe(aceParentDiv);
+
+    return disconnectObserver;
+  }, [aceParentRef, conjoinedResizeObserver]);
 
   /** Once the editor has loaded, there are a few things we have to do:
    *
