@@ -98,8 +98,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     const maybeWarpTarget = pendingCursorWarp.acquireIfForHandler(handlerId);
     if (maybeWarpTarget != null) {
-      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
-      controller.focus();
+      conjoinedResizeObserver.addAllResizedHandler(() => {
+        controller.scrollIntoView(maybeWarpTarget.lineNo);
+        controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
+        controller.focus();
+      });
     }
 
     editor.session.setOverwrite(false);
