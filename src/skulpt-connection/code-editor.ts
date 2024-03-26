@@ -2,7 +2,7 @@
  * to a particular line. */
 
 import { IAceEditorProps } from "react-ace";
-import { PYTCH_CYPRESS } from "../utils";
+import { PYTCH_CYPRESS, ancestorHavingClass } from "../utils";
 import { SourceMap, Uuid } from "../model/junior/structured-program";
 import { PendingCursorWarp } from "../model/junior/structured-program";
 
@@ -40,6 +40,53 @@ class AceController {
 
   focus() {
     this.editor.focus();
+  }
+
+  static kScrollIntoViewLinesBelow = 2.5;
+
+  scrollIntoView(targetLineNo: number) {
+    // Scroll such that the hat-block of the target script is at the top
+    // of the IDE pane.  If that leaves the target line partially hidden
+    // behind the "add something" button strip, or beyond the bottom of
+    // the viewport, we move the viewport lower until the target line is
+    // a small distance above the top of the "add something" button
+    // strip.
+
+    // The below is fragile and coupled in the sense that it relies on
+    // the structure of how the editors are contained within the
+    // Junior-CodeEditor. It will only work for the per-method IDE.
+
+    const lineIdx = targetLineNo - 1;
+    const aceContainer = this.editor.container;
+
+    const codePanelElt = aceContainer.offsetParent as HTMLElement | null;
+    if (codePanelElt == null) {
+      return; // Should not happen.
+    }
+    const blurStripElt = codePanelElt.querySelector(
+      ".AddSomethingButtonStrip"
+    ) as HTMLElement;
+
+    const nCodeLines = this.editor.getSession().getLength();
+    const lineStride = aceContainer.offsetHeight / nCodeLines;
+
+    const targetLineGlobalTop = aceContainer.offsetTop + lineIdx * lineStride;
+    const codePanelUnblurredHeight =
+      codePanelElt.offsetHeight - blurStripElt.offsetHeight;
+
+    const scriptEditorElt = ancestorHavingClass(
+      aceContainer,
+      "PytchScriptEditor"
+    );
+    const scriptScrollTop = scriptEditorElt.offsetTop;
+
+    const targetLineScrollTop =
+      targetLineGlobalTop -
+      codePanelUnblurredHeight +
+      AceController.kScrollIntoViewLinesBelow * lineStride;
+    const effectiveScrollTop = Math.max(targetLineScrollTop, scriptScrollTop);
+
+    codePanelElt.scrollTo(0, effectiveScrollTop);
   }
 
   value(): string {

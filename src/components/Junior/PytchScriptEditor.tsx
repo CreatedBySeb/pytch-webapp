@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AceEditor from "react-ace";
 import { PytchAceAutoCompleter } from "../../skulpt-connection/code-completion";
 
@@ -28,6 +28,7 @@ import {
 import PytchScriptPreview from "../../images/drag-preview-event-handler.png";
 import { DragPreviewImage } from "react-dnd";
 import { useNotableChanges } from "../hooks/notable-changes";
+import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -41,6 +42,7 @@ type PytchScriptEditorProps = {
   handlerId: Uuid;
   prevHandlerId: Uuid | null;
   nextHandlerId: Uuid | null;
+  conjoinedResizeObserver: ConjoinedResizeObserver;
 };
 export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   actorKind,
@@ -48,6 +50,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   handlerId,
   prevHandlerId,
   nextHandlerId,
+  conjoinedResizeObserver,
 }) => {
   const [dragProps, dragRef, preview] = usePytchScriptDrag(handlerId);
   const [dropProps, dropRef] = usePytchScriptDrop(actorId, handlerId);
@@ -73,6 +76,33 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     setHandlerPythonCode({ actorId, handlerId, code });
   };
 
+  useEffect(() => {
+    const aceParentDiv = aceParentRef.current;
+    if (aceParentDiv == null) return;
+
+    if (!conjoinedResizeObserver.enabled) {
+      // If the "all have resized" event has already fired, we don't
+      // need to notify the conjoinedResizeObserver when we resize.
+      return;
+    }
+
+    let resizeObserver: ResizeObserver | null = null;
+
+    function disconnectObserver() {
+      resizeObserver?.disconnect();
+      resizeObserver = null;
+    }
+
+    resizeObserver = new ResizeObserver((_entries, _observer) => {
+      conjoinedResizeObserver.acceptConjunctResizeEvent(handlerId);
+      disconnectObserver();
+    });
+
+    resizeObserver.observe(aceParentDiv);
+
+    return disconnectObserver;
+  }, [aceParentRef, conjoinedResizeObserver]);
+
   /** Once the editor has loaded, there are a few things we have to do:
    *
    * * Make an entry in the EventHandlerId->Editor map.
@@ -95,8 +125,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     const maybeWarpTarget = pendingCursorWarp.acquireIfForHandler(handlerId);
     if (maybeWarpTarget != null) {
-      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
-      controller.focus();
+      conjoinedResizeObserver.addAllResizedHandler(() => {
+        controller.scrollIntoView(maybeWarpTarget.lineNo);
+        controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
+        controller.focus();
+      });
     }
 
     editor.session.setOverwrite(false);
