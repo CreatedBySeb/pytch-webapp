@@ -48,6 +48,7 @@ const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
     if (maybeController != null) {
       maybeController.gotoLocation(localLineNo, localColNo);
       maybeController.focus();
+      maybeController.scrollIntoView(localLineNo);
     } else {
       pendingCursorWarp.set({
         handlerId: contextualLoc.handlerId,
