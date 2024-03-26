@@ -84,6 +84,10 @@ const ScriptsEditor = () => {
   // this, and adding padding was an easy workaround.  The "pt-2" is to
   // match the margin-top of the appearances and sounds lists, so the
   // NoContentHelp alerts line up for an empty sprite.
+  //
+  // Is it maybe the same as the issue with scroll-into-view?  I.e.,
+  // that the Ace editor is resized after rendering?
+  //
   const wrap = (content: JSX.Element) => (
     <>
       <div ref={scriptsDivRef} className="pt-2 pb-5 Junior-ScriptsEditor">
