@@ -505,8 +505,7 @@
 
   .AddSomethingButton {
     span.label {
-      margin-left: 1rem;
-      margin-right: 0px;
+      margin: 0.5rem 0px 0.5rem 1rem;
       font-size: 1rem;
     }
 
@@ -516,7 +515,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 2.5rem;
+    min-height: 2.5rem;
     margin: 1rem;
 
     &.add-script {
