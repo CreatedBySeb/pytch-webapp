@@ -26,7 +26,13 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
 }) => {
   if (appearances.length === 0) {
     const appearanceName = ActorKindOps.names(actorKind).appearancesDisplay;
-    return <NoContentHelp actorKind={actorKind} contentKind={appearanceName} />;
+    return (
+      <NoContentHelp
+        actorKind={actorKind}
+        contentKind={appearanceName}
+        buttonsPlural={true}
+      />
+    );
   }
 
   // Any costume of a sprite can be deleted, including if that would

@@ -18,7 +18,13 @@ type SoundsContentProps = {
 };
 const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
   if (sounds.length === 0)
-    return <NoContentHelp actorKind={actorKind} contentKind="sounds" />;
+    return (
+      <NoContentHelp
+        actorKind={actorKind}
+        contentKind="sounds"
+        buttonsPlural={false}
+      />
+    );
 
   return (
     <>
