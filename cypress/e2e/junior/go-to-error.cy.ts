@@ -24,4 +24,8 @@ context("Scroll error-line into view", () => {
     });
     cy.get(".Junior-CodeEditor").contains("pront");
   }
+
+  function clickSoleGoToError() {
+    cy.get(".go-to-line").should("have.length", 1).click();
+  }
 });
