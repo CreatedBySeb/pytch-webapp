@@ -54,4 +54,12 @@ context("Scroll error-line into view", () => {
         });
       });
   }
+
+  const goToErrorLocationSpecs = [
+    { scriptIdx: 0, lineNo: 4 },
+    { scriptIdx: 0, lineNo: 38 },
+    { scriptIdx: 1, lineNo: 4 },
+    { scriptIdx: 1, lineNo: 24 },
+    { scriptIdx: 1, lineNo: 48 },
+  ];
 });
