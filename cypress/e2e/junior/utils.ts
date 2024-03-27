@@ -7,6 +7,8 @@ import { deIndent } from "../../common/utils";
 import { IconName } from "@fortawesome/fontawesome-common-types";
 import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
 import { launchDropdownAction } from "../utils";
+import { Actions } from "easy-peasy";
+import { IActiveProject } from "../../../src/model/project";
 
 /** Click on the Sprite with the given `spriteName`, thereby selecting
  * it. */
@@ -263,3 +265,25 @@ export const loadAndRunDemo = (demoSlug: string) => () => {
   cy.get("button").contains("Demo").click();
   cy.pytchGreenFlag();
 };
+
+type WithPytchJrProgramTestFun = (
+  program: StructuredProgram,
+  actions: Actions<IActiveProject>
+) => void | Promise<void>;
+
+/** Under the given `title`, run the given `fn`, passing it the current
+ * structured Pytch program and the bundle Easy-Peasy actions for the
+ * `IActiveProject` model slice. */
+export const withPytchJrProgramIt = (
+  title: string,
+  fn: WithPytchJrProgramTestFun
+) =>
+  it(title, () =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cy.window().then((window: any) => {
+      const pytchCy = window.PYTCH_CYPRESS;
+      const program: StructuredProgram = pytchCy.currentProgram.program;
+      const actions: Actions<IActiveProject> = pytchCy.currentProgramActions;
+      fn(program, actions);
+    })
+  );
