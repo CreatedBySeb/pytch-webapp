@@ -1,7 +1,14 @@
 import { Actions } from "easy-peasy";
 import { StructuredProgram } from "../../../src/model/junior/structured-program";
 import { IActiveProject } from "../../../src/model/project";
-import { loadAndRunDemo } from "./utils";
+import {
+  loadAndRunDemo,
+  selectStage,
+  selectActorAspect,
+  selectInfoPane,
+  selectSprite,
+  withPytchJrProgramIt,
+} from "./utils";
 
 context("Scroll error-line into view", () => {
   beforeEach(loadAndRunDemo("per-method-long-scripts"));
@@ -62,4 +69,44 @@ context("Scroll error-line into view", () => {
     { scriptIdx: 1, lineNo: 24 },
     { scriptIdx: 1, lineNo: 48 },
   ];
+
+  goToErrorLocationSpecs.forEach((spec) =>
+    withPytchJrProgramIt(
+      `scrolls error at ${spec.scriptIdx}/${spec.lineNo} into view`,
+      (program, actions) => {
+        insertNameErrorIntoStage(program, spec.scriptIdx, spec.lineNo, actions);
+
+        selectSprite("Snake");
+        selectActorAspect("Sounds");
+        selectInfoPane("Output");
+        cy.pytchGreenFlag();
+
+        cy.pytchShouldShowJuniorErrorCard(
+          "name 'pront' is not defined",
+          "user-space"
+        );
+
+        selectStage();
+        selectActorAspect("Code");
+
+        clickSoleGoToError();
+        assertScrollCorrect(spec.scriptIdx);
+        cy.pytchSendKeysToApp("x = ");
+        cy.get(".ace_line").contains("x = pront");
+
+        cy.get(".Junior-CodeEditor").scrollTo("top");
+        clickSoleGoToError();
+        assertScrollCorrect(spec.scriptIdx);
+        cy.pytchSendKeysToApp("y");
+        cy.get(".ace_line").contains("yx = pront");
+
+        selectActorAspect("Sounds");
+        selectActorAspect("Code");
+        clickSoleGoToError();
+        assertScrollCorrect(spec.scriptIdx);
+        cy.pytchSendKeysToApp("z");
+        cy.get(".ace_line").contains("zyx = pront");
+      }
+    )
+  );
 });
