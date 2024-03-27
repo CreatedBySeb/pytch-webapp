@@ -92,7 +92,13 @@ const ScriptsEditor = () => {
   );
 
   if (nHandlers === 0) {
-    return wrap(<NoContentHelp actorKind={kind} contentKind="scripts" />);
+    return wrap(
+      <NoContentHelp
+        actorKind={kind}
+        contentKind="scripts"
+        buttonsPlural={false}
+      />
+    );
   }
 
   // TODO: Get a list of which handlers have raised errors.  Give them a
