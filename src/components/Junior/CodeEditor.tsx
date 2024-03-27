@@ -81,10 +81,12 @@ const ScriptsEditor = () => {
 
   // The "pb-5" adds padding below; without this, the above scroll
   // didn't scroll quite to the bottom.  I didn't get to the bottom of
-  // this, and adding padding was an easy workaround.
+  // this, and adding padding was an easy workaround.  The "pt-2" is to
+  // match the margin-top of the appearances and sounds lists, so the
+  // NoContentHelp alerts line up for an empty sprite.
   const wrap = (content: JSX.Element) => (
     <>
-      <div ref={scriptsDivRef} className="pb-5 Junior-ScriptsEditor">
+      <div ref={scriptsDivRef} className="pt-2 pb-5 Junior-ScriptsEditor">
         {content}
       </div>
       <AddHandlerButton />
