@@ -1,6 +1,3 @@
-import { Actions } from "easy-peasy";
-import { IActiveProject } from "../../../src/model/project";
-import { StructuredProgram } from "../../../src/model/junior/structured-program";
 import {
   selectStage,
   selectActorAspect,
