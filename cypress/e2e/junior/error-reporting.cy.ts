@@ -6,27 +6,12 @@ import {
   selectActorAspect,
   selectInfoPane,
   selectSprite,
+  withPytchJrProgramIt,
   loadAndRunDemo,
 } from "./utils";
 
 context("Interact with errors", () => {
   beforeEach(loadAndRunDemo("simple-pytchjr-project"));
-
-  type TestFun = (
-    program: StructuredProgram,
-    actions: Actions<IActiveProject>
-  ) => void | Promise<void>;
-
-  const withPytchJrProgramIt = (title: string, fn: TestFun) =>
-    it(title, () =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cy.window().then((window: any) => {
-        const pytchCy = window.PYTCH_CYPRESS;
-        const program: StructuredProgram = pytchCy.currentProgram.program;
-        const actions: Actions<IActiveProject> = pytchCy.currentProgramActions;
-        fn(program, actions);
-      })
-    );
 
   const goToErrorLocationSpecs = [
     { activeActor: "stage", activateActorFun: selectStage },
