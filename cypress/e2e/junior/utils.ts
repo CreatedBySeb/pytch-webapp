@@ -7,6 +7,8 @@ import { deIndent } from "../../common/utils";
 import { IconName } from "@fortawesome/fontawesome-common-types";
 import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
 import { launchDropdownAction } from "../utils";
+import { Actions } from "easy-peasy";
+import { IActiveProject } from "../../../src/model/project";
 
 /** Click on the Sprite with the given `spriteName`, thereby selecting
  * it. */
@@ -236,3 +238,52 @@ export const renameProject = (currentNameMatch: string, newName: string) => {
   cy.get("input").type(newName);
   settleModalDialog("Rename");
 };
+
+/** Return a function which uses the demo mechanism to load a fixture
+ * zipfile and run it.  The given `demoSlug` must be the stem of a
+ * fixture zipfile, i.e., the file
+ *
+ * * `cypress/fixtures/project-zipfiles/${demoSlug}.zip`
+ *
+ * must exist.
+ *
+ * For use as a `before()` or `beforeEach()` function, e.g.,
+ *
+ * ```
+ * beforeEach(loadAndRunDemo("lots-of-costumes"));
+ * ```
+ *  */
+export const loadAndRunDemo = (demoSlug: string) => () => {
+  // Initial ** is to match the fetched URL both when running
+  // development server and when serving a deployment zipfile.
+  cy.intercept("GET", `**/cypress/${demoSlug}.zip`, {
+    fixture: `project-zipfiles/${demoSlug}.zip`,
+  });
+  cy.pytchResetDatabase({
+    initialUrl: `/suggested-demo/cypress/${demoSlug}`,
+  });
+  cy.get("button").contains("Demo").click();
+  cy.pytchGreenFlag();
+};
+
+type WithPytchJrProgramTestFun = (
+  program: StructuredProgram,
+  actions: Actions<IActiveProject>
+) => void | Promise<void>;
+
+/** Under the given `title`, run the given `fn`, passing it the current
+ * structured Pytch program and the bundle Easy-Peasy actions for the
+ * `IActiveProject` model slice. */
+export const withPytchJrProgramIt = (
+  title: string,
+  fn: WithPytchJrProgramTestFun
+) =>
+  it(title, () =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cy.window().then((window: any) => {
+      const pytchCy = window.PYTCH_CYPRESS;
+      const program: StructuredProgram = pytchCy.currentProgram.program;
+      const actions: Actions<IActiveProject> = pytchCy.currentProgramActions;
+      fn(program, actions);
+    })
+  );
