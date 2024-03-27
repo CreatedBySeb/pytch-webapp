@@ -236,3 +236,30 @@ export const renameProject = (currentNameMatch: string, newName: string) => {
   cy.get("input").type(newName);
   settleModalDialog("Rename");
 };
+
+/** Return a function which uses the demo mechanism to load a fixture
+ * zipfile and run it.  The given `demoSlug` must be the stem of a
+ * fixture zipfile, i.e., the file
+ *
+ * * `cypress/fixtures/project-zipfiles/${demoSlug}.zip`
+ *
+ * must exist.
+ *
+ * For use as a `before()` or `beforeEach()` function, e.g.,
+ *
+ * ```
+ * beforeEach(loadAndRunDemo("lots-of-costumes"));
+ * ```
+ *  */
+export const loadAndRunDemo = (demoSlug: string) => () => {
+  // Initial ** is to match the fetched URL both when running
+  // development server and when serving a deployment zipfile.
+  cy.intercept("GET", `**/cypress/${demoSlug}.zip`, {
+    fixture: `project-zipfiles/${demoSlug}.zip`,
+  });
+  cy.pytchResetDatabase({
+    initialUrl: `/suggested-demo/cypress/${demoSlug}`,
+  });
+  cy.get("button").contains("Demo").click();
+  cy.pytchGreenFlag();
+};
