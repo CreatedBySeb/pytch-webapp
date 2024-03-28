@@ -2,7 +2,7 @@
  * to a particular line. */
 
 import { IAceEditorProps } from "react-ace";
-import { PYTCH_CYPRESS } from "../utils";
+import { PYTCH_CYPRESS, ancestorHavingClass } from "../utils";
 import { SourceMap, Uuid } from "../model/junior/structured-program";
 import { PendingCursorWarp } from "../model/junior/structured-program";
 
@@ -40,6 +40,42 @@ class AceController {
 
   focus() {
     this.editor.focus();
+  }
+
+  static kScrollIntoViewLinesBelow = 2.5;
+
+  scrollIntoView(targetLineNo: number) {
+    const lineIdx = targetLineNo - 1;
+    const aceContainer = this.editor.container;
+
+    const codePanelElt = aceContainer.offsetParent as HTMLElement | null;
+    if (codePanelElt == null) {
+      return; // Should not happen.
+    }
+    const blurStripElt = codePanelElt.querySelector(
+      ".AddSomethingButtonStrip"
+    ) as HTMLElement;
+
+    const nCodeLines = this.editor.getSession().getLength();
+    const lineStride = aceContainer.offsetHeight / nCodeLines;
+
+    const targetLineGlobalTop = aceContainer.offsetTop + lineIdx * lineStride;
+    const codePanelUnblurredHeight =
+      codePanelElt.offsetHeight - blurStripElt.offsetHeight;
+
+    const scriptEditorElt = ancestorHavingClass(
+      aceContainer,
+      "PytchScriptEditor"
+    );
+    const scriptScrollTop = scriptEditorElt.offsetTop;
+
+    const targetLineScrollTop =
+      targetLineGlobalTop -
+      codePanelUnblurredHeight +
+      AceController.kScrollIntoViewLinesBelow * lineStride;
+    const effectiveScrollTop = Math.max(targetLineScrollTop, scriptScrollTop);
+
+    codePanelElt.scrollTo(0, effectiveScrollTop);
   }
 
   value(): string {
