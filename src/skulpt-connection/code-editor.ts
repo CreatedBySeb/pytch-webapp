@@ -45,6 +45,17 @@ class AceController {
   static kScrollIntoViewLinesBelow = 2.5;
 
   scrollIntoView(targetLineNo: number) {
+    // Scroll such that the hat-block of the target script is at the top
+    // of the IDE pane.  If that leaves the target line partially hidden
+    // behind the "add something" button strip, or beyond the bottom of
+    // the viewport, we move the viewport lower until the target line is
+    // a small distance above the top of the "add something" button
+    // strip.
+
+    // The below is fragile and coupled in the sense that it relies on
+    // the structure of how the editors are contained within the
+    // Junior-CodeEditor. It will only work for the per-method IDE.
+
     const lineIdx = targetLineNo - 1;
     const aceContainer = this.editor.container;
 
