@@ -22,10 +22,11 @@ context("Send anonymous instrumentation events", () => {
     initIntercept();
     cy.pytchExactlyOneProject();
     awaitInstrumentationEvent().should("equal", "render");
+    awaitInstrumentationEvent().should("match", /^project-loaded/);
     cy.pytchGreenFlag();
-    awaitInstrumentationEvent().should("match", /^build-success\./);
+    awaitInstrumentationEvent().should("match", /^build-flat-success\./);
     cy.pytchSetCodeRaw("syntax(error");
     cy.pytchGreenFlag();
-    awaitInstrumentationEvent().should("match", /^build-failure\./);
+    awaitInstrumentationEvent().should("match", /^build-flat-failure\./);
   });
 });

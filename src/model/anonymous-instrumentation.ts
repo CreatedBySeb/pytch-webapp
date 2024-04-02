@@ -77,8 +77,8 @@ class AnonymousSession {
         url.searchParams.append("sid", this.uuid);
         url.searchParams.append("evt", eventData);
 
-        await fetch(url, { cache: "no-store" });
         this.noteJustSent();
+        await fetch(url, { cache: "no-store" });
       } catch (err) {
         console.log("failure while submitting anonymous event", err);
       }

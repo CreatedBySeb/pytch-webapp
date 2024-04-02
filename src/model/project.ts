@@ -833,6 +833,7 @@ export const activeProject: IActiveProject = {
       }
 
       actions.noteLoadRequestOutcome("succeeded");
+      fireAndForgetEvent("project-loaded", `${projectId}`);
       storeActions.infoPanel.setActiveTabKey(initialTabKey);
     } catch (err) {
       // TODO: Is there anything more intelligent we can do as
@@ -1177,9 +1178,10 @@ export const activeProject: IActiveProject = {
 
       const buildOutcome = await build(project, appendOutput, recordError);
 
+      const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
       const eventData = JSON.stringify(project.program);
-      fireAndForgetEvent(`build-${outcomeKind}`, eventData);
+      fireAndForgetEvent(`build-${programKind}-${outcomeKind}`, eventData);
 
       console.log("build outcome:", buildOutcome);
 
