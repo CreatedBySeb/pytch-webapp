@@ -833,6 +833,7 @@ export const activeProject: IActiveProject = {
       }
 
       actions.noteLoadRequestOutcome("succeeded");
+      fireAndForgetEvent("project-loaded", `${projectId}`);
       storeActions.infoPanel.setActiveTabKey(initialTabKey);
     } catch (err) {
       // TODO: Is there anything more intelligent we can do as
