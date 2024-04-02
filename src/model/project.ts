@@ -1178,9 +1178,10 @@ export const activeProject: IActiveProject = {
 
       const buildOutcome = await build(project, appendOutput, recordError);
 
+      const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
       const eventData = JSON.stringify(project.program);
-      fireAndForgetEvent(`build-${outcomeKind}`, eventData);
+      fireAndForgetEvent(`build-${programKind}-${outcomeKind}`, eventData);
 
       console.log("build outcome:", buildOutcome);
 
