@@ -9,9 +9,7 @@ const NavBanner = () => {
     <div className="NavBar">
       <div className="title-and-version">
         <Link to="/">
-          <h1>
-            Pytch <span className="beta-tag">BETA</span>
-          </h1>
+          <h1>Pytch</h1>
         </Link>
         <p className="version-tag">
           <a href={withinSite("/doc/releases/changelog.html")}>{versionTag}</a>
