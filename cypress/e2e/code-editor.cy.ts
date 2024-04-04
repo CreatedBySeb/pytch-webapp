@@ -82,7 +82,7 @@ context("Interact with code editor", () => {
     // Do the final typing as one call to type(); multiple chained calls
     // seem to reset the insertion point in the Ace editor.
     cy.get("#pytch-ace-editor")
-      .type("{end}")
+      .type("{downArrow}{downArrow}{downArrow}{end}")
       .type("# 012345{enter}")
       .type(
         "{upArrow}{home}{rightArrow}{rightArrow}A" +
