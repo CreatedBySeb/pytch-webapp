@@ -18,14 +18,20 @@ context("Interact with code editor", () => {
     cy.get("#pytch-ace-editor").type("pytch.st_and_wa{ctrl} ");
 
     // This feels quite fragile but is working for now:
-    cy.get(".ace_autocomplete").click();
+    cy.get(".ace_autocomplete")
+      .contains("broadcast_and_wait")
+      .should("be.visible");
+    cy.pytchSendKeysToApp("{enter}");
 
     cy.pytchCodeTextShouldContain("pytch.broadcast_and_wait");
   });
 
   it("auto-completes Actor methods", () => {
     cy.get("#pytch-ace-editor").type("self.sound_until{ctrl} ");
-    cy.get(".ace_autocomplete").click();
+    cy.get(".ace_autocomplete")
+      .contains("play_sound_until_done")
+      .should("be.visible");
+    cy.pytchSendKeysToApp("{enter}");
     cy.pytchCodeTextShouldContain("self.play_sound_until_done");
   });
 
