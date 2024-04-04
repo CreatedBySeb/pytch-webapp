@@ -1,5 +1,4 @@
 import {
-  aceControllerMapFromWindow,
   assertHatBlockLabels,
   clickUniqueButton,
   deleteAllCodeOfSoleHandler,
