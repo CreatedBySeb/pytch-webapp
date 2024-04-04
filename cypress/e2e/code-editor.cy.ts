@@ -8,7 +8,11 @@ context("Interact with code editor", () => {
     cy.pytchExactlyOneProject();
   });
 
-  beforeEach(() => cy.pytchBuildCode("\nimport pytch\n"));
+  const baseProgram = "import pytch\nprint('hello')\n";
+  beforeEach(() => {
+    cy.pytchBuildCode("\n" + baseProgram);
+    cy.pytchStdoutShouldEqual("hello\n");
+  });
 
   it("auto-completes top-level pytch attributes", () => {
     cy.get("#pytch-ace-editor").type("pytch.st_and_wa{ctrl} ");
@@ -85,7 +89,7 @@ context("Interact with code editor", () => {
           "{insert}{rightArrow}B{insert}{rightArrow}C" +
           "{insert}{rightArrow}D{insert}{rightArrow}E"
       );
-    cy.pytchCodeTextShouldEqual("import pytch\n# A0B1C2D3E45\n");
+    cy.pytchCodeTextShouldEqual(baseProgram + "# A0B1C2D3E45\n");
   });
 
   [
