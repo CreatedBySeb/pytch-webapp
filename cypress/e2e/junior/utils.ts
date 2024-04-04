@@ -287,3 +287,19 @@ export const withPytchJrProgramIt = (
       fn(program, actions);
     })
   );
+
+/** Assuming there is only one event-handler visible, delete all its
+ * code. */
+export const deleteAllCodeOfSoleHandler = () => {
+  // Getting focus to the editor seems a bit race-prone.  Try this:
+  cy.waitUntil(() => {
+    cy.get(".ace_editor").click().type("{selectAll}{del}");
+    return cy.window().then((window) => {
+      const controllerMap = aceControllerMapFromWindow(window);
+      const editorIds = controllerMap.nonSpecialEditorIds();
+      if (editorIds.length !== 1) return false;
+      const soleCode = controllerMap.get(editorIds[0]).value();
+      return soleCode === "";
+    });
+  });
+};

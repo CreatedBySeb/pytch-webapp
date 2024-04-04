@@ -2,6 +2,7 @@ import {
   aceControllerMapFromWindow,
   assertHatBlockLabels,
   clickUniqueButton,
+  deleteAllCodeOfSoleHandler,
   selectActorAspect,
   selectSprite,
   selectStage,
@@ -54,20 +55,6 @@ context("Create/modify/delete event handlers", () => {
     addHandler(() =>
       cy.get("li.EventKindOption").contains("this sprite").click()
     );
-  };
-
-  const deleteAllCodeOfSoleHandler = () => {
-    // Getting focus to the editor seems a bit race-prone.  Try this:
-    cy.waitUntil(() => {
-      cy.get(".ace_editor").click().type("{selectAll}{del}");
-      return cy.window().then((window) => {
-        const controllerMap = aceControllerMapFromWindow(window);
-        const editorIds = controllerMap.nonSpecialEditorIds();
-        if (editorIds.length !== 1) return false;
-        const soleCode = controllerMap.get(editorIds[0]).value();
-        return soleCode === "";
-      });
-    });
   };
 
   const allExtendedHandlerLabels = [
