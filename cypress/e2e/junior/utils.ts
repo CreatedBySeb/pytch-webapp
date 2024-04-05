@@ -303,3 +303,12 @@ export const deleteAllCodeOfSoleHandler = () => {
     });
   });
 };
+
+/** Start with the webapp containing just a project created from the
+ * given `zipName`, and open that project. */
+export const loadFromZipfile = (zipName: string) => {
+  cy.pytchResetDatabase();
+  cy.pytchTryUploadZipfiles([zipName]);
+  cy.get("div.modal.show").should("not.exist");
+  cy.get(".NoContentHelp");
+};
