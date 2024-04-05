@@ -36,6 +36,9 @@ interface BoardInfo {
   hardwareVersion: [number, number, number];
 }
 
+type CommandResult = string[] | MicroBitError;
+type QueuedCommand = [string, (response: CommandResult) => void];
+
 // TODO: Allow people to label devices to help differentiate? (using the firmware)
 export class MicroBitDevice extends EventTarget {
   public static readonly BAUD_RATE = 115200;
@@ -60,8 +63,10 @@ export class MicroBitDevice extends EventTarget {
   protected buffer = "";
   protected readonly daplink: DAPLink;
   protected readonly device: USBDevice;
-  protected inflight: ((response: string[] | MicroBitError) => void)[] = [];
+  protected flushing = false;
+  protected inflight: ((message: CommandResult) => void)[] = [];
   protected initialising: (() => void) | undefined;
+  protected outgoing: QueuedCommand[] = [];
   protected pendingMessages: string[] = [];
   protected undrainedEvents: string[] = [];
 
@@ -107,12 +112,17 @@ export class MicroBitDevice extends EventTarget {
     await this.send("show_image", ["00000:00000:00000:00000:00000"]);
   }
 
-  public async send(command: string, args: string[] = []): Promise<string[] | MicroBitError> {
-    await this.daplink.serialWrite([command, ...args].join("|") + "\n");
-
-    return await new Promise((resolve) => {
-      this.inflight.push(resolve);
+  public async send(command: string, args: string[] = []): Promise<CommandResult> {
+    const promise = new Promise((resolve: (message: CommandResult) => void) => {
+      this.outgoing.push([
+        [command, ...args].join("|") + "\n",
+        resolve,
+      ]);
+      console.debug(`Queued: ${command} (${args.join(",")})`);
     });
+
+    this.flushCommands();
+    return promise;
   }
 
   public async setup(): Promise<void> {
@@ -177,6 +187,25 @@ export class MicroBitDevice extends EventTarget {
 
   public async stop(): Promise<void> {
     await this.send("stop_music");
+  }
+
+  protected async flushCommands() {
+    if (this.flushing) return;
+    this.flushing = true;
+    console.debug("Starting flush");
+
+    try {
+      let queued: QueuedCommand | undefined;
+
+      while ((queued = this.outgoing.shift()) != undefined) {
+        const [command, callback] = queued;
+        this.inflight.push(callback);
+        this.daplink.serialWrite(command);
+        console.debug(`Flushed: ${command}`)
+      }
+    } finally {
+      this.flushing = false;
+    }
   }
 
   protected handleData(value: string) {
