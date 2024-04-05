@@ -8,20 +8,30 @@ context("Interact with code editor", () => {
     cy.pytchExactlyOneProject();
   });
 
-  beforeEach(() => cy.pytchBuildCode("\nimport pytch\n"));
+  const baseProgram = "import pytch\nprint('hello')\n";
+  beforeEach(() => {
+    cy.pytchBuildCode("\n" + baseProgram);
+    cy.pytchStdoutShouldEqual("hello\n");
+  });
 
   it("auto-completes top-level pytch attributes", () => {
     cy.get("#pytch-ace-editor").type("pytch.st_and_wa{ctrl} ");
 
     // This feels quite fragile but is working for now:
-    cy.get(".ace_autocomplete").click();
+    cy.get(".ace_autocomplete")
+      .contains("broadcast_and_wait")
+      .should("be.visible");
+    cy.pytchSendKeysToApp("{enter}");
 
     cy.pytchCodeTextShouldContain("pytch.broadcast_and_wait");
   });
 
   it("auto-completes Actor methods", () => {
     cy.get("#pytch-ace-editor").type("self.sound_until{ctrl} ");
-    cy.get(".ace_autocomplete").click();
+    cy.get(".ace_autocomplete")
+      .contains("play_sound_until_done")
+      .should("be.visible");
+    cy.pytchSendKeysToApp("{enter}");
     cy.pytchCodeTextShouldContain("self.play_sound_until_done");
   });
 
@@ -78,14 +88,14 @@ context("Interact with code editor", () => {
     // Do the final typing as one call to type(); multiple chained calls
     // seem to reset the insertion point in the Ace editor.
     cy.get("#pytch-ace-editor")
-      .type("{end}")
+      .type("{downArrow}{downArrow}{downArrow}{end}")
       .type("# 012345{enter}")
       .type(
         "{upArrow}{home}{rightArrow}{rightArrow}A" +
           "{insert}{rightArrow}B{insert}{rightArrow}C" +
           "{insert}{rightArrow}D{insert}{rightArrow}E"
       );
-    cy.pytchCodeTextShouldEqual("import pytch\n# A0B1C2D3E45\n");
+    cy.pytchCodeTextShouldEqual(baseProgram + "# A0B1C2D3E45\n");
   });
 
   [

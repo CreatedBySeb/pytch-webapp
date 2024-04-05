@@ -1,4 +1,8 @@
-import { selectActorAspect, selectSprite } from "./utils";
+import {
+  deleteAllCodeOfSoleHandler,
+  selectActorAspect,
+  selectSprite,
+} from "./utils";
 
 context("Use Python stdlib modules", () => {
   beforeEach(() => {
@@ -8,9 +12,9 @@ context("Use Python stdlib modules", () => {
   const setScriptCode = (codeText: string) => {
     selectSprite("Snake");
     selectActorAspect("Code");
-    cy.get(".PytchScriptEditor .ace_editor").type(
-      `{selectAll}{del}${codeText}`
-    );
+    cy.get(".ace_editor").contains("Hi there").should("be.visible");
+    deleteAllCodeOfSoleHandler();
+    cy.get(".PytchScriptEditor .ace_editor").type(codeText);
   };
 
   it("can use math module", () => {

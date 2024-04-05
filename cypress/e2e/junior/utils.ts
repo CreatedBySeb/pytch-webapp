@@ -287,3 +287,109 @@ export const withPytchJrProgramIt = (
       fn(program, actions);
     })
   );
+
+/** Assuming there is only one event-handler visible, delete all its
+ * code. */
+export const deleteAllCodeOfSoleHandler = () => {
+  // Getting focus to the editor seems a bit race-prone.  Try this:
+  cy.waitUntil(() => {
+    cy.get(".ace_editor").click().type("{selectAll}{del}");
+    return cy.window().then((window) => {
+      const controllerMap = aceControllerMapFromWindow(window);
+      const editorIds = controllerMap.nonSpecialEditorIds();
+      if (editorIds.length !== 1) return false;
+      const soleCode = controllerMap.get(editorIds[0]).value();
+      return soleCode === "";
+    });
+  });
+};
+
+/** Start with the webapp containing just a project created from the
+ * given `zipName`, and open that project. */
+export const loadFromZipfile = (zipName: string) => {
+  cy.pytchResetDatabase();
+  cy.pytchTryUploadZipfiles([zipName]);
+  cy.get("div.modal.show").should("not.exist");
+  cy.get(".NoContentHelp");
+};
+
+/** Collection of functions and constants for testing behaviour of the
+ * script-by-script editor. */
+export class ScriptOps {
+  /** Assuming the "upsert handler" modal is open, type the given
+   * `message` into the "When I receive" input box. */
+  static typeMessageValue(message: string) {
+    cy.get("li.EventKindOption input").type(`{selectAll}{del}${message}`);
+  }
+
+  /** Launch the "add script" modal for the Snake sprite. */
+  static launchAddHandler() {
+    selectSprite("Snake");
+    selectActorAspect("Code");
+    cy.get(".Junior-CodeEditor .AddSomethingButton").click();
+  }
+
+  /** Add a script to the focused actor.  The given
+   * `activateDesiredKindFun` function should select the desired kind of
+   * hat-block, and, if supplied, the given `doSubmitFun` function
+   * should do the equivalent of clicking "Add". */
+  static addHandler(
+    activateDesiredKindFun: () => void,
+    doSubmitFun?: () => void
+  ) {
+    ScriptOps.launchAddHandler();
+    activateDesiredKindFun();
+    if (doSubmitFun != null) {
+      doSubmitFun();
+    } else {
+      settleModalDialog("OK");
+    }
+  }
+
+  /** Open the drop-down for the script at the given `scriptIndex`, and
+   * click on the entry matching `itemMatch`. */
+  static chooseHandlerDropdownItem(scriptIndex: number, itemMatch: string) {
+    cy.get(".PytchScriptEditor .HatBlock")
+      .eq(scriptIndex)
+      .find("button.dropdown-toggle")
+      .click();
+    cy.get(".dropdown-item").contains(itemMatch).click();
+  }
+
+  /** Add three sample scripts to the Snake sprite, for testing with.
+   * If the test starts with the `newly-created-per-method` zipfile,
+   * this will result in four scripts on the Snake sprite altogether. */
+  static addSomeHandlers() {
+    // Use a mixture of "OK" and double-click.
+
+    ScriptOps.addHandler(() => ScriptOps.typeMessageValue("award-point"));
+
+    // Using as() like this relies on addHandler() calling the
+    // "activate" and "submit" functions in that order.
+    ScriptOps.addHandler(
+      () =>
+        cy.get("li.EventKindOption").contains("clone").as("clone-hat").click(),
+      () => cy.get("@clone-hat").dblclick()
+    );
+
+    ScriptOps.addHandler(() =>
+      cy.get("li.EventKindOption").contains("this sprite").click()
+    );
+  }
+
+  /** The expected list of hat-block labels after using
+   * `addSomeHandlers()` on a project created from the
+   * `newly-created-per-method` zipfile. */
+  static readonly allExtendedHandlerLabels = [
+    "when green flag clicked",
+    'when I receive "award-point"',
+    "when I start as a clone",
+    "when this sprite clicked",
+  ];
+
+  /** A sublist (chosen by the given `idxs`) of the
+   * `allExtendedHandlerLabels` list. */
+  static someExtendedHandlerLabels(idxs: Array<number>) {
+    return idxs.map((i) => ScriptOps.allExtendedHandlerLabels[i]);
+  }
+}
