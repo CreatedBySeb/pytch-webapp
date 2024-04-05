@@ -1,7 +1,6 @@
 import {
   assertHatBlockLabels,
   clickUniqueButton,
-  deleteAllCodeOfSoleHandler,
   selectActorAspect,
   selectSprite,
   selectStage,
