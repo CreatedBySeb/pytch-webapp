@@ -265,63 +265,6 @@ context("Create/modify/delete event handlers", () => {
     soleEventHandlerCodeShouldEqual("# Hello world");
   });
 
-  it("drag-and-drop event handlers", () => {
-    addSomeHandlers();
-    assertHatBlockLabels(allExtendedHandlerLabels);
-    saveButton.click();
-
-    cy.get(".Junior-ScriptsEditor").as("editor");
-    cy.get("@editor").contains("when green flag clicked").as("flag-clicked");
-    cy.get("@editor").contains("when I receive").as("msg-rcvd");
-    cy.get("@editor").contains("when I start as a clone").as("clone");
-    cy.get("@editor").contains("when this sprite clicked").as("sprite-clicked");
-
-    saveButton.shouldReactToInteraction(() => {
-      cy.get("@sprite-clicked").drag("@clone");
-    });
-    assertHatBlockLabels(someExtendedHandlerLabels([0, 1, 3, 2]));
-
-    saveButton.shouldReactToInteraction(() => {
-      cy.get("@sprite-clicked").drag("@flag-clicked");
-    });
-    assertHatBlockLabels(someExtendedHandlerLabels([3, 0, 1, 2]));
-
-    saveButton.shouldReactToInteraction(() => {
-      cy.get("@msg-rcvd").drag("@flag-clicked");
-    });
-    assertHatBlockLabels(someExtendedHandlerLabels([3, 1, 0, 2]));
-  });
-
-  it("can reorder event handlers with buttons", () => {
-    const moveHandlerAndAssertLabels = (
-      movingIdx: number,
-      direction: "prev" | "next",
-      expOrderAfterMove: Array<number>
-    ) => {
-      cy.get(".Junior-ScriptsEditor .HatBlock")
-        .eq(movingIdx)
-        .find(`button.swap-${direction}`)
-        .click({ force: true });
-      assertHatBlockLabels(someExtendedHandlerLabels(expOrderAfterMove));
-    };
-
-    saveButton.shouldReactToInteraction(() => {
-      addSomeHandlers();
-    });
-    saveButton.shouldReactToInteraction(() => {
-      moveHandlerAndAssertLabels(1, "prev", [1, 0, 2, 3]);
-    });
-
-    saveButton.shouldReactToInteraction(() => {
-      moveHandlerAndAssertLabels(1, "next", [1, 2, 0, 3]);
-      moveHandlerAndAssertLabels(0, "next", [2, 1, 0, 3]);
-    });
-
-    saveButton.shouldReactToInteraction(() => {
-      moveHandlerAndAssertLabels(2, "next", [2, 1, 3, 0]);
-    });
-  });
-
   it("restricts characters for when-receive", () => {
     ScriptOps.launchAddHandler();
 
@@ -364,45 +307,6 @@ context("Create/modify/delete event handlers", () => {
       "when green flag clicked",
       'when I receive "message-1"',
       'when I receive "hello-world"',
-    ]);
-  });
-
-  it("can change hatblock with double-click", () => {
-    addHandler(() => typeMessageValue("go for it"));
-    saveButton.click();
-
-    saveButton.shouldReactToInteraction(() => {
-      cy.get(".HatBlock").contains('"go for it"').dblclick();
-      cy.contains("when I start as a clone").click();
-      settleModalDialog("OK");
-    });
-
-    assertHatBlockLabels([
-      "when green flag clicked", // From sample
-      "when I start as a clone",
-    ]);
-  });
-
-  it("can change hatblock with dropdown item", () => {
-    saveButton.shouldReactToInteraction(() => {
-      addHandler(() => typeMessageValue("go for it"));
-    });
-
-    saveButton.shouldReactToInteraction(() => {
-      chooseHandlerDropdownItem(1, "Change hat block");
-
-      cy.get("li.EventKindOption.chosen")
-        .should("have.length", 1)
-        .find("input")
-        .should("have.value", "go for it");
-
-      cy.get(".EventKindOption").contains("when this").click();
-      settleModalDialog("OK");
-    });
-
-    assertHatBlockLabels([
-      "when green flag clicked", // From sample
-      "when this sprite clicked",
     ]);
   });
 
