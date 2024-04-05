@@ -8,6 +8,7 @@ import {
   settleModalDialog,
   soleEventHandlerCodeShouldEqual,
   typeIntoScriptEditor,
+  ScriptOps,
 } from "./utils";
 import { saveButton } from "../utils";
 
@@ -15,67 +16,6 @@ context("Create/modify/delete event handlers", () => {
   beforeEach(() => {
     cy.pytchBasicJrProject();
   });
-
-  const launchAddHandler = () => {
-    selectSprite("Snake");
-    selectActorAspect("Code");
-    cy.get(".Junior-CodeEditor .AddSomethingButton").click();
-  };
-
-  const addHandler = (
-    activateDesiredKindFun: () => void,
-    doSubmitFun?: () => void
-  ) => {
-    launchAddHandler();
-    activateDesiredKindFun();
-    if (doSubmitFun != null) {
-      doSubmitFun();
-    } else {
-      settleModalDialog("OK");
-    }
-  };
-
-  const typeMessageValue = (message: string) =>
-    cy.get("li.EventKindOption input").type(`{selectAll}{del}${message}`);
-
-  const addSomeHandlers = () => {
-    // Use a mixture of "OK" and double-click.
-
-    addHandler(() => typeMessageValue("award-point"));
-
-    // Using as() like this relies on addHandler() calling the
-    // "activate" and "submit" functions in that order.
-    addHandler(
-      () =>
-        cy.get("li.EventKindOption").contains("clone").as("clone-hat").click(),
-      () => cy.get("@clone-hat").dblclick()
-    );
-
-    addHandler(() =>
-      cy.get("li.EventKindOption").contains("this sprite").click()
-    );
-  };
-
-  const allExtendedHandlerLabels = [
-    "when green flag clicked",
-    'when I receive "award-point"',
-    "when I start as a clone",
-    "when this sprite clicked",
-  ];
-
-  const someExtendedHandlerLabels = (idxs: Array<number>) =>
-    idxs.map((i) => allExtendedHandlerLabels[i]);
-
-  const chooseHandlerDropdownItem = (
-    scriptIndex: number,
-    itemMatch: string
-  ) => {
-    cy.get(".PytchScriptEditor .HatBlock")
-      .eq(scriptIndex)
-      .find("button.dropdown-toggle")
-      .click();
-    cy.get(".dropdown-item").contains(itemMatch).click();
-  };
 
   it("shows help when no handlers", () => {
     selectStage();
@@ -87,19 +27,19 @@ context("Create/modify/delete event handlers", () => {
     const assertHandlersUnchanged = () =>
       assertHatBlockLabels(["when green flag clicked"]);
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     cy.assertCausesToVanish(".UpsertHandlerModal", () =>
       cy.get(".UpsertHandlerModal").type("{esc}")
     );
     assertHandlersUnchanged();
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     cy.assertCausesToVanish(".UpsertHandlerModal", () =>
       cy.get(".UpsertHandlerModal .btn-close").click()
     );
     assertHandlersUnchanged();
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     settleModalDialog("Cancel");
     assertHandlersUnchanged();
   });
@@ -144,7 +84,7 @@ context("Create/modify/delete event handlers", () => {
       }
 
       // If we provide a message, that hat-block should become active.
-      typeMessageValue("go-for-it");
+      ScriptOps.typeMessageValue("go-for-it");
       cy.get("li.EventKindOption.chosen")
         .should("have.length", 1)
         .contains("when I receive");
@@ -161,7 +101,7 @@ context("Create/modify/delete event handlers", () => {
         .should("have.length", 1)
         .contains(match);
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     launchKeyChooser();
     assertKeySelected("space");
 
@@ -198,39 +138,39 @@ context("Create/modify/delete event handlers", () => {
 
   it("can add and delete handlers", () => {
     const launchDeleteHandlerByIndex = (idx: number) => {
-      chooseHandlerDropdownItem(idx, "DELETE");
+      ScriptOps.chooseHandlerDropdownItem(idx, "DELETE");
       cy.get(".modal-header").contains("Delete script?");
     };
 
     selectSprite("Snake");
 
     saveButton.shouldReactToInteraction(() => {
-      addSomeHandlers();
+      ScriptOps.addSomeHandlers();
     });
-    assertHatBlockLabels(allExtendedHandlerLabels);
+    assertHatBlockLabels(ScriptOps.allExtendedHandlerLabels);
 
     launchDeleteHandlerByIndex(2);
     settleModalDialog("Cancel");
-    assertHatBlockLabels(allExtendedHandlerLabels);
+    assertHatBlockLabels(ScriptOps.allExtendedHandlerLabels);
     saveButton.shouldShowNoUnsavedChanges();
 
     saveButton.shouldReactToInteraction(() => {
       launchDeleteHandlerByIndex(2);
       settleModalDialog("DELETE");
     });
-    assertHatBlockLabels(someExtendedHandlerLabels([0, 1, 3]));
+    assertHatBlockLabels(ScriptOps.someExtendedHandlerLabels([0, 1, 3]));
 
     saveButton.shouldReactToInteraction(() => {
       launchDeleteHandlerByIndex(2);
       settleModalDialog("DELETE");
     });
-    assertHatBlockLabels(someExtendedHandlerLabels([0, 1]));
+    assertHatBlockLabels(ScriptOps.someExtendedHandlerLabels([0, 1]));
 
     saveButton.shouldReactToInteraction(() => {
       launchDeleteHandlerByIndex(0);
       settleModalDialog("DELETE");
     });
-    assertHatBlockLabels(someExtendedHandlerLabels([1]));
+    assertHatBlockLabels(ScriptOps.someExtendedHandlerLabels([1]));
 
     saveButton.shouldReactToInteraction(() => {
       launchDeleteHandlerByIndex(0);
@@ -383,9 +323,9 @@ context("Create/modify/delete event handlers", () => {
   });
 
   it("restricts characters for when-receive", () => {
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
 
-    typeMessageValue("go\\for'it");
+    ScriptOps.typeMessageValue("go\\for'it");
     settleModalDialog("OK");
 
     assertHatBlockLabels([
@@ -402,7 +342,7 @@ context("Create/modify/delete event handlers", () => {
         .click("left")
         .dblclick("left");
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     doubleClickWhenIReceive();
 
     assertHatBlockLabels([
@@ -410,7 +350,7 @@ context("Create/modify/delete event handlers", () => {
       'when I receive "message-1"',
     ]);
 
-    launchAddHandler();
+    ScriptOps.launchAddHandler();
     cy.get(".EventKindOption").contains("receive").click("left");
     cy.get('input[type="text"]').click().type("{selectAll}{del}");
     doubleClickWhenIReceive();
