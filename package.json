@@ -34,7 +34,7 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run:quiet": "cypress run --quiet",
-    "cy:parallel": "cypress-parallel -s cy:run:quiet -t 8 -d 'cypress/e2e/**/*.cy.ts'",
+    "cy:parallel": "cypress-parallel -s cy:run:quiet -t ${CY_PARALLEL_N_THREADS-8} -d 'cypress/e2e/**/*.cy.ts'",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src cypress --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -54,7 +54,7 @@
     "@vitejs/plugin-react": "^4.0.0",
     "ajv-cli": "^5.0.0",
     "chai": "^4.3.7",
-    "cypress": "^12.17.1",
+    "cypress": "^13.8.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-parallel": "^0.13.0",
     "cypress-wait-until": "^1.7.1",

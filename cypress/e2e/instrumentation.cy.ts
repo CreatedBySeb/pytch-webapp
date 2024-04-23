@@ -19,6 +19,10 @@ context("Send anonymous instrumentation events", () => {
   });
 
   it("sends build events", () => {
+    // The precise pattern of instrumentation events is different under
+    // Vite's development vs preview servers.  The tests below assume
+    // the local server is running with DEV_VITE_USE_PREVIEW=yes and
+    // will fail if this isn't true.
     initIntercept();
     cy.pytchExactlyOneProject();
     awaitInstrumentationEvent().should("equal", "render");
