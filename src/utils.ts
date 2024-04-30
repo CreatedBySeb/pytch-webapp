@@ -1,8 +1,9 @@
 import { action, Action, ActionCreator, State, ThunkCreator } from "easy-peasy";
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { guessedMimeType } from "./storage/guessed-mime-type";
 
 export type EmptyProps = Record<string, never>;
+export type OnlyChildrenProps = PropsWithChildren<object>;
 
 export const delaySeconds = (seconds: number, forceRealDelay = false) => {
   const useZeroDelay = PYTCH_CYPRESS()["instantDelays"] && !forceRealDelay;
