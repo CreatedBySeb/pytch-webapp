@@ -1,8 +1,9 @@
 import { liveSourceMap } from "./code-editor";
-import { StoredProjectContent } from "../model/project";
 import { PytchProgramOps } from "../model/pytch-program";
 import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
+import { ProjectContent } from "../model/project-core";
+import { AssetPresentation } from "../model/asset";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -49,7 +50,7 @@ interface BuildFailure {
 export type BuildOutcome = BuildSuccess | BuildFailure;
 
 export const build = async (
-  project: StoredProjectContent,
+  project: ProjectContent<AssetPresentation>,
   addOutputChunk: (chunk: string) => void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleError: (pytchError: any, errorContext: any) => void
