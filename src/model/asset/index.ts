@@ -24,6 +24,10 @@ export {
   assetOperationContextFromKey,
 } from "./core";
 
+export type AssetPresentationCreateOpts = Partial<{
+  prepareAssetServer: boolean;
+}>;
+
 export class AssetPresentation {
   constructor(
     readonly assetInProject: IAssetInProject,
