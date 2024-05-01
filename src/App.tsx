@@ -30,6 +30,7 @@ import { envVarOrFail, pathWithinApp } from "./env-utils";
 import { ProjectFromSpecimenFlow } from "./components/ProjectFromSpecimenFlow";
 import { DeliberateFailureWithBoundary } from "./components/DeliberateFailure";
 import { fireAndForgetEvent } from "./model/anonymous-instrumentation";
+import { StandalonePlayDemo } from "./components/StandalonePlayDemo";
 
 const UnknownRoute: React.FC<EmptyProps> = () => {
   return (
@@ -78,6 +79,10 @@ function App() {
         {
           index: true,
           element: <Welcome />,
+        },
+        {
+          path: "play-demo/:buildId/:demoId",
+          element: <StandalonePlayDemo />,
         },
         {
           path: "my-projects/",
