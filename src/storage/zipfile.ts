@@ -1,6 +1,10 @@
 import JSZip from "jszip";
 import { typeFromExtension } from "./mime-types";
-import { AddAssetDescriptor, assetData } from "../database/indexed-db";
+import {
+  AddAssetDescriptor,
+  TransformedAssetDescriptor,
+  assetData,
+} from "../database/indexed-db";
 import { AssetTransform, AssetTransformOps } from "../model/asset";
 import { StoredProjectContent } from "../model/project";
 import { assertNever, failIfNull, fetchArrayBuffer, hexSHA256 } from "../utils";
@@ -140,7 +144,7 @@ export type StandaloneProjectDescriptor = {
   name: string;
   summary?: string;
   program: PytchProgram;
-  assets: Array<AddAssetDescriptor>;
+  assets: Array<TransformedAssetDescriptor>;
 };
 
 // TODO: Not sure this is the best place for this:
