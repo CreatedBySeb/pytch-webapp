@@ -28,6 +28,11 @@ export type AssetPresentationCreateOpts = Partial<{
   prepareAssetServer: boolean;
 }>;
 
+const kDefaultAssetPresentationCreateOpts: Required<AssetPresentationCreateOpts> =
+  {
+    prepareAssetServer: true,
+  };
+
 export class AssetPresentation {
   constructor(
     readonly assetInProject: IAssetInProject,
