@@ -188,6 +188,12 @@ class AssetServer {
     );
   }
 
+  async prepareFromData(assetDescriptor: TransformedAssetDescriptor) {
+    const label = `asset "${assetDescriptor.name}"`;
+    const asset = await this.createAsset(assetDescriptor, label);
+    this.assetByName.set(assetDescriptor.name, asset);
+  }
+
   /** Discard all stored assets. */
   clear() {
     const revokeURLIfImage = (asset: Asset) => {
