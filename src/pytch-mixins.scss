@@ -33,3 +33,13 @@
   justify-items: center;
   align-items: center;
 }
+
+@mixin pytch-colours-hover {
+  font-style: italic;
+  user-select: none;
+  cursor: pointer;
+  color: $pytch-colour-main-blue;
+  &:hover {
+    color: $pytch-colour-accent-lavender;
+  }
+}
