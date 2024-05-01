@@ -47,7 +47,11 @@ export class AssetPresentation {
     return this.assetInProject.name;
   }
 
-  static async create(assetInProject: IAssetInProject) {
+  static async create(
+    assetInProject: IAssetInProject,
+    opts: AssetPresentationCreateOpts = {}
+  ) {
+    const effectiveOpts = { ...kDefaultAssetPresentationCreateOpts, ...opts };
     await assetServer.prepare([assetInProject]);
 
     const assetType = assetInProject.mimeType.split("/")[0];
