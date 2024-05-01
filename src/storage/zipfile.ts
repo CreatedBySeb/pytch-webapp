@@ -330,9 +330,10 @@ const parseZipfile_V2_V3 = async (
   });
 
   const rawAssets = await Promise.all(assetPromises);
-  const assets: Array<AddAssetDescriptor> = rawAssets.map((a) => ({
+  const assets: Array<TransformedAssetDescriptor> = rawAssets.map((a) => ({
     ...a,
-    transform: transformFromName.get(a.name),
+    transform:
+      transformFromName.get(a.name) ?? AssetTransformOps.newNoop(a.mimeType),
   }));
 
   const summary =
