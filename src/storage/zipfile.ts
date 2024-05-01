@@ -209,7 +209,11 @@ const parseZipfile_V1 = async (
     assetPromises.push(_zipAsset(path, zipObj))
   );
 
-  const assets = await Promise.all(assetPromises);
+  const rawAssets = await Promise.all(assetPromises);
+  const assets: Array<TransformedAssetDescriptor> = rawAssets.map((a) => ({
+    ...a,
+    transform: AssetTransformOps.newNoop(a.mimeType),
+  }));
 
   const summary =
     zipName == null ? undefined : `Created from zipfile "${zipName}"`;
