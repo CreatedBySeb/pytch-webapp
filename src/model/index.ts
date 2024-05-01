@@ -43,6 +43,10 @@ import {
   googleDriveIntegration,
 } from "./google-drive-import-export";
 import { VersionOptIn, versionOptIn } from "./version-opt-in";
+import {
+  StandalonePlayDemoState,
+  standalonePlayDemoState,
+} from "./standalone-play-demo";
 
 export interface IPytchAppModel {
   versionOptIn: VersionOptIn;
@@ -64,6 +68,7 @@ export interface IPytchAppModel {
   projectFromSpecimenFlow: ProjectFromSpecimenFlow;
   clipArtGallery: IClipArtGallery;
   googleDriveImportExport: GoogleDriveIntegration;
+  standalonePlayDemoState: StandalonePlayDemoState;
 }
 
 export type PytchAppModelActions = Actions<IPytchAppModel>;
@@ -88,4 +93,5 @@ export const pytchAppModel: IPytchAppModel = {
   projectFromSpecimenFlow,
   clipArtGallery,
   googleDriveImportExport: googleDriveIntegration,
+  standalonePlayDemoState,
 };
