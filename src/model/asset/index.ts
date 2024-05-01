@@ -52,7 +52,10 @@ export class AssetPresentation {
     opts: AssetPresentationCreateOpts = {}
   ) {
     const effectiveOpts = { ...kDefaultAssetPresentationCreateOpts, ...opts };
-    await assetServer.prepare([assetInProject]);
+
+    if (effectiveOpts.prepareAssetServer) {
+      await assetServer.prepare([assetInProject]);
+    }
 
     const assetType = assetInProject.mimeType.split("/")[0];
     let presentation: AssetPresentationData;
