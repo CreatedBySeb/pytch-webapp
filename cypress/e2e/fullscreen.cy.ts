@@ -60,8 +60,8 @@ context("Full-screen layout", () => {
       label: "height-constrained",
       size: [800, 600],
       attr: "height",
-      // TODO: Replace this "40" with a constant:
-      expValue: 600 - 40 - 2 * stageFullScreenBorderPx,
+      // TODO: Replace this "36" and "8" with constants:
+      expValue: 600 - 36 - 8 - 2 * stageFullScreenBorderPx,
     },
     {
       label: "width-constrained",
