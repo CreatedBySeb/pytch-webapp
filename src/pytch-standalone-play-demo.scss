@@ -6,4 +6,18 @@
   place-content: center center;
 
   background-color: $secondary-bg-color;
+
+  .spinner-container,
+  .ErrorNotice {
+    margin-top: 8px;
+    border: $canvas-border-width solid grey;
+    display: grid;
+    place-content: center center;
+    background-color: $main-bg-color;
+  }
+
+  .ErrorNotice {
+    text-align: center;
+    user-select: none;
+  }
 }
