@@ -7,7 +7,9 @@ import {
 import { IPytchAppModel } from ".";
 import { propSetterAction } from "../utils";
 import { ProjectContent } from "./project-core";
-import { AssetPresentation } from "./asset";
+import { AssetPresentation, IAssetInProject } from "./asset";
+import { assetServer } from "../skulpt-connection/asset-server";
+import { TransformedAssetDescriptor } from "../database/indexed-db";
 
 // TODO: Record some information about the various kinds of error?
 type CoreState =
@@ -36,6 +38,18 @@ export function stateHasProject(
   state: CoreState
 ): state is CoreStateWithProject {
   return kindsWithProject.includes(state.kind);
+}
+
+async function createAssetPresentation(asset: TransformedAssetDescriptor) {
+  await assetServer.prepareFromData(asset);
+  const fakeAssetInProject: IAssetInProject = {
+    id: "nonsense", // TODO: Could compute hash but don't think it matters.
+    name: asset.name,
+    mimeType: asset.mimeType,
+    transform: asset.transform,
+  };
+  const createOpts = { prepareAssetServer: false };
+  return await AssetPresentation.create(fakeAssetInProject, createOpts);
 }
 
 // "Slice action" — Action<> specialised for this slice-type.
