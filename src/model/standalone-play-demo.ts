@@ -64,6 +64,8 @@ type SThunk<ArgT, ResultT = void> = GenericThunk<
   ResultT
 >;
 
+type DemoPath = { buildId: string; demoId: string };
+
 export type StandalonePlayDemoState = {
   coreState: CoreState;
   setCoreState: SAction<CoreState>;
