@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 
 import { EmptyProps } from "../utils";
 
+import { envVarOrDefault } from "../env-utils";
+
 import { useStoreActions, useStoreState } from "../store";
 import { Actions, State } from "easy-peasy";
 
@@ -49,6 +51,22 @@ const useStageDimensionsStyle = ({
   }
 
   return style;
+};
+
+////////////////////////////////////////////////////////////////////////
+// Sub-components.
+
+const MadeWithPytchButton: React.FC<EmptyProps> = () => {
+  const url = envVarOrDefault("BASE_URL", "https://pytch.org/");
+  return (
+    <div className="MadeWithPytchButton">
+      <p>
+        <a href={url} target="_blank" rel="noreferrer">
+          <span className="pseudo-link">Made with Pytch</span>
+        </a>
+      </p>
+    </div>
+  );
 };
 
 ////////////////////////////////////////////////////////////////////////
