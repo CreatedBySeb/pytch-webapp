@@ -208,7 +208,10 @@ $task-checkbox-not-done-colour: #999;
   }
 
   .ShowNextHelpStageButton-container {
-    text-align: right;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     button {
       padding: 2px 4px;
     }
