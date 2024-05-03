@@ -198,6 +198,12 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
     }
   };
 
+  const greenFlag = (
+    <div className="StageControlPseudoButton GreenFlag" onClick={onGreenFlag}>
+      <FontAwesomeIcon icon="play" />
+    </div>
+  );
+
   return (
     <div className="StandalonePlayDemo abs-0000">
     </div>
