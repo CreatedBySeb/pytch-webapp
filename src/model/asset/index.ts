@@ -47,6 +47,9 @@ export class AssetPresentation {
     return this.assetInProject.name;
   }
 
+  // The `opts` here are a bit scrappy.  I think we should be able to
+  // separate the jobs of loading the data into the asset-server and
+  // that of creating the AssetPresentation.  TODO.
   static async create(
     assetInProject: IAssetInProject,
     opts: AssetPresentationCreateOpts = {}
