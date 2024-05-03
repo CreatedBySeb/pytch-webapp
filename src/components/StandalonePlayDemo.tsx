@@ -148,6 +148,7 @@ const DemoContent: React.FC<EmptyProps> = () => {
 
 export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   const params = useParams();
+  const state = useSPDState((s) => s.coreState);
 
   const noteLoadFailed = useSPDActions((a) => a.noteBootFailed);
   const bootIfRequired = useSPDActions((a) => a.bootIfRequired);
@@ -164,6 +165,10 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
       noteLoadFailed(); // Shouldn't happen.
     } else {
       bootIfRequired({ buildId: params.buildId, demoId: params.demoId });
+    }
+
+    if (state.kind === "ready") {
+      onGreenFlag();
     }
   });
 
