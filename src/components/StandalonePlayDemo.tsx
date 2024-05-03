@@ -9,7 +9,7 @@ import { useStoreActions, useStoreState } from "../store";
 import { Actions, State } from "easy-peasy";
 
 import { BuildOutcomeKind, build } from "../skulpt-connection/build";
-import { eqDisplaySize } from "../model/ui";
+import { eqDisplaySize, fullScreenStageDisplaySize } from "../model/ui";
 
 import {
   StandalonePlayDemoState,
@@ -159,6 +159,9 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   const incrementBuildSeqnum = useStoreActions(
     (actions) => actions.activeProject.incrementBuildSeqnum
   );
+  const setStageDisplayWidth = useStoreActions(
+    (actions) => actions.ideLayout.setStageDisplayWidth
+  );
 
   useEffect(() => {
     if (params.buildId == null || params.demoId == null) {
@@ -166,6 +169,13 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
     } else {
       bootIfRequired({ buildId: params.buildId, demoId: params.demoId });
     }
+
+    const handleResize = () => {
+      // This "28" is the height of the controls; ideally we would get
+      // this from somewhere definitive, not hard-code it.
+      const layout = fullScreenStageDisplaySize(28);
+      setStageDisplayWidth(layout.width);
+    };
 
     if (state.kind === "ready") {
       onGreenFlag();
