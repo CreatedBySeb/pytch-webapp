@@ -1,0 +1,9 @@
+@import "./pytch-mixins.scss";
+@import "./pytch-variables.scss";
+
+.StandalonePlayDemo {
+  display: grid;
+  place-content: center center;
+
+  background-color: $secondary-bg-color;
+}
