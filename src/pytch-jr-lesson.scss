@@ -167,6 +167,16 @@ $task-checkbox-not-done-colour: #999;
 .alert.LearnerTask {
   margin: 0rem -0.25rem 1rem;
 
+  .to-do-checkbox-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    span {
+      font-style: italic;
+      margin-left: 0.5rem;
+    }
+  }
+
   .to-do-checkbox {
     position: relative;
     margin: 0px;
