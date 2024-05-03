@@ -67,6 +67,30 @@ const HelpStage: React.FC<HelpStageProps> = ({
   );
 };
 
+type CheckboxHelpProps = { interactivityKind: TaskInteractivityKind };
+const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
+  switch (interactivityKind) {
+    case "current":
+      return (
+        <span>
+          <FontAwesomeIcon className="help-arrow" icon="arrow-left-long" />{" "}
+          Click when you’ve done this.
+        </span>
+      );
+    case "previous":
+      return (
+        <span>
+          <FontAwesomeIcon className="help-arrow" icon="arrow-left-long" />{" "}
+          Done! (Click to rewind to this task.)
+        </span>
+      );
+    case "old":
+      return <span>Done!</span>;
+    default:
+      return assertNever(interactivityKind);
+  }
+};
+
 type ShowHelpStageButtonProps = {
   nStagesStillHidden: number;
   showNextHelpStage: () => void;
