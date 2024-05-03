@@ -22,6 +22,8 @@ import QuestionInputPanel from "./QuestionInputPanel";
 import { RedStop } from "./StageControls";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import "../pytch-standalone-play-demo.scss";
+
 ////////////////////////////////////////////////////////////////////////
 // Utilities for using slice's state/actions.
 
