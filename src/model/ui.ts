@@ -133,12 +133,15 @@ export interface IIDELayout {
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
 }
 
-const fullScreenStageDisplaySize = () => {
+export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
   const { clientWidth, clientHeight } = document.documentElement;
   const maxStageWidth = clientWidth - 2 * stageFullScreenBorderPx;
-  // TODO: "40" comes from an estimate of StageControls height; turn
-  // this into a constant somewhere.
-  const maxStageHeight = clientHeight - 40 - 2 * stageFullScreenBorderPx;
+
+  // The "8" is the margin between controls and stage; ideally this
+  // would be fetched from somewhere, as would the default value of the
+  // "controlsHeight" arg.
+  const maxStageHeight =
+    clientHeight - controlsHeight - 8 - 2 * stageFullScreenBorderPx;
 
   const stretchWidth = maxStageWidth / stageWidth;
   const stretchHeight = maxStageHeight / stageHeight;
