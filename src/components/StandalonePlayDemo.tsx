@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 
-import { EmptyProps, OnlyChildrenProps } from "../utils";
+import { EmptyProps, OnlyChildrenProps, assertNever } from "../utils";
 
 import { envVarOrDefault } from "../env-utils";
 
@@ -15,6 +15,8 @@ import {
 } from "../model/standalone-play-demo";
 
 import Spinner from "react-bootstrap/Spinner";
+import Stage from "./Stage";
+import QuestionInputPanel from "./QuestionInputPanel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,6 +97,48 @@ const SizedSpinner: React.FC<EmptyProps> = () => {
       <Spinner animation="border" />
     </div>
   );
+};
+
+const DemoContent: React.FC<EmptyProps> = () => {
+  const state = useSPDState((s) => s.coreState);
+
+  switch (state.kind) {
+    case "idle":
+    case "booting":
+      return <SizedSpinner />;
+    case "boot-failed":
+      return (
+        <ErrorNotice>
+          <p>Sorry, this Pytch program could not be loaded.</p>
+        </ErrorNotice>
+      );
+    case "build-failed":
+      return (
+        <ErrorNotice>
+          <p>Sorry, this Pytch program could not be started.</p>
+        </ErrorNotice>
+      );
+    case "ready":
+    case "launched":
+      return (
+        <div className="stage-and-text-input">
+          <Stage />
+          <QuestionInputPanel />
+        </div>
+      );
+    case "runtime-error":
+      return (
+        <ErrorNotice>
+          <p>Sorry, this Pytch program encountered an error.</p>
+          <p>
+            You can try re-running the program by clicking the green button
+            above the stage.
+          </p>
+        </ErrorNotice>
+      );
+    default:
+      return assertNever(state);
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////
