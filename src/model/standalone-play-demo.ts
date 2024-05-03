@@ -5,6 +5,7 @@ import {
   thunk,
 } from "easy-peasy";
 import { IPytchAppModel } from ".";
+import { propSetterAction } from "../utils";
 import { ProjectContent } from "./project-core";
 import { AssetPresentation } from "./asset";
 
@@ -33,7 +34,11 @@ type SThunk<ArgT, ResultT = void> = GenericThunk<
 >;
 
 export type StandalonePlayDemoState = {
+  coreState: CoreState;
+  setCoreState: SAction<CoreState>;
 };
 
 export let standalonePlayDemoState: StandalonePlayDemoState = {
+  coreState: kIdleState,
+  setCoreState: propSetterAction("coreState"),
 };
