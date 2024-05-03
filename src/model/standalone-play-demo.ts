@@ -9,6 +9,7 @@ import { propSetterAction } from "../utils";
 import { ProjectContent } from "./project-core";
 import { AssetPresentation } from "./asset";
 
+// TODO: Record some information about the various kinds of error?
 type CoreState =
   | { kind: "idle" }
   | { kind: "booting" }
