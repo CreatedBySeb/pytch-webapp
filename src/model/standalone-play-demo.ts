@@ -10,6 +10,7 @@ import { ProjectContent } from "./project-core";
 import { AssetPresentation, IAssetInProject } from "./asset";
 import { assetServer } from "../skulpt-connection/asset-server";
 import { TransformedAssetDescriptor } from "../database/indexed-db";
+import { demoURLFromId, projectDescriptorFromURL } from "../storage/zipfile";
 
 // TODO: Record some information about the various kinds of error?
 type CoreState =
@@ -73,6 +74,8 @@ export type StandalonePlayDemoState = {
   noteBuildFailed: SAction<void>;
   noteLaunched: SAction<void>;
   noteRuntimeError: SAction<void>;
+
+  bootIfRequired: SThunk<DemoPath, Promise<void>>;
 };
 
 export let standalonePlayDemoState: StandalonePlayDemoState = {
@@ -108,5 +111,28 @@ export let standalonePlayDemoState: StandalonePlayDemoState = {
       kind: "runtime-error",
       project: coreState.project,
     };
+  }),
+
+  bootIfRequired: thunk(async (actions, demoPath, helpers) => {
+    if (helpers.getState().coreState.kind !== "idle") {
+      return;
+    }
+
+    actions.setCoreState(kBootingState);
+
+    try {
+      const demoURL = demoURLFromId(`${demoPath.buildId}/${demoPath.demoId}`);
+      const descriptor = await projectDescriptorFromURL(demoURL);
+
+      assetServer.clear();
+
+      const assetPromises = descriptor.assets.map(createAssetPresentation);
+      const assets = await Promise.all(assetPromises);
+      const project = { program: descriptor.program, assets };
+
+      actions.setCoreState({ kind: "ready", project });
+    } catch /* TODO: Do something with error? */ {
+      actions.noteBootFailed();
+    }
   }),
 };
