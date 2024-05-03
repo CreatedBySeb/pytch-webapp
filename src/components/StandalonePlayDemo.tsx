@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 
-import { EmptyProps } from "../utils";
+import { EmptyProps, OnlyChildrenProps } from "../utils";
 
 import { envVarOrDefault } from "../env-utils";
 
@@ -13,6 +13,8 @@ import { eqDisplaySize } from "../model/ui";
 import {
   StandalonePlayDemoState,
 } from "../model/standalone-play-demo";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 ////////////////////////////////////////////////////////////////////////
 // Utilities for using slice's state/actions.
@@ -65,6 +67,22 @@ const MadeWithPytchButton: React.FC<EmptyProps> = () => {
           <span className="pseudo-link">Made with Pytch</span>
         </a>
       </p>
+    </div>
+  );
+};
+
+const ErrorNotice: React.FC<OnlyChildrenProps> = ({ children }) => {
+  const dimensionsStyle = useStageDimensionsStyle({ includeHeight: true });
+  return (
+    <div className="ErrorNotice mx-auto" style={dimensionsStyle}>
+      <div>
+        <FontAwesomeIcon
+          className="mb-3"
+          size="2x"
+          icon="triangle-exclamation"
+        />
+        {children}
+      </div>
     </div>
   );
 };
