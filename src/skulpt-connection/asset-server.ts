@@ -1,4 +1,4 @@
-import { assetData } from "../database/indexed-db";
+import { TransformedAssetDescriptor, assetData } from "../database/indexed-db";
 import { IAssetInProject, ImageCropDescriptor } from "../model/asset";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,12 +114,29 @@ class AssetServer {
 
   private async fetchAsset(asset: IAssetInProject): Promise<Asset> {
     const data = await assetData(asset.id);
+    const transformedAsset: TransformedAssetDescriptor = {
+      name: asset.name,
+      mimeType: asset.mimeType,
+      data,
+      transform: asset.transform,
+    };
+
+    return this.createAsset(
+      transformedAsset,
+      `asset "${asset.name}" with id ${asset.id}`
+    );
+  }
+
+  private async createAsset(
+    asset: TransformedAssetDescriptor,
+    label: string
+  ): Promise<Asset> {
     const mimeTopLevelType = asset.mimeType.split("/")[0];
     switch (mimeTopLevelType) {
       // TODO: Should check that we only ever create assets
       // with these mime top-level types:
       case "image": {
-        const blob = new Blob([data], { type: asset.mimeType });
+        const blob = new Blob([asset.data], { type: asset.mimeType });
 
         // The ObjectURL we create here is revoked in clear().
         const dataUrl = URL.createObjectURL(blob);
@@ -148,13 +165,12 @@ class AssetServer {
         // TODO: Audio transform?
         return {
           kind: AssetKind.Sound,
-          audioData: data,
+          audioData: asset.data,
         };
       }
       default:
         throw Error(
-          `unknown top-level mime type ${mimeTopLevelType}` +
-            ` for asset "${asset.name}" with id ${asset.id}`
+          `unknown top-level mime type ${mimeTopLevelType} for ${label}`
         );
     }
   }
@@ -170,6 +186,12 @@ class AssetServer {
         this.assetByName.set(asset.name, await this.fetchAsset(asset));
       })
     );
+  }
+
+  async prepareFromData(assetDescriptor: TransformedAssetDescriptor) {
+    const label = `asset "${assetDescriptor.name}"`;
+    const asset = await this.createAsset(assetDescriptor, label);
+    this.assetByName.set(assetDescriptor.name, asset);
   }
 
   /** Discard all stored assets. */
