@@ -14,6 +14,7 @@ import {
   StandalonePlayDemoState,
 } from "../model/standalone-play-demo";
 
+import Spinner from "react-bootstrap/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,15 @@ const ErrorNotice: React.FC<OnlyChildrenProps> = ({ children }) => {
         />
         {children}
       </div>
+    </div>
+  );
+};
+
+const SizedSpinner: React.FC<EmptyProps> = () => {
+  const dimensionsStyle = useStageDimensionsStyle({ includeHeight: true });
+  return (
+    <div className="spinner-container mx-auto" style={dimensionsStyle}>
+      <Spinner animation="border" />
     </div>
   );
 };
