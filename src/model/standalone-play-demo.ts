@@ -53,6 +53,7 @@ export type StandalonePlayDemoState = {
   coreState: CoreState;
   setCoreState: SAction<CoreState>;
   noteBootFailed: SAction<void>;
+  noteBuildFailed: SAction<void>;
 };
 
 export let standalonePlayDemoState: StandalonePlayDemoState = {
@@ -61,5 +62,13 @@ export let standalonePlayDemoState: StandalonePlayDemoState = {
 
   noteBootFailed: action((state) => {
     state.coreState = { kind: "boot-failed" };
+  }),
+
+  noteBuildFailed: action((state) => {
+    const coreState = state.coreState;
+    if (coreState.kind !== "ready")
+      throw new Error("can only note build failure if ready");
+
+    state.coreState = { kind: "build-failed" };
   }),
 };
