@@ -1,0 +1,52 @@
+@import "./pytch-mixins.scss";
+@import "./pytch-variables.scss";
+
+.StandalonePlayDemo {
+  display: grid;
+  place-content: center center;
+
+  background-color: $secondary-bg-color;
+
+  .spinner-container,
+  .ErrorNotice {
+    margin-top: 8px;
+    border: $canvas-border-width solid grey;
+    display: grid;
+    place-content: center center;
+    background-color: $main-bg-color;
+  }
+
+  .ErrorNotice {
+    text-align: center;
+    user-select: none;
+  }
+
+  .StageControls {
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .run-stop-controls {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+
+      .StageControlPseudoButton {
+        height: 28px;
+      }
+    }
+
+    .MadeWithPytchButton {
+      place-self: center end;
+      p {
+        margin: 0px;
+        white-space: nowrap;
+      }
+      .pseudo-link {
+        @include pytch-colours-hover();
+      }
+    }
+  }
+}

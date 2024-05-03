@@ -56,7 +56,7 @@ const GreenFlag = () => {
   );
 };
 
-const RedStop = () => {
+export const RedStop = () => {
   const redStop = () => {
     Sk.pytch.current_live_project.on_red_stop_clicked();
     focusStage();
