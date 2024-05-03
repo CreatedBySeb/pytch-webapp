@@ -24,6 +24,15 @@ export {
   assetOperationContextFromKey,
 } from "./core";
 
+export type AssetPresentationCreateOpts = Partial<{
+  prepareAssetServer: boolean;
+}>;
+
+const kDefaultAssetPresentationCreateOpts: Required<AssetPresentationCreateOpts> =
+  {
+    prepareAssetServer: true,
+  };
+
 export class AssetPresentation {
   constructor(
     readonly assetInProject: IAssetInProject,
@@ -38,8 +47,18 @@ export class AssetPresentation {
     return this.assetInProject.name;
   }
 
-  static async create(assetInProject: IAssetInProject) {
-    await assetServer.prepare([assetInProject]);
+  // The `opts` here are a bit scrappy.  I think we should be able to
+  // separate the jobs of loading the data into the asset-server and
+  // that of creating the AssetPresentation.  TODO.
+  static async create(
+    assetInProject: IAssetInProject,
+    opts: AssetPresentationCreateOpts = {}
+  ) {
+    const effectiveOpts = { ...kDefaultAssetPresentationCreateOpts, ...opts };
+
+    if (effectiveOpts.prepareAssetServer) {
+      await assetServer.prepare([assetInProject]);
+    }
 
     const assetType = assetInProject.mimeType.split("/")[0];
     let presentation: AssetPresentationData;
