@@ -298,6 +298,7 @@ Cypress.Commands.add("pytchStdoutShouldEqual", (match: string) => {
 Cypress.Commands.add(
   "pytchCanvasShouldBeSolidColour",
   (expectedColour: ArrayRGBA) => {
+    cy.waitUntil(() =>
     cy.get("#pytch-canvas").then(($canvas) => {
       const canvas = $canvas[0] as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
@@ -315,8 +316,9 @@ Cypress.Commands.add(
         )
           allOK = false;
       }
-      expect(allOK).eq(true);
-    });
+      return allOK;
+    })
+    );
   }
 );
 
