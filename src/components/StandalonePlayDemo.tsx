@@ -19,6 +19,7 @@ import {
 import Spinner from "react-bootstrap/Spinner";
 import Stage from "./Stage";
 import QuestionInputPanel from "./QuestionInputPanel";
+import { RedStop } from "./StageControls";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 ////////////////////////////////////////////////////////////////////////
@@ -149,6 +150,7 @@ const DemoContent: React.FC<EmptyProps> = () => {
 export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   const params = useParams();
   const state = useSPDState((s) => s.coreState);
+  const widthOfStageStyle = useStageDimensionsStyle({ includeHeight: false });
 
   const noteLoadFailed = useSPDActions((a) => a.noteBootFailed);
   const bootIfRequired = useSPDActions((a) => a.bootIfRequired);
@@ -221,6 +223,16 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
 
   return (
     <div className="StandalonePlayDemo abs-0000">
+      <div className="StageWithControls">
+        <div className="StageControls" style={widthOfStageStyle}>
+          <div className="run-stop-controls">
+            {greenFlag}
+            <RedStop />
+          </div>
+          <MadeWithPytchButton />
+        </div>
+        <DemoContent />
+      </div>
     </div>
   );
 };
