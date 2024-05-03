@@ -25,6 +25,18 @@ type CoreStateWithProject = CoreState & {
   kind: "ready" | "launched" | "runtime-error";
 };
 
+const kindsWithProject: Array<CoreState["kind"]> = [
+  "ready",
+  "launched",
+  "runtime-error",
+];
+
+export function stateHasProject(
+  state: CoreState
+): state is CoreStateWithProject {
+  return kindsWithProject.includes(state.kind);
+}
+
 // "Slice action" — Action<> specialised for this slice-type.
 type SAction<ArgT> = GenericAction<StandalonePlayDemoState, ArgT>;
 
