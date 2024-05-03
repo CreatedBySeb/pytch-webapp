@@ -167,20 +167,23 @@ $task-checkbox-not-done-colour: #999;
 .alert.LearnerTask {
   margin: 0rem -0.25rem 1rem;
 
-  .task-outline > .to-do-checkbox {
-    float: right;
+  .to-do-checkbox {
     position: relative;
-    z-index: 2;
-    margin-right: 0px;
-    margin-left: 0.5rem;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
+    margin: 0px;
     user-select: none;
-    color: #bbb;
     font-size: 2.5rem;
   }
-  &.learner-task-old .task-outline > .to-do-checkbox {
+  &.learner-task-old .to-do-checkbox {
     cursor: default;
+    color: $task-checkbox-done-colour;
+  }
+  &.learner-task-previous .to-do-checkbox {
+    cursor: pointer;
+    @include foreground-color-as-button($task-checkbox-done-colour);
+  }
+  &.learner-task-current .to-do-checkbox {
+    cursor: pointer;
+    @include foreground-color-as-button($task-checkbox-not-done-colour);
   }
 
   .help-stage-divider {
@@ -199,11 +202,6 @@ $task-checkbox-not-done-colour: #999;
     button {
       padding: 2px 4px;
     }
-  }
-
-  &.learner-task-previous .task-outline .to-do-checkbox,
-  &.learner-task-old .task-outline .to-do-checkbox {
-    color: #9b9;
   }
 }
 
