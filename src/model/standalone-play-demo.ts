@@ -52,9 +52,14 @@ type SThunk<ArgT, ResultT = void> = GenericThunk<
 export type StandalonePlayDemoState = {
   coreState: CoreState;
   setCoreState: SAction<CoreState>;
+  noteBootFailed: SAction<void>;
 };
 
 export let standalonePlayDemoState: StandalonePlayDemoState = {
   coreState: kIdleState,
   setCoreState: propSetterAction("coreState"),
+
+  noteBootFailed: action((state) => {
+    state.coreState = { kind: "boot-failed" };
+  }),
 };
