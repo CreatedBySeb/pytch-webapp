@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { interceptDemoZipfile } from "./utils";
+
 context("Work with suggested demos", () => {
   beforeEach(() => {
     cy.pytchResetDatabase();
@@ -8,9 +10,7 @@ context("Work with suggested demos", () => {
   // TODO: Set PYTCH_CYPRESS.instantDelays for these tests:
 
   it("Launch a suggested demo", () => {
-    cy.intercept("GET", "**/fake-build-id-for-tests/bubbles.zip", {
-      fixture: "project-zipfiles/bubbles.zip",
-    });
+    interceptDemoZipfile("bubbles");
     cy.visit("/suggested-demo/fake-build-id-for-tests/bubbles");
     cy.contains("Bubbles");
     cy.get("button[title*='Try this project']").click();
