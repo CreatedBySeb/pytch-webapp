@@ -177,9 +177,14 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
       setStageDisplayWidth(layout.width);
     };
 
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
     if (state.kind === "ready") {
       onGreenFlag();
     }
+
+    return () => window.removeEventListener("resize", handleResize);
   });
 
   const onGreenFlag = async () => {
