@@ -69,11 +69,13 @@ type ShowHelpStageButtonProps = {
   nStagesStillHidden: number;
   showNextHelpStage: () => void;
   hideAllHelpStages: () => void;
+  onCheckboxClick: () => void;
 };
 const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   nStagesStillHidden,
   showNextHelpStage,
   hideAllHelpStages,
+  onCheckboxClick,
 }) => {
   const label = (() => {
     switch (nStagesStillHidden) {
@@ -91,6 +93,13 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
 
   return (
     <div className="ShowNextHelpStageButton-container">
+      <div className="to-do-checkbox-container">
+        <FontAwesomeIcon
+          className="to-do-checkbox"
+          icon="check-square"
+          onClick={onCheckboxClick}
+        />
+      </div>
       <Button
         key={nStagesStillHidden}
         variant="outline-success"
@@ -167,6 +176,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
         nStagesStillHidden={nStagesStillHidden}
         showNextHelpStage={() => showNextHelpStage(task.index)}
         hideAllHelpStages={() => hideAllHelpStages(task.index)}
+        onCheckboxClick={onCheckboxClick}
       />
     </>
   );
