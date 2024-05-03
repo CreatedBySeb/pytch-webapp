@@ -14,6 +14,8 @@ import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
+type TaskInteractivityKind = "old" | "previous" | "current";
+
 type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
   const content = (() => {
@@ -114,7 +116,7 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
 type LearnerTaskProps = {
   keyPath: string;
   task: LearnerTaskDescriptor;
-  kind: "old" | "previous" | "current";
+  kind: TaskInteractivityKind;
 };
 export const LearnerTask: React.FC<LearnerTaskProps> = ({
   keyPath,
