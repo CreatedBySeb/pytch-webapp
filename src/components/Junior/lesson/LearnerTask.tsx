@@ -93,12 +93,14 @@ const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
 
 type ShowHelpStageButtonProps = {
   nStagesStillHidden: number;
+  interactivityKind: TaskInteractivityKind;
   showNextHelpStage: () => void;
   hideAllHelpStages: () => void;
   onCheckboxClick: () => void;
 };
 const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   nStagesStillHidden,
+  interactivityKind,
   showNextHelpStage,
   hideAllHelpStages,
   onCheckboxClick,
@@ -125,6 +127,7 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
           icon="check-square"
           onClick={onCheckboxClick}
         />
+        <CheckboxHelp interactivityKind={interactivityKind} />
       </div>
       <Button
         key={nStagesStillHidden}
@@ -200,6 +203,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
       <div className="help-stage-divider" />
       <ShowNextHelpStageButton
         nStagesStillHidden={nStagesStillHidden}
+        interactivityKind={kind}
         showNextHelpStage={() => showNextHelpStage(task.index)}
         hideAllHelpStages={() => hideAllHelpStages(task.index)}
         onCheckboxClick={onCheckboxClick}
