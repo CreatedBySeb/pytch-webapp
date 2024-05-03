@@ -216,11 +216,6 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
   return (
     <Alert key={keyPath} variant={alertVariant} className={classes}>
       <div className="task-outline">
-        <FontAwesomeIcon
-          className="to-do-checkbox"
-          icon="check-square"
-          onClick={onCheckboxClick}
-        />
         <div className="task-intro-content">
           <RawElement element={task.intro} />
         </div>
