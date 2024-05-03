@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { EmptyProps, OnlyChildrenProps, assertNever } from "../utils";
@@ -146,6 +146,17 @@ const DemoContent: React.FC<EmptyProps> = () => {
 
 export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   const params = useParams();
+
+  const noteLoadFailed = useSPDActions((a) => a.noteBootFailed);
+  const bootIfRequired = useSPDActions((a) => a.bootIfRequired);
+
+  useEffect(() => {
+    if (params.buildId == null || params.demoId == null) {
+      noteLoadFailed(); // Shouldn't happen.
+    } else {
+      bootIfRequired({ buildId: params.buildId, demoId: params.demoId });
+    }
+  });
 
   return (
     <div className="StandalonePlayDemo abs-0000">
