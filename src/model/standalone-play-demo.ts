@@ -21,6 +21,10 @@ type CoreState =
 const kIdleState: CoreState = { kind: "idle" };
 const kBootingState: CoreState = { kind: "booting" };
 
+type CoreStateWithProject = CoreState & {
+  kind: "ready" | "launched" | "runtime-error";
+};
+
 // "Slice action" — Action<> specialised for this slice-type.
 type SAction<ArgT> = GenericAction<StandalonePlayDemoState, ArgT>;
 
