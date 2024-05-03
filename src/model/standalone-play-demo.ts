@@ -55,6 +55,7 @@ export type StandalonePlayDemoState = {
   noteBootFailed: SAction<void>;
   noteBuildFailed: SAction<void>;
   noteLaunched: SAction<void>;
+  noteRuntimeError: SAction<void>;
 };
 
 export let standalonePlayDemoState: StandalonePlayDemoState = {
@@ -79,5 +80,16 @@ export let standalonePlayDemoState: StandalonePlayDemoState = {
       throw new Error("can only launch if state has project");
 
     state.coreState = { kind: "launched", project: coreState.project };
+  }),
+
+  noteRuntimeError: action((state) => {
+    const coreState = state.coreState;
+    if (coreState.kind !== "launched")
+      throw new Error("can only note error if launched");
+
+    state.coreState = {
+      kind: "runtime-error",
+      project: coreState.project,
+    };
   }),
 };
