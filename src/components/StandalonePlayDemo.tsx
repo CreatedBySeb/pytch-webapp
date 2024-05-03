@@ -8,10 +8,12 @@ import { envVarOrDefault } from "../env-utils";
 import { useStoreActions, useStoreState } from "../store";
 import { Actions, State } from "easy-peasy";
 
+import { BuildOutcomeKind, build } from "../skulpt-connection/build";
 import { eqDisplaySize } from "../model/ui";
 
 import {
   StandalonePlayDemoState,
+  stateHasProject,
 } from "../model/standalone-play-demo";
 
 import Spinner from "react-bootstrap/Spinner";
@@ -149,6 +151,13 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
 
   const noteLoadFailed = useSPDActions((a) => a.noteBootFailed);
   const bootIfRequired = useSPDActions((a) => a.bootIfRequired);
+  const noteBuildFailed = useSPDActions((a) => a.noteBuildFailed);
+  const noteLaunched = useSPDActions((a) => a.noteLaunched);
+  const noteErrorOccurred = useSPDActions((a) => a.noteRuntimeError);
+
+  const incrementBuildSeqnum = useStoreActions(
+    (actions) => actions.activeProject.incrementBuildSeqnum
+  );
 
   useEffect(() => {
     if (params.buildId == null || params.demoId == null) {
@@ -157,6 +166,32 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
       bootIfRequired({ buildId: params.buildId, demoId: params.demoId });
     }
   });
+
+  const onGreenFlag = async () => {
+    if (!stateHasProject(state)) {
+      return;
+    }
+
+    const buildResult = await build(
+      state.project,
+      (_outputChunk) => {
+        // TODO: Can we do anything useful with Python print() output?
+        return;
+      },
+      (_pytchError, _errorContext) => {
+        // TODO: Could put up button saying "launch Pytch (in new tab)
+        // with this project so you can debug".
+        noteErrorOccurred();
+      }
+    );
+
+    if (buildResult.kind === BuildOutcomeKind.Success) {
+      noteLaunched();
+      incrementBuildSeqnum(); // Rerender Stage; new ProjectEngine.
+    } else {
+      noteBuildFailed();
+    }
+  };
 
   return (
     <div className="StandalonePlayDemo abs-0000">
