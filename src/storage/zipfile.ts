@@ -1,6 +1,10 @@
 import JSZip from "jszip";
 import { typeFromExtension } from "./mime-types";
-import { AddAssetDescriptor, assetData } from "../database/indexed-db";
+import {
+  AddAssetDescriptor,
+  TransformedAssetDescriptor,
+  assetData,
+} from "../database/indexed-db";
 import { AssetTransform, AssetTransformOps } from "../model/asset";
 import { StoredProjectContent } from "../model/project";
 import { assertNever, failIfNull, fetchArrayBuffer, hexSHA256 } from "../utils";
@@ -140,7 +144,7 @@ export type StandaloneProjectDescriptor = {
   name: string;
   summary?: string;
   program: PytchProgram;
-  assets: Array<AddAssetDescriptor>;
+  assets: Array<TransformedAssetDescriptor>;
 };
 
 // TODO: Not sure this is the best place for this:
@@ -205,7 +209,11 @@ const parseZipfile_V1 = async (
     assetPromises.push(_zipAsset(path, zipObj))
   );
 
-  const assets = await Promise.all(assetPromises);
+  const rawAssets = await Promise.all(assetPromises);
+  const assets: Array<TransformedAssetDescriptor> = rawAssets.map((a) => ({
+    ...a,
+    transform: AssetTransformOps.newNoop(a.mimeType),
+  }));
 
   const summary =
     zipName == null ? undefined : `Created from zipfile "${zipName}"`;
@@ -322,9 +330,10 @@ const parseZipfile_V2_V3 = async (
   });
 
   const rawAssets = await Promise.all(assetPromises);
-  const assets: Array<AddAssetDescriptor> = rawAssets.map((a) => ({
+  const assets: Array<TransformedAssetDescriptor> = rawAssets.map((a) => ({
     ...a,
-    transform: transformFromName.get(a.name),
+    transform:
+      transformFromName.get(a.name) ?? AssetTransformOps.newNoop(a.mimeType),
   }));
 
   const summary =

@@ -142,6 +142,8 @@ export interface AddAssetDescriptor {
   transform?: AssetTransform;
 }
 
+export type TransformedAssetDescriptor = Required<AddAssetDescriptor>;
+
 async function dbUpgrade_V3_from_V2(txn: Transaction) {
   console.log("upgrading to DBv3");
 
