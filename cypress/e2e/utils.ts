@@ -38,6 +38,14 @@ export const saveButton = (() => {
   };
 })();
 
+/** Set up a Cypress `intercept()` for the demo zipfile whose filename
+ * has the given `demoStem`. */
+export function interceptDemoZipfile(demoStem: string) {
+  cy.intercept("GET", `**/fake-build-id-for-tests/${demoStem}.zip`, {
+    fixture: `project-zipfiles/${demoStem}.zip`,
+  });
+}
+
 export const launchDropdownAction = (
   projectName: string,
   actionName: string
