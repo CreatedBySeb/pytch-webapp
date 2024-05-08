@@ -5,9 +5,21 @@ import {
   selectSprite,
   selectStage,
   soleEventHandlerCodeShouldEqual,
+  ScriptOps,
+  settleModalDialog,
 } from "./utils";
 
 context("Edit Python of scripts", () => {
+  it("focuses editor of newly-added script", () => {
+    loadFromZipfile("newly-created-per-method.zip");
+    selectSprite("Snake");
+    ScriptOps.chooseHandlerDropdownItem(0, "DELETE");
+    settleModalDialog("DELETE");
+    ScriptOps.addHandler(ScriptOps.selectGreenFlagHatBlock);
+    cy.pytchSendKeysToApp("# 42");
+    soleEventHandlerCodeShouldEqual("# 42");
+  });
+
   it("ignores INS key in script body editor", () => {
     loadFromZipfile("newly-created-per-method.zip");
 
