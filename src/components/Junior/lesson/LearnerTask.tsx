@@ -14,6 +14,8 @@ import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
+type TaskInteractivityKind = "old" | "previous" | "current";
+
 type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
   const content = (() => {
@@ -65,15 +67,43 @@ const HelpStage: React.FC<HelpStageProps> = ({
   );
 };
 
+type CheckboxHelpProps = { interactivityKind: TaskInteractivityKind };
+const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
+  switch (interactivityKind) {
+    case "current":
+      return (
+        <span>
+          <FontAwesomeIcon className="help-arrow" icon="arrow-left-long" />{" "}
+          Click when you’ve done this.
+        </span>
+      );
+    case "previous":
+      return (
+        <span>
+          <FontAwesomeIcon className="help-arrow" icon="arrow-left-long" />{" "}
+          Done! (Click to rewind to this task.)
+        </span>
+      );
+    case "old":
+      return <span>Done!</span>;
+    default:
+      return assertNever(interactivityKind);
+  }
+};
+
 type ShowHelpStageButtonProps = {
   nStagesStillHidden: number;
+  interactivityKind: TaskInteractivityKind;
   showNextHelpStage: () => void;
   hideAllHelpStages: () => void;
+  onCheckboxClick: () => void;
 };
 const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   nStagesStillHidden,
+  interactivityKind,
   showNextHelpStage,
   hideAllHelpStages,
+  onCheckboxClick,
 }) => {
   const label = (() => {
     switch (nStagesStillHidden) {
@@ -91,6 +121,14 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
 
   return (
     <div className="ShowNextHelpStageButton-container">
+      <div className="to-do-checkbox-container">
+        <FontAwesomeIcon
+          className="to-do-checkbox"
+          icon="check-square"
+          onClick={onCheckboxClick}
+        />
+        <CheckboxHelp interactivityKind={interactivityKind} />
+      </div>
       <Button
         key={nStagesStillHidden}
         variant="outline-success"
@@ -105,7 +143,7 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
 type LearnerTaskProps = {
   keyPath: string;
   task: LearnerTaskDescriptor;
-  kind: "old" | "previous" | "current";
+  kind: TaskInteractivityKind;
 };
 export const LearnerTask: React.FC<LearnerTaskProps> = ({
   keyPath,
@@ -165,8 +203,10 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
       <div className="help-stage-divider" />
       <ShowNextHelpStageButton
         nStagesStillHidden={nStagesStillHidden}
+        interactivityKind={kind}
         showNextHelpStage={() => showNextHelpStage(task.index)}
         hideAllHelpStages={() => hideAllHelpStages(task.index)}
+        onCheckboxClick={onCheckboxClick}
       />
     </>
   );
@@ -176,11 +216,6 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
   return (
     <Alert key={keyPath} variant={alertVariant} className={classes}>
       <div className="task-outline">
-        <FontAwesomeIcon
-          className="to-do-checkbox"
-          icon="check-square"
-          onClick={onCheckboxClick}
-        />
         <div className="task-intro-content">
           <RawElement element={task.intro} />
         </div>
