@@ -100,6 +100,23 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     resizeObserver.observe(aceParentDiv);
 
+    conjoinedResizeObserver.addAllResizedHandler(() => {
+      const maybeWarpTarget = pendingCursorWarp.acquireIfForHandler(handlerId);
+      if (maybeWarpTarget == null) {
+        return;
+      }
+
+      const controller = aceControllerMap.get(handlerId);
+      if (controller == null) {
+        console.log("could not find controller for", handlerId);
+        return;
+      }
+
+      controller.scrollIntoView(maybeWarpTarget.lineNo);
+      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
+      controller.focus();
+    });
+
     return disconnectObserver;
   }, [aceParentRef, conjoinedResizeObserver]);
 
@@ -117,20 +134,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
    * editor in "flat" mode?**
    */
   const onAceEditorLoad = (editor: AceEditorT) => {
-    const controller = aceControllerMap.set(handlerId, editor);
-
-    if (justUpserted) {
-      controller.focus();
-    }
-
-    const maybeWarpTarget = pendingCursorWarp.acquireIfForHandler(handlerId);
-    if (maybeWarpTarget != null) {
-      conjoinedResizeObserver.addAllResizedHandler(() => {
-        controller.scrollIntoView(maybeWarpTarget.lineNo);
-        controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
-        controller.focus();
-      });
-    }
+    aceControllerMap.set(handlerId, editor);
 
     editor.session.setOverwrite(false);
     editor.commands.removeCommand("overwrite", true);

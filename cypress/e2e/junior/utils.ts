@@ -346,6 +346,11 @@ export class ScriptOps {
     }
   }
 
+  /** Click on the "green flag" hat block. */
+  static selectGreenFlagHatBlock() {
+    cy.get("li.EventKindOption").contains("green flag").click();
+  }
+
   /** Open the drop-down for the script at the given `scriptIndex`, and
    * click on the entry matching `itemMatch`. */
   static chooseHandlerDropdownItem(scriptIndex: number, itemMatch: string) {

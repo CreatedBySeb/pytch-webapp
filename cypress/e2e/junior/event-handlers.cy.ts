@@ -194,6 +194,7 @@ context("Create/modify/delete event handlers", () => {
     dragHatBlockByIdx(2);
     expHatBlockLabels.push("when stage clicked");
     assertHatBlockLabels(expHatBlockLabels.slice());
+    cy.get(".ace_editor.ace_focus");
 
     cy.pytchSendKeysToApp("# Hello world");
     soleEventHandlerCodeShouldEqual("# Hello world");
