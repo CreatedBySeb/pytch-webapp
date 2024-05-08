@@ -59,7 +59,10 @@ import { liveReloadURL } from "./live-reload";
 
 import { fireAndForgetEvent } from "./anonymous-instrumentation";
 
-import { getFlatAceController } from "../skulpt-connection/code-editor";
+import {
+  getFlatAceController,
+  pendingCursorWarp,
+} from "../skulpt-connection/code-editor";
 import { PytchProgramKind, PytchProgramOps } from "./pytch-program";
 import { Uuid } from "./junior/structured-program/core-types";
 import {
@@ -590,6 +593,10 @@ export const activeProject: IActiveProject = {
       upsertKind: descriptor.action.kind,
       handlerId: handlerId,
     });
+
+    // It's a slight fudge to use this pending-warp machinery, but the
+    // "scroll into view" behaviour this generates does no harm.
+    pendingCursorWarp.set({ handlerId, lineNo: 1, colNo: 0 });
   }),
 
   _setHandlerPythonCode: action((state, updateDescriptor) => {

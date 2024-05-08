@@ -112,8 +112,6 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         return;
       }
 
-      // TODO: Handle focus of newly-upserted script.
-
       controller.scrollIntoView(maybeWarpTarget.lineNo);
       controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
       controller.focus();
