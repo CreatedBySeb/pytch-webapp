@@ -582,11 +582,13 @@ export const activeProject: IActiveProject = {
   upsertHandler: thunk((actions, descriptor) => {
     let idCell = valueCell<Uuid>("");
     actions._upsertHandler({ descriptor, handleHandlerId: idCell.set });
+    const handlerId = idCell.get();
+
     actions.noteCodeChange();
     actions.pulseNotableChange({
       kind: "script-upserted",
       upsertKind: descriptor.action.kind,
-      handlerId: idCell.get(),
+      handlerId: handlerId,
     });
   }),
 
