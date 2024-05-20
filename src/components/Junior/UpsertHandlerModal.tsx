@@ -118,149 +118,149 @@ export const UpsertHandlerModal = () => {
   }, [fsmState]);
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { mode, chosenKind, keyIfChosen, messageIfChosen } =
-    activeFsmState.runState;
-  const settle = settleFunctions(isSubmittable, activeFsmState);
+    const { mode, chosenKind, keyIfChosen, messageIfChosen } =
+      activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const maybeAttemptUpsert = () => {
-    if (isSubmittable) {
-      settle.submit();
-    } else {
-      setShowEmptyMessageError(true);
-    }
-  };
+    const maybeAttemptUpsert = () => {
+      if (isSubmittable) {
+        settle.submit();
+      } else {
+        setShowEmptyMessageError(true);
+      }
+    };
 
-  const handleClose = () => {
-    settle.cancel();
-    setShowEmptyMessageError(false);
-  };
+    const handleClose = () => {
+      settle.cancel();
+      setShowEmptyMessageError(false);
+    };
 
-  const handleKeyDown = submitOnEnterKeyFun(maybeAttemptUpsert, true);
+    const handleKeyDown = submitOnEnterKeyFun(maybeAttemptUpsert, true);
 
-  const handleMessageChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    const rawValue = evt.target.value;
-    const value = rawValue.replace(InvalidMessageCharactersRegExp, "");
-    setMessageIfChosen(value);
-    setShowEmptyMessageError(false);
-  };
+    const handleMessageChange = (evt: ChangeEvent<HTMLInputElement>) => {
+      const rawValue = evt.target.value;
+      const value = rawValue.replace(InvalidMessageCharactersRegExp, "");
+      setMessageIfChosen(value);
+      setShowEmptyMessageError(false);
+    };
 
-  const handleEditKeyClick = () => {
-    setMode("choosing-key");
-  };
+    const handleEditKeyClick = () => {
+      setMode("choosing-key");
+    };
 
-  if (mode === "choosing-key") {
-    return (
-      <KeyChoiceModal
-        startingKey={keyIfChosen}
-        onCancel={() => setMode("choosing-hat-block")}
-        onAccept={(key) => {
-          setKeyIfChosen(key);
-          setMode("choosing-hat-block");
-        }}
-      />
-    );
-  }
-
-  const actorNounPhrase = ActorKindOps.names(actorKind).whenClickedNounPhrase;
-
-  const messageInputClasses = classNames({
-    isEmpty: messageIfChosen === "",
-    showEmptyMessageError,
-  });
-
-  const emptyMessageHintClasses = classNames("empty-message-hint", {
-    showEmptyMessageError:
-      chosenKind === "message-received" && showEmptyMessageError,
-  });
-
-  // Base props for <EventKindOption> instances:
-  const ekoProps = { chosenKind, onDoubleClick: settle.submit };
-
-  const mCloneHatBlockOption = actorKind === "sprite" && (
-    <EventKindOption {...ekoProps} kind="start-as-clone">
-      <div className="content">when I start as a clone</div>
-    </EventKindOption>
-  );
-
-  return (
-    <Modal
-      className="UpsertHandlerModal"
-      show={isActive(activeFsmState)}
-      onHide={handleClose}
-      animation={false}
-      centered
-    >
-      <Modal.Header closeButton={isInteractable(activeFsmState)}>
-        <Modal.Title>Choose hat block</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <ul tabIndex={-1} onKeyDown={handleKeyDown} ref={ulRef}>
-            <EventKindOption {...ekoProps} kind="green-flag">
-              <div className="content">when green flag clicked</div>
-            </EventKindOption>
-            <EventKindOption {...ekoProps} kind="clicked">
-              <div className="content">when {actorNounPhrase} clicked</div>
-            </EventKindOption>
-            {mCloneHatBlockOption}
-            <EventKindOption {...ekoProps} kind="key-pressed">
-              <div className="content">
-                when{" "}
-                <KeyEditor
-                  displayName={keyIfChosen.displayName}
-                  onEditClick={handleEditKeyClick}
-                />{" "}
-                key pressed
-              </div>
-            </EventKindOption>
-            <EventKindOption
-              chosenKind={chosenKind}
-              kind="message-received"
-              onDoubleClick={maybeAttemptUpsert}
-            >
-              <div className="content">
-                when I receive “
-                <Form.Control
-                  className={messageInputClasses}
-                  type="text"
-                  placeholder="message"
-                  value={messageIfChosen}
-                  onChange={handleMessageChange}
-                  // Only select the double-clicked-on word; don't
-                  // choose (as if clicking "OK") that hat-block:
-                  onDoubleClick={(event) => event.stopPropagation()}
-                ></Form.Control>
-                ”
-              </div>
-            </EventKindOption>
-            <li className={emptyMessageHintClasses}>
-              Please provide a message.
-            </li>
-          </ul>
-        </Form>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess={"" /* not used; we skip "succeeded" */}
-          attemptSucceeded={isSucceeded(activeFsmState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+    if (mode === "choosing-key") {
+      return (
+        <KeyChoiceModal
+          startingKey={keyIfChosen}
+          onCancel={() => setMode("choosing-hat-block")}
+          onAccept={(key) => {
+            setKeyIfChosen(key);
+            setMode("choosing-hat-block");
+          }}
         />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          disabled={!isInteractable}
-          variant="secondary"
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!isInteractable}
-          variant="primary"
-          onClick={maybeAttemptUpsert}
-        >
-          OK
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+      );
+    }
+
+    const actorNounPhrase = ActorKindOps.names(actorKind).whenClickedNounPhrase;
+
+    const messageInputClasses = classNames({
+      isEmpty: messageIfChosen === "",
+      showEmptyMessageError,
+    });
+
+    const emptyMessageHintClasses = classNames("empty-message-hint", {
+      showEmptyMessageError:
+        chosenKind === "message-received" && showEmptyMessageError,
+    });
+
+    // Base props for <EventKindOption> instances:
+    const ekoProps = { chosenKind, onDoubleClick: settle.submit };
+
+    const mCloneHatBlockOption = actorKind === "sprite" && (
+      <EventKindOption {...ekoProps} kind="start-as-clone">
+        <div className="content">when I start as a clone</div>
+      </EventKindOption>
+    );
+
+    return (
+      <Modal
+        className="UpsertHandlerModal"
+        show={isActive(activeFsmState)}
+        onHide={handleClose}
+        animation={false}
+        centered
+      >
+        <Modal.Header closeButton={isInteractable(activeFsmState)}>
+          <Modal.Title>Choose hat block</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <ul tabIndex={-1} onKeyDown={handleKeyDown} ref={ulRef}>
+              <EventKindOption {...ekoProps} kind="green-flag">
+                <div className="content">when green flag clicked</div>
+              </EventKindOption>
+              <EventKindOption {...ekoProps} kind="clicked">
+                <div className="content">when {actorNounPhrase} clicked</div>
+              </EventKindOption>
+              {mCloneHatBlockOption}
+              <EventKindOption {...ekoProps} kind="key-pressed">
+                <div className="content">
+                  when{" "}
+                  <KeyEditor
+                    displayName={keyIfChosen.displayName}
+                    onEditClick={handleEditKeyClick}
+                  />{" "}
+                  key pressed
+                </div>
+              </EventKindOption>
+              <EventKindOption
+                chosenKind={chosenKind}
+                kind="message-received"
+                onDoubleClick={maybeAttemptUpsert}
+              >
+                <div className="content">
+                  when I receive “
+                  <Form.Control
+                    className={messageInputClasses}
+                    type="text"
+                    placeholder="message"
+                    value={messageIfChosen}
+                    onChange={handleMessageChange}
+                    // Only select the double-clicked-on word; don't
+                    // choose (as if clicking "OK") that hat-block:
+                    onDoubleClick={(event) => event.stopPropagation()}
+                  ></Form.Control>
+                  ”
+                </div>
+              </EventKindOption>
+              <li className={emptyMessageHintClasses}>
+                Please provide a message.
+              </li>
+            </ul>
+          </Form>
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess={"" /* not used; we skip "succeeded" */}
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={!isInteractable}
+            variant="secondary"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isInteractable}
+            variant="primary"
+            onClick={maybeAttemptUpsert}
+          >
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
