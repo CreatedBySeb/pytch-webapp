@@ -203,29 +203,19 @@ context("Management of project list", () => {
     cy.pytchProjectNamesShouldDeepEqual(["Bananas", "Test seed project"]);
   });
 
-  [
-    {
-      label: "escape key",
-      invoke: () => cy.contains("Are you sure").type("{esc}"),
-    },
-    {
-      label: "cancel button",
-      invoke: () => cy.get("button").contains("Cancel").click(),
-    },
-  ].forEach((cancelMethod) => {
-    it(`can cancel project deletion (via ${cancelMethod.label})`, () => {
-      createProject("Apples", "without-example", "button");
-      createProject("Bananas", "without-example", "enter");
+  it("can cancel project deletion", () => {
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    const expProjectNames = ["Bananas", "Apples", "Test seed project"];
 
-      launchDeletion("Apples");
-      cancelMethod.invoke();
-      cy.contains("Are you sure").should("not.exist");
-      cy.pytchProjectNamesShouldDeepEqual([
-        "Bananas",
-        "Apples",
-        "Test seed project",
-      ]);
-    });
+    launchDeletion("Apples");
+    cy.contains("Are you sure").type("{esc}");
+    cy.contains("Are you sure").should("not.exist");
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
+
+    launchDeletion("Apples");
+    cy.get("button").contains("Cancel").click();
+    cy.contains("Are you sure").should("not.exist");
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
   });
 });
 
