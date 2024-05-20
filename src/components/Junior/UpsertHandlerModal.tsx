@@ -30,17 +30,16 @@ import { asyncFlowModal } from "../async-flow-modals/utils";
 const InvalidMessageCharactersRegExp = new RegExp("[^ _a-zA-Z0-9-]", "g");
 
 type EventKindOptionProps = React.PropsWithChildren<{
+  chosenKind: EventDescriptorKind;
   kind: EventDescriptorKind;
   onDoubleClick: () => void;
 }>;
 const EventKindOption: React.FC<EventKindOptionProps> = ({
+  chosenKind,
   kind,
   onDoubleClick,
   children,
 }) => {
-  const chosenKind = useJrEditState(
-    (s) => s.upsertHatBlockInteraction.chosenKind
-  );
   const setChosenKind = useJrEditActions(
     (a) => a.upsertHatBlockInteraction.setChosenKind
   );
