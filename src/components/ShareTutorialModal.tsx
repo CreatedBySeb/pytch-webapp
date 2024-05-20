@@ -1,31 +1,29 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { useStoreActions, useStoreState } from "../store";
 import {
   sharingUrlFromSlug,
   sharingUrlFromSlugForDemo,
 } from "../model/user-interactions/share-tutorial";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { copyTextToClipboard } from "../utils";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { settleFunctions } from "../model/user-interactions/async-user-flow";
+import { useFlowState } from "../model";
 
 export const ShareTutorialModal = () => {
-  const { isActive, info } = useStoreState(
-    (state) => state.userConfirmations.shareTutorialInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.shareTutorialFlow);
 
-  const { dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.shareTutorialInteraction
-  );
-
-  const handleClose = () => dismiss();
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const info = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
   return (
     <Modal
       className="ShareTutorial"
       size="lg"
-      show={isActive}
-      onHide={dismiss}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       centered
     >
@@ -82,10 +80,11 @@ export const ShareTutorialModal = () => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handleClose}>
+        <Button variant="primary" onClick={settle.cancel}>
           OK
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
