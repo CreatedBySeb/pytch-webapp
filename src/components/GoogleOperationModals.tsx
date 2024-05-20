@@ -233,8 +233,15 @@ export const GoogleTaskStatusModal = () => {
 
   switch (taskState.kind) {
     case "idle":
-    case "pending-already-modal":
       return null;
+    case "pending-already-modal":
+      // Return something invisible for e2e test support.
+      return (
+        <div
+          className="GoogleTaskStatusModal-already-modal"
+          style={{ display: "none" }}
+        />
+      );
     case "pending": {
       return (
         <Modal
