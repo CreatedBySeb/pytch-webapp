@@ -10,6 +10,16 @@ function startCreateProject(name: string) {
   cy.get("input[type=text]").clear().type(name);
 }
 
+context("Default creation of project", () => {
+  it('creates "flat" by default', () => {
+    cy.pytchResetDatabase({ uiVersion: "v1" });
+    cy.contains("My projects").click();
+    startCreateProject("Bananas");
+    cy.get("button").contains("Create project").click();
+    cy.contains("Your project’s images and sounds");
+  });
+});
+
 context("Management of project list", () => {
   beforeEach(() => {
     cy.pytchResetDatabase();
