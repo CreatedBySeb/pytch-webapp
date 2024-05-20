@@ -28,34 +28,34 @@ export const DisplayScreenshotModal = () => {
   });
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const settle = settleFunctions(isSubmittable, activeFsmState);
-  return (
-    <Modal
-      className="DisplayScreenshot"
-      size="lg"
-      show={isActive(activeFsmState)}
-      onHide={settle.cancel}
-      animation={false}
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Screenshot</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Right-click on the image to copy or save:</p>
-        <img
-          ref={imgRef}
-          width={stageWidth}
-          height={stageHeight}
-          alt="snapshot of stage"
-        ></img>
-      </Modal.Body>{" "}
-      <Modal.Footer>
-        <Button variant="primary" onClick={settle.cancel}>
-          OK
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    const settle = settleFunctions(isSubmittable, activeFsmState);
+    return (
+      <Modal
+        className="DisplayScreenshot"
+        size="lg"
+        show={isActive(activeFsmState)}
+        onHide={settle.cancel}
+        animation={false}
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Screenshot</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Right-click on the image to copy or save:</p>
+          <img
+            ref={imgRef}
+            width={stageWidth}
+            height={stageHeight}
+            alt="snapshot of stage"
+          ></img>
+        </Modal.Body>{" "}
+        <Modal.Footer>
+          <Button variant="primary" onClick={settle.cancel}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
