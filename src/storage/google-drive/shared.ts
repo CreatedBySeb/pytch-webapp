@@ -43,7 +43,7 @@ export interface GoogleDriveApi {
    * the given `tokenInfo` to authorise.  The returned Promise can
    * reject, for example if the user cancels the operation or if an
    * error occurs. */
-  importFiles(tokenInfo: TokenInfo): Promise<Array<AsyncFile>>;
+  importFiles(tokenInfo: TokenInfo): ImportFilesFlow;
 
   /** Export the data in the given `file`, using the given `tokenInfo`
    * to authorise. */
