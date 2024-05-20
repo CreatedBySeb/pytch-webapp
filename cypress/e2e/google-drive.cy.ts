@@ -132,6 +132,19 @@ context("Google Drive import and export", () => {
         );
         cy.go("back");
       });
+
+      it("can navigate back from auth-pending", () => {
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["wait"],
+          getUserInfo: [],
+          exportFile: [],
+          importFiles: [],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-title").contains("Connecting to Google");
+        cy.go("back");
+      });
     });
 
     it("shows error if no auth then succeeds on retry", () => {
