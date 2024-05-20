@@ -176,12 +176,16 @@ context("Management of project list", () => {
   });
 
   it("can rename project", () => {
-    createProject("Bananas", "without-example", "button");
-    cy.pytchProjectNamesShouldDeepEqual(["Bananas", "Test seed project"]);
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    let expProjectNames = ["Bananas", "Apples", "Test seed project"];
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames.slice());
+
     launchDropdownAction("Bananas", "Rename");
     cy.get("input").as("textField").clear().type("Oranges{enter}");
     cy.get("@textField").should("not.exist");
-    cy.pytchProjectNamesShouldDeepEqual(["Oranges", "Test seed project"]);
+
+    expProjectNames[0] = "Oranges";
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
   });
 
   const launchDeletion = (projectName: string) => {
