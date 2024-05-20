@@ -172,7 +172,7 @@ const ClipArtGalleryPanelReady: React.FC<ClipArtGalleryPanelReadyProps> = ({
   );
 };
 
-const ClipArtGalleryPanel: React.FC<EmptyProps> = () => {
+const ClipArtGalleryPanel: React.FC<SelectionProps> = (selectionProps) => {
   const gallery = useStoreState((state) => state.clipArtGallery.state);
 
   switch (gallery.status) {
@@ -187,7 +187,7 @@ const ClipArtGalleryPanel: React.FC<EmptyProps> = () => {
     case "fetch-pending":
       return <p>loading...</p>;
     case "ready":
-      return <ClipArtGalleryPanelReady {...{ gallery }} />;
+      return <ClipArtGalleryPanelReady {...{ gallery, ...selectionProps }} />;
     default:
       return assertNever(gallery);
   }
