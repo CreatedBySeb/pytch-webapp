@@ -86,6 +86,20 @@ to behave in certain ways so that Cypress can test the UI flow under
 different conditions.
 
 
+Flows
+-----
+
+There are two main flows: import and export.  Each one needs the
+authentication flow to have been completed first.
+
+Each flow is wrapped in ``doTask()``, with the following state
+diagram:
+
+.. figure:: google-drive-states.svg
+
+   State-machine for Google Drive flows.
+
+
 Choice of real vs mock APIs
 ---------------------------
 
