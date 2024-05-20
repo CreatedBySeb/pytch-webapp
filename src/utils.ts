@@ -73,6 +73,13 @@ export async function copyTextToClipboard(text: string) {
   PYTCH_CYPRESS()["latestTextCopied"] = text;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function discardReturnValue<T extends any[], R>(
+  f: (...args: T) => R
+): (...args: T) => void {
+  return (...args: T) => void f(...args);
+}
+
 export const failIfNull = function <T>(
   maybeX: T | null | undefined,
   errorIfNull: string
