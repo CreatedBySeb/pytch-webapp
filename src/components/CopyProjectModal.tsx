@@ -2,44 +2,39 @@ import React, { ChangeEvent, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { useStoreActions, useStoreState } from "../store";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { focusOrBlurFun, submitOnEnterKeyFun } from "../utils";
+import { submitOnEnterKeyFun } from "../utils";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { useFlowActions, useFlowState } from "../model";
 
 export const CopyProjectModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    sourceProjectId,
-    nameOfCopy,
-  } = useStoreState((state) => state.userConfirmations.copyProjectInteraction);
-
-  const { dismiss, attempt, setNameOfCopy, refreshInputsReady } =
-    useStoreActions(
-      (actions) => actions.userConfirmations.copyProjectInteraction
-    );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.saveProjectAsFlow);
+  const { setNameOfCopy } = useFlowActions((f) => f.saveProjectAsFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { nameOfCopy } = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
+
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setNameOfCopy(evt.target.value);
-    refreshInputsReady();
   };
-  const handleSaveAs = () => {
-    attempt({ sourceProjectId, nameOfCopy });
-  };
-  const handleKeyPress = submitOnEnterKeyFun(handleSaveAs, inputsReady);
+  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
   return (
     <Modal
       className="CopyProject"
-      show={isActive}
-      onHide={handleClose}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       centered
     >
@@ -50,7 +45,7 @@ export const CopyProjectModal = () => {
         <Form>
           <Form.Group>
             <Form.Control
-              readOnly={!isInteractable}
+              readOnly={!isInteractable(activeFsmState)}
               type="text"
               value={nameOfCopy}
               onChange={handleChange}
@@ -63,26 +58,27 @@ export const CopyProjectModal = () => {
         </Form>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Project copied!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button
           variant="secondary"
-          onClick={handleClose}
+          onClick={settle.cancel}
           disabled={!isInteractable}
         >
           Cancel
         </Button>
         <Button
-          disabled={!(isInteractable && inputsReady)}
+          disabled={!isSubmittable}
           variant="primary"
-          onClick={handleSaveAs}
+          onClick={settle.submit}
         >
           Make a copy
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
