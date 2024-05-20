@@ -4,73 +4,54 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 
 import { useStoreActions, useStoreState } from "../store";
-import { focusOrBlurFun, submitOnEnterKeyFun } from "../utils";
+import { submitOnEnterKeyFun } from "../utils";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
 import { RadioButtonOption } from "./RadioButtonOption";
 
 import { PytchProgramKind } from "../model/pytch-program";
-import {
-  WhetherExampleTag,
-  templateKindFromComponents,
-} from "../model/project-templates";
+import { WhetherExampleTag } from "../model/project-templates";
 
 import FlatEditorThumbnail from "../images/flat.png";
 import PerMethodEditorThumbnail from "../images/per-method.png";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import {
+  flowFocusOrBlurFun,
+  isActive,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../model";
 
 const WhetherExampleOption = RadioButtonOption<WhetherExampleTag>;
 const EditorKindOption = RadioButtonOption<PytchProgramKind>;
 
 export const CreateProjectModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    name,
-    whetherExample,
-    editorKind,
-  } = useStoreState(
-    (state) => state.userConfirmations.createProjectInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.createProjectFlow);
   const activeUiVersion = useStoreState(
     (state) => state.versionOptIn.activeUiVersion
   );
 
-  const {
-    dismiss,
-    attempt,
-    setName,
-    setWhetherExample,
-    setEditorKind,
-    refreshInputsReady,
-  } = useStoreActions(
-    (actions) => actions.userConfirmations.createProjectInteraction
+  const { setEditorKind, setWhetherExample, setName } = useFlowActions(
+    (f) => f.createProjectFlow
   );
   const setActiveUiVersion = useStoreActions(
     (actions) => actions.versionOptIn.setActiveUiVersion
   );
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleCreate = () => {
-    const effectiveEditorKind = activeUiVersion === "v1" ? "flat" : editorKind;
-
-    attempt({
-      name,
-      template: templateKindFromComponents(whetherExample, effectiveEditorKind),
-    });
-  };
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { name, editorKind, whetherExample } = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setName(evt.target.value);
-    refreshInputsReady();
   };
 
-  const handleClose = () => dismiss();
-
-  const handleKeyPress = submitOnEnterKeyFun(handleCreate, inputsReady);
+  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
   const editorKindThumbnail =
     editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
@@ -106,20 +87,28 @@ export const CreateProjectModal = () => {
     </p>
   );
 
+  // Ensure that "back to classic Pytch" forces "flat" project:
+  const setUiV1 = () => {
+    setActiveUiVersion("v1");
+    setEditorKind("flat");
+  };
+
+  // And that "try new Pytch" defaults to "per-method" project:
+  const setUiV2 = () => {
+    setActiveUiVersion("v2");
+    setEditorKind("per-method");
+  };
+
   const changeUiStyleLink =
     activeUiVersion === "v1"
-      ? wrapUiStyleText("Try our new script-by-script editor!", () =>
-          setActiveUiVersion("v2")
-        )
-      : wrapUiStyleText("Go back to classic Pytch", () =>
-          setActiveUiVersion("v1")
-        );
+      ? wrapUiStyleText("Try our new script-by-script editor!", setUiV2)
+      : wrapUiStyleText("Go back to classic Pytch", setUiV1);
 
   return (
     <Modal
       className="CreateProjectModal"
-      show={isActive}
-      onHide={handleClose}
+      show={isActive(activeFsmState)}
+      onHide={settle.cancel}
       animation={false}
       size="lg"
     >
@@ -130,7 +119,7 @@ export const CreateProjectModal = () => {
         <Form>
           <Form.Group>
             <Form.Control
-              readOnly={!isInteractable}
+              readOnly={!isInteractable(activeFsmState)}
               type="text"
               value={name}
               onChange={handleChange}
@@ -161,29 +150,30 @@ export const CreateProjectModal = () => {
         </Form>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Project created!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
         {changeUiStyleLink}
         <Button
           variant="secondary"
-          onClick={handleClose}
+          onClick={settle.cancel}
           disabled={!isInteractable}
         >
           Cancel
         </Button>
         <Button
-          disabled={!(isInteractable && inputsReady)}
+          disabled={!isSubmittable}
           variant="primary"
-          onClick={handleCreate}
+          onClick={settle.submit}
         >
           Create project
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
 
 export default CreateProjectModal;
