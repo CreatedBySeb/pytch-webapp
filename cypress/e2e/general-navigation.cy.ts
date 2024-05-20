@@ -36,4 +36,19 @@ context("General site navigation", () => {
     cy.visit(`/deliberate-failure/${detail}`);
     cy.get(".ExceptionDisplay").contains(detail);
   });
+
+  // For "out-of-range", generate a string of decimals which will parse
+  // to an "unsafe integer", i.e., one which can't be stored exactly.
+  [
+    { label: "non-numeric", idString: "not-a-valid-id" },
+    { label: "out-of-range", idString: `${Number.MAX_SAFE_INTEGER}1` },
+  ].forEach((spec) => {
+    it(`handles malformed project-id (${spec.label})`, () => {
+      cy.visit(`/ide/${spec.idString}`);
+      cy.contains("Sorry, there was a problem");
+      cy.title().should("eq", "Pytch: Problem loading project");
+      cy.contains("Return to").click();
+      cy.get("h1").contains("My projects");
+    });
+  });
 });
