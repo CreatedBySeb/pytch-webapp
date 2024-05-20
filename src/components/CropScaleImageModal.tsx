@@ -1,5 +1,4 @@
 import React from "react";
-import { useStoreActions, useStoreState } from "../store";
 import Modal from "react-bootstrap/Modal";
 import ReactCrop from "react-image-crop";
 import Form from "react-bootstrap/Form";
@@ -9,9 +8,20 @@ import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
 
 import { Crop as ReactCropSpec } from "react-image-crop";
 import { ImageCropSourceDescriptor, ImageDimensions } from "../model/asset";
-import { zeroCrop } from "../model/user-interactions/crop-scale-image";
+import {
+  effectiveCropFromDisplayedCrop,
+  zeroCrop,
+} from "../model/user-interactions/crop-scale-image";
 
 import "react-image-crop/dist/ReactCrop.css";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import {
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../model";
 
 // The react-image-crop interface works in percentages but the model
 // state and the transformation functions work in proportions.  And the
@@ -135,33 +145,15 @@ const UnitRangeFormControl: React.FC<{
 };
 
 export const CropScaleImageModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    displayedNewCrop,
-    effectiveNewCrop,
-    newScale,
-    sourceURL,
-    originalSize,
-    descriptorForAttempt,
-  } = useStoreState(
-    (state) => state.userConfirmations.cropScaleImageInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.cropScaleImageFlow);
+  const { setNewScale, setDisplayedNewCrop, setEffectiveNewCrop } =
+    useFlowActions((f) => f.cropScaleImageFlow);
 
-  const {
-    dismiss,
-    attempt,
-    setDisplayedNewCrop,
-    setEffectiveNewCrop,
-    setNewScale,
-  } = useStoreActions(
-    (actions) => actions.userConfirmations.cropScaleImageInteraction
-  );
-
-  const handleClose = () => dismiss();
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { sourceURL, originalSize, newScale, displayedNewCrop } =
+    activeFsmState.runState;
+  const effectiveNewCrop = effectiveCropFromDisplayedCrop(displayedNewCrop);
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
   const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const rangeValue = parseFloat(e.target.value);
@@ -173,8 +165,8 @@ export const CropScaleImageModal = () => {
   return (
     <Modal
       className="CropScaleImage"
-      show={isActive}
-      onHide={handleClose}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       backdrop="static"
       centered
@@ -214,7 +206,7 @@ export const CropScaleImageModal = () => {
             />
             <div className="buttons">
               <Button
-                disabled={!isInteractable}
+                disabled={!isInteractable(activeFsmState)}
                 variant="outline-success"
                 onClick={() => {
                   setDisplayedNewCrop(zeroCrop);
@@ -225,16 +217,16 @@ export const CropScaleImageModal = () => {
               </Button>
               <div className="main">
                 <Button
-                  disabled={!isInteractable}
+                  disabled={!isInteractable(activeFsmState)}
                   variant="secondary"
-                  onClick={handleClose}
+                  onClick={settle.cancel}
                 >
                   Cancel
                 </Button>
                 <Button
-                  disabled={!(isInteractable && inputsReady)}
+                  disabled={!isSubmittable}
                   variant="primary"
-                  onClick={() => attempt(descriptorForAttempt)}
+                  onClick={settle.submit}
                 >
                   OK
                 </Button>
@@ -244,10 +236,11 @@ export const CropScaleImageModal = () => {
         </div>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Updated!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
     </Modal>
   );
+  });
 };
