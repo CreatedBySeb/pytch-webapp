@@ -14,6 +14,7 @@ import {
 
 import { EmptyProps, assertNever } from "../utils";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
+import { OnTagClickFun } from "../model/user-interactions/clipart-gallery-select";
 
 const kMaxImageWidthOrHeight = 100;
 
@@ -41,17 +42,16 @@ const ClipArtTagButton: React.FC<ClipArtTagButtonProps> = ({
   return <Button {...{ variant, onClick }}>{label}</Button>;
 };
 
-type ClipArtTagButtonCollectionProps = { gallery: ClipArtGalleryData };
+type ClipArtTagButtonCollectionProps = {
+  gallery: ClipArtGalleryData;
+  selectedTags: Array<string>;
+  onTagClick: OnTagClickFun;
+};
 const ClipArtTagButtonCollection: React.FC<ClipArtTagButtonCollectionProps> = ({
   gallery,
+  selectedTags,
+  onTagClick,
 }) => {
-  const { selectedTags } = useStoreState(
-    (state) => state.userConfirmations.addClipArtItemsInteraction
-  );
-  const { onTagClick } = useStoreActions(
-    (actions) => actions.userConfirmations.addClipArtItemsInteraction
-  );
-
   const allIsSelected = selectedTags.length === 0;
 
   type MouseEventHandlerFun = (tag: string) => MouseEventHandler;
