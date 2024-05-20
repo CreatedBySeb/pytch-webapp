@@ -130,13 +130,13 @@ let chooseFilenameFlow: ChooseFilenameFlow = {
 
   _resolve: thunk((actions, outcome, helpers) => {
     const state = helpers.getState();
-    ensureFlowState("submit", state, "active");
+    ensureFlowState("_resolve", state, "active");
     state.state.resolve(outcome);
     actions.setIdle();
   }),
 
   setUserInput: action((state, userInput) => {
-    ensureFlowState("setCurrentFilename", state, "active");
+    ensureFlowState("setUserInput", state, "active");
     state.state.userInput = userInput;
   }),
 
@@ -157,12 +157,12 @@ let chooseFilenameFlow: ChooseFilenameFlow = {
 
   cancel: thunk((actions, _voidPayload, helpers) => {
     const state = helpers.getState();
-    ensureFlowState("submit", state, "active");
+    ensureFlowState("cancel", state, "active");
     actions._resolve({ kind: "cancelled" });
   }),
 
   outcome: thunk((actions, formatSpecifier, helpers) => {
-    ensureFlowState("chosenFilename", helpers.getState(), "idle");
+    ensureFlowState("outcome", helpers.getState(), "idle");
     const userInput = uniqueUserInputFragment(formatSpecifier).initialValue;
     return new Promise<ChooseFilenameOutcome>((resolve) => {
       actions.setState({
