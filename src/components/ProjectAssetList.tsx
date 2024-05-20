@@ -6,7 +6,6 @@ import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { failIfNull } from "../utils";
 import { AssetThumbnail } from "./AssetThumbnail";
 import { useFlowActions } from "../model";
 
@@ -115,9 +114,7 @@ const ProjectAssetList = () => {
   const loadState = useStoreState(
     (state) => state.activeProject.syncState.loadState
   );
-  const maybeAssets = useStoreState(
-    (state) => state.activeProject.project?.assets
-  );
+  const assets = useStoreState((state) => state.activeProject.project.assets);
 
   const launchAdd = useFlowActions((f) => f.addAssetsFlow.run);
   const operationContextKey = "flat/any" as const;
@@ -142,11 +139,6 @@ const ProjectAssetList = () => {
     default:
       throw new Error(`unknown loadState "${loadState}"`);
   }
-
-  const assets = failIfNull(
-    maybeAssets,
-    'no project even though loadState "succeeded"'
-  );
 
   const intro =
     assets.length === 0 ? (
