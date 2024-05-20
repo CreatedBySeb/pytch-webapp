@@ -165,6 +165,25 @@ context("Google Drive import and export", () => {
             expect(wasCancelled.get()).eq(true);
           });
       });
+
+      it("can navigate back from summary modal", () => {
+        let wasCancelled = valueCell(false);
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["ok"],
+          getUserInfo: ["ok"],
+          exportFile: [],
+          importFiles: [{ kind: "ok", files: [], wasCancelled }],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-header").contains("Import from Google");
+        cy.go("back");
+        cy.get(".modal-header")
+          .should("not.exist")
+          .then(() => {
+            expect(wasCancelled.get()).eq(false);
+          });
+      });
     });
 
     it("shows error if no auth then succeeds on retry", () => {
