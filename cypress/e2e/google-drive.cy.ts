@@ -71,6 +71,8 @@ context("Google Drive import and export", () => {
     cy.get("button").contains("Drive unavailable").should("be.disabled");
   });
 
+  ////////////////////////////////////////////////////////////////////////
+
   context("with successful boot", () => {
     const okBootBehaviour = (
       remainingBehaviour: Omit<MockApiBehaviour, "boot">
