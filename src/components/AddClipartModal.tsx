@@ -122,6 +122,14 @@ const ClipArtCard: React.FC<ClipArtCardProps> = ({
   );
 };
 
+type SelectionProps = {
+  selectedIds: Array<ClipArtGalleryEntryId>;
+  selectedTags: Array<string>;
+  selectItemById: (id: ClipArtGalleryEntryId) => void;
+  deselectItemById: (id: ClipArtGalleryEntryId) => void;
+  onTagClick: OnTagClickFun;
+};
+
 type ClipArtGalleryPanelReadyProps = { gallery: ClipArtGalleryData };
 const ClipArtGalleryPanelReady: React.FC<ClipArtGalleryPanelReadyProps> = ({
   gallery,
