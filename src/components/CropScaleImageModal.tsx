@@ -150,99 +150,99 @@ export const CropScaleImageModal = () => {
     useFlowActions((f) => f.cropScaleImageFlow);
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { sourceURL, originalSize, newScale, displayedNewCrop } =
-    activeFsmState.runState;
-  const effectiveNewCrop = effectiveCropFromDisplayedCrop(displayedNewCrop);
-  const settle = settleFunctions(isSubmittable, activeFsmState);
+    const { sourceURL, originalSize, newScale, displayedNewCrop } =
+      activeFsmState.runState;
+    const effectiveNewCrop = effectiveCropFromDisplayedCrop(displayedNewCrop);
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (
-    event
-  ) => {
-    const rangeValue = parseFloat(event.target.value);
-    setNewScale(scaleForRangeValue(rangeValue));
-  };
+    const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (
+      event
+    ) => {
+      const rangeValue = parseFloat(event.target.value);
+      setNewScale(scaleForRangeValue(rangeValue));
+    };
 
-  const pctCrop = percentCropFromProportionCrop(displayedNewCrop);
+    const pctCrop = percentCropFromProportionCrop(displayedNewCrop);
 
-  return (
-    <Modal
-      className="CropScaleImage"
-      show={true}
-      onHide={settle.cancel}
-      animation={false}
-      backdrop="static"
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Adjust image</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="outer-content">
-          <div className="left-content">
-            <h2>Crop and scale:</h2>
-            <div className="crop-container">
-              <ReactCrop
-                crop={pctCrop}
-                onChange={(_pxCrop, pctCrop) =>
-                  setDisplayedNewCrop(proportionCropFromPercentCrop(pctCrop))
-                }
-                onComplete={(_pxCrop, pctCrop) =>
-                  setEffectiveNewCrop(proportionCropFromPercentCrop(pctCrop))
-                }
-              >
-                <img alt="Full source" src={sourceURL.toString()} />
-              </ReactCrop>
+    return (
+      <Modal
+        className="CropScaleImage"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        backdrop="static"
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Adjust image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="outer-content">
+            <div className="left-content">
+              <h2>Crop and scale:</h2>
+              <div className="crop-container">
+                <ReactCrop
+                  crop={pctCrop}
+                  onChange={(_pxCrop, pctCrop) =>
+                    setDisplayedNewCrop(proportionCropFromPercentCrop(pctCrop))
+                  }
+                  onComplete={(_pxCrop, pctCrop) =>
+                    setEffectiveNewCrop(proportionCropFromPercentCrop(pctCrop))
+                  }
+                >
+                  <img alt="Full source" src={sourceURL.toString()} />
+                </ReactCrop>
+              </div>
+              <UnitRangeFormControl
+                value={rangeValueForScale(newScale)}
+                onChange={setScaleFromEvent}
+              />
             </div>
-            <UnitRangeFormControl
-              value={rangeValueForScale(newScale)}
-              onChange={setScaleFromEvent}
-            />
-          </div>
-          <div className="right-content">
-            <h2>Preview on Stage:</h2>
-            <StageMockup
-              sourceURL={sourceURL}
-              sourceCrop={effectiveNewCrop}
-              originalSize={originalSize}
-              scale={newScale}
-            />
-            <div className="buttons">
-              <Button
-                disabled={!isInteractable(activeFsmState)}
-                variant="outline-success"
-                onClick={() => {
-                  setDisplayedNewCrop(zeroCrop);
-                  setNewScale(1.0);
-                }}
-              >
-                Reset
-              </Button>
-              <div className="main">
+            <div className="right-content">
+              <h2>Preview on Stage:</h2>
+              <StageMockup
+                sourceURL={sourceURL}
+                sourceCrop={effectiveNewCrop}
+                originalSize={originalSize}
+                scale={newScale}
+              />
+              <div className="buttons">
                 <Button
                   disabled={!isInteractable(activeFsmState)}
-                  variant="secondary"
-                  onClick={settle.cancel}
+                  variant="outline-success"
+                  onClick={() => {
+                    setDisplayedNewCrop(zeroCrop);
+                    setNewScale(1.0);
+                  }}
                 >
-                  Cancel
+                  Reset
                 </Button>
-                <Button
-                  disabled={!isSubmittable}
-                  variant="primary"
-                  onClick={settle.submit}
-                >
-                  OK
-                </Button>
+                <div className="main">
+                  <Button
+                    disabled={!isInteractable(activeFsmState)}
+                    variant="secondary"
+                    onClick={settle.cancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!isSubmittable}
+                    variant="primary"
+                    onClick={settle.submit}
+                  >
+                    OK
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Updated!"
-          attemptSucceeded={isSucceeded(activeFsmState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
-        />
-      </Modal.Body>
-    </Modal>
-  );
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Updated!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+      </Modal>
+    );
   });
 };
