@@ -193,13 +193,10 @@ context("Management of project list", () => {
   };
 
   it("can delete a project", () => {
-    createProject("Apples", "without-example", "enter");
-    createProject("Bananas", "without-example", "button");
-    cy.pytchProjectNamesShouldDeepEqual([
-      "Bananas",
-      "Apples",
-      "Test seed project",
-    ]);
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    const expProjectNames = ["Bananas", "Apples", "Test seed project"];
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
+
     launchDeletion("Apples");
     cy.contains("Are you sure");
     cy.get("button").contains("DELETE").click();
