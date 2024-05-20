@@ -155,8 +155,10 @@ export const CropScaleImageModal = () => {
   const effectiveNewCrop = effectiveCropFromDisplayedCrop(displayedNewCrop);
   const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const rangeValue = parseFloat(e.target.value);
+  const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    const rangeValue = parseFloat(event.target.value);
     setNewScale(scaleForRangeValue(rangeValue));
   };
 
