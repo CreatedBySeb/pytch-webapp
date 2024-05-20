@@ -12,45 +12,45 @@ export const AddAssetsModal = () => {
   const setChosenFiles = useFlowActions((f) => f.addAssetsFlow.setChosenFiles);
 
   return asyncFlowModal(fsmState, (activeState) => {
-  const { operationContext, chosenFiles } = activeState.runState;
-  const settle = settleFunctions(isSubmittable, activeState);
-  const assetPlural = operationContext.assetPlural;
+    const { operationContext, chosenFiles } = activeState.runState;
+    const settle = settleFunctions(isSubmittable, activeState);
+    const assetPlural = operationContext.assetPlural;
 
-  if (
-    activeState.kind === "interacting" &&
-    activeState.maybeLastFailure != null
-  ) {
-    const error = activeState.maybeLastFailure as FileFailureError;
-    const titleText = `Problem adding ${assetPlural}`;
-    return (
-      <FileProcessingFailures
-        titleText={titleText}
-        introText="Sorry, there was a problem adding files to your project:"
-        failures={error.fileFailures}
-        dismiss={settle.cancel}
-      />
-    );
-  }
-
-  switch (activeState.kind) {
-    case "interacting":
-    case "attempting": {
+    if (
+      activeState.kind === "interacting" &&
+      activeState.maybeLastFailure != null
+    ) {
+      const error = activeState.maybeLastFailure as FileFailureError;
+      const titleText = `Problem adding ${assetPlural}`;
       return (
-        <ChooseFiles
-          titleText={`Add ${assetPlural}`}
-          introText={`Choose ${assetPlural} to add to your project.`}
-          actionButtonText="Add to project"
-          status={activeState.kind}
-          chosenFiles={chosenFiles}
-          setChosenFiles={setChosenFiles}
-          tryProcess={settle.submit}
+        <FileProcessingFailures
+          titleText={titleText}
+          introText="Sorry, there was a problem adding files to your project:"
+          failures={error.fileFailures}
           dismiss={settle.cancel}
         />
       );
     }
-    case "succeeded":
-      // TODO: Something better here?
-      return <GenericWorkingModal />;
-  }
+
+    switch (activeState.kind) {
+      case "interacting":
+      case "attempting": {
+        return (
+          <ChooseFiles
+            titleText={`Add ${assetPlural}`}
+            introText={`Choose ${assetPlural} to add to your project.`}
+            actionButtonText="Add to project"
+            status={activeState.kind}
+            chosenFiles={chosenFiles}
+            setChosenFiles={setChosenFiles}
+            tryProcess={settle.submit}
+            dismiss={settle.cancel}
+          />
+        );
+      }
+      case "succeeded":
+        // TODO: Something better here?
+        return <GenericWorkingModal />;
+    }
   });
 };
