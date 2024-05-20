@@ -69,8 +69,7 @@ context("Management of project list", () => {
     whetherExample: WhetherExampleTag,
     invocation: "button" | "enter"
   ) => {
-    cy.get("button").contains("Create new").click();
-    cy.get("input[type=text]").clear().type(name);
+    startCreateProject(name);
 
     // We get away with using the same data attribute for both
     // components because the two types don't overlap:
