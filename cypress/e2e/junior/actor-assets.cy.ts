@@ -7,6 +7,7 @@ import {
   clickAddSomething,
   clickHeaderCloseButton,
   clickUniqueButton,
+  initiateAddFromMediaLib,
   selectActorAspect,
   selectSprite,
   selectStage,
@@ -17,19 +18,6 @@ context("Working with assets of an actor", () => {
   beforeEach(() => {
     cy.pytchBasicJrProject();
   });
-
-  const initiateAddFromMediaLib = (matches: Array<string>) => {
-    clickAddSomething("from media library");
-
-    for (const match of matches) {
-      // Sometimes the media library is scrolled such that the chosen
-      // image is out of view.  Force Cypress to click it:
-      cy.get(".clipart-card .clipart-name")
-        .contains(match)
-        .should("have.length", 1)
-        .click({ force: true });
-    }
-  };
 
   const attemptAddFromMediaLib = (matches: Array<string>) => {
     initiateAddFromMediaLib(matches);

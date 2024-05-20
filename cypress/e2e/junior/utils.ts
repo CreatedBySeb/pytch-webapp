@@ -412,3 +412,19 @@ export const launchAddSprite = () =>
  * of the button to click. */
 export const clickAddSomething = (match: string) =>
   cy.get("div.tab-pane.active .AddSomethingButton").contains(match).click();
+
+/** Assuming that we are in the per-method IDE, launch the "add from
+ * media library" modal dialog, and for each of the given `matches`,
+ * select the matching card. */
+export const initiateAddFromMediaLib = (matches: Array<string>) => {
+  clickAddSomething("from media library");
+
+  for (const match of matches) {
+    // Sometimes the media library is scrolled such that the chosen
+    // image is out of view.  Force Cypress to click it:
+    cy.get(".clipart-card .clipart-name")
+      .contains(match)
+      .should("have.length", 1)
+      .click({ force: true });
+  }
+};
