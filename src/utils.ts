@@ -179,7 +179,12 @@ export const dateAsLocalISO8601 = (date: Date) => {
 
 ////////////////////////////////////////////////////////////////////////
 
-export function valueCell<ValueT>(initialValue: ValueT) {
+export type ValueCell<ValueT> = {
+  get: () => ValueT;
+  set: (value: ValueT) => void;
+};
+
+export function valueCell<ValueT>(initialValue: ValueT): ValueCell<ValueT> {
   let _value: ValueT = initialValue;
   return {
     get() {
