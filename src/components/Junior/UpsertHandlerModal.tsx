@@ -13,6 +13,14 @@ import { submitOnEnterKeyFun } from "../../utils";
 import { KeyChoiceModal } from "./KeyChoiceModal";
 import { useJrEditActions, useJrEditState, useMappedProgram } from "./hooks";
 import classNames from "classnames";
+import {
+  isActive,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 
 // TODO: Is this unduly restrictive?  I think we should end up with a
 // valid Python string literal if we forbid the backslash character, the
@@ -73,18 +81,9 @@ const KeyEditor: React.FC<KeyEditorProps> = ({ displayName, onEditClick }) => {
 };
 
 export const UpsertHandlerModal = () => {
-  const {
-    mode,
-    upsertionDescriptor,
-    keyIfChosen,
-    messageIfChosen,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    inputsReady,
-  } = useJrEditState((s) => s.upsertHatBlockInteraction);
-
+  const { fsmState, isSubmittable } = useJrEditState(
+    (s) => s.upsertHatBlockFlow
+  );
   const [showEmptyMessageError, setShowEmptyMessageError] = useState(false);
 
   // This is a bit clunky.  We have to always use the same hooks, so
@@ -93,46 +92,46 @@ export const UpsertHandlerModal = () => {
   // case the state's upsertion-descriptor will have a nonsense
   // actorId); it will make no real difference.
   const actorKind = useMappedProgram("UpsertHandlerModal", (program) =>
-    isActive
+    isActive(fsmState)
       ? StructuredProgramOps.uniqueActorById(
           program,
-          upsertionDescriptor.actorId
+          fsmState.runState.operation.actorId
         ).kind
       : "sprite"
   );
 
-  const {
-    setMode,
-    setKeyIfChosen,
-    setMessageIfChosen,
-    refreshInputsReady,
-    attempt,
-    dismiss,
-  } = useJrEditActions((a) => a.upsertHatBlockInteraction);
+  const { setMode, setKeyIfChosen, setMessageIfChosen } = useJrEditActions(
+    (a) => a.upsertHatBlockFlow
+  );
 
   const ulRef: React.RefObject<HTMLUListElement> = createRef();
 
-  const chosenKind = upsertionDescriptor.eventDescriptor.kind;
   useEffect(() => {
     if (
-      mode === "choosing-hat-block" &&
+      isActive(fsmState) &&
+      fsmState.runState.mode === "choosing-hat-block" &&
       ulRef.current != null &&
-      EventDescriptorKindOps.arity(chosenKind) === 0
+      EventDescriptorKindOps.arity(fsmState.runState.chosenKind) === 0
     ) {
       ulRef.current.focus();
     }
-  }, [mode, ulRef, chosenKind]);
+  }, [fsmState]);
+
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { mode, chosenKind, keyIfChosen, messageIfChosen } =
+    activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
   const maybeAttemptUpsert = () => {
-    if (inputsReady) {
-      attempt(upsertionDescriptor);
+    if (isSubmittable) {
+      settle.submit();
     } else {
       setShowEmptyMessageError(true);
     }
   };
 
   const handleClose = () => {
-    dismiss();
+    settle.cancel();
     setShowEmptyMessageError(false);
   };
 
@@ -142,7 +141,6 @@ export const UpsertHandlerModal = () => {
     const rawValue = evt.target.value;
     const value = rawValue.replace(InvalidMessageCharactersRegExp, "");
     setMessageIfChosen(value);
-    refreshInputsReady();
     setShowEmptyMessageError(false);
   };
 
@@ -172,12 +170,14 @@ export const UpsertHandlerModal = () => {
 
   const emptyMessageHintClasses = classNames("empty-message-hint", {
     showEmptyMessageError:
-      upsertionDescriptor.eventDescriptor.kind === "message-received" &&
-      showEmptyMessageError,
+      chosenKind === "message-received" && showEmptyMessageError,
   });
 
+  // Base props for <EventKindOption> instances:
+  const ekoProps = { chosenKind, onDoubleClick: settle.submit };
+
   const mCloneHatBlockOption = actorKind === "sprite" && (
-    <EventKindOption kind="start-as-clone">
+    <EventKindOption {...ekoProps} kind="start-as-clone">
       <div className="content">when I start as a clone</div>
     </EventKindOption>
   );
@@ -185,25 +185,25 @@ export const UpsertHandlerModal = () => {
   return (
     <Modal
       className="UpsertHandlerModal"
-      show={isActive}
+      show={isActive(activeFsmState)}
       onHide={handleClose}
       animation={false}
       centered
     >
-      <Modal.Header closeButton={isInteractable}>
+      <Modal.Header closeButton={isInteractable(activeFsmState)}>
         <Modal.Title>Choose hat block</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <ul tabIndex={-1} onKeyDown={handleKeyDown} ref={ulRef}>
-            <EventKindOption kind="green-flag">
+            <EventKindOption {...ekoProps} kind="green-flag">
               <div className="content">when green flag clicked</div>
             </EventKindOption>
-            <EventKindOption kind="clicked">
+            <EventKindOption {...ekoProps} kind="clicked">
               <div className="content">when {actorNounPhrase} clicked</div>
             </EventKindOption>
             {mCloneHatBlockOption}
-            <EventKindOption kind="key-pressed">
+            <EventKindOption {...ekoProps} kind="key-pressed">
               <div className="content">
                 when{" "}
                 <KeyEditor
@@ -214,6 +214,7 @@ export const UpsertHandlerModal = () => {
               </div>
             </EventKindOption>
             <EventKindOption
+              chosenKind={chosenKind}
               kind="message-received"
               onDoubleClick={maybeAttemptUpsert}
             >
@@ -239,8 +240,8 @@ export const UpsertHandlerModal = () => {
         </Form>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess={"" /* not used; we skip "succeeded" */}
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
@@ -261,4 +262,5 @@ export const UpsertHandlerModal = () => {
       </Modal.Footer>
     </Modal>
   );
+  });
 };
