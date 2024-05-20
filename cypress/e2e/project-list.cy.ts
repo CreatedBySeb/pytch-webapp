@@ -124,14 +124,13 @@ context("Management of project list", () => {
     },
   ].forEach((spec) => {
     it(`can save and re-open projects (via ${spec.label})`, () => {
-      createProject("Pac-Person", "without-example", "button");
-      cy.pytchOpenProject("Pac-Person");
+      cy.pytchTryUploadZipfiles(["Apples-bare.zip"]);
       // Erase the skeleton project text before typing our marker.
       cy.get("#pytch-ace-editor").type(
         "{selectall}{backspace}import pytch\n\n# HELLO PAC-PERSON{enter}"
       );
       spec.action();
-      cy.pytchSwitchProject("Pac-Person");
+      cy.pytchSwitchProject("Apples");
       cy.pytchCodeTextShouldContain("HELLO PAC-PERSON");
 
       cy.pytchSwitchProject("Test seed");
@@ -139,7 +138,7 @@ context("Management of project list", () => {
       cy.get("#pytch-ace-editor").type("# HELLO SEED PROJECT{enter}");
       spec.action();
 
-      cy.pytchSwitchProject("Pac-Person");
+      cy.pytchSwitchProject("Apples");
       cy.pytchCodeTextShouldContain("HELLO PAC-PERSON");
 
       cy.pytchSwitchProject("Test seed");
