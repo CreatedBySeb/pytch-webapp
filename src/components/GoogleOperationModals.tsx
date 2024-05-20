@@ -230,9 +230,6 @@ export const GoogleTaskStatusModal = () => {
   const taskState = useStoreState(
     (state) => state.googleDriveImportExport.taskState
   );
-  const setTaskState = useStoreActions(
-    (actions) => actions.googleDriveImportExport.setTaskState
-  );
 
   switch (taskState.kind) {
     case "idle":
@@ -257,7 +254,7 @@ export const GoogleTaskStatusModal = () => {
       );
     }
     case "done": {
-      const dismiss = () => setTaskState({ kind: "idle" });
+      const dismiss = taskState.dismissNotification;
       const taskOutcome = taskState.outcome;
       const maybeMessage = taskOutcome.message && <p>{taskOutcome.message}</p>;
       return (
