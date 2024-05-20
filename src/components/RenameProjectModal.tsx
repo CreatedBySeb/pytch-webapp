@@ -2,47 +2,40 @@ import React, { ChangeEvent, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { useStoreActions, useStoreState } from "../store";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { focusOrBlurFun, submitOnEnterKeyFun } from "../utils";
+import { submitOnEnterKeyFun } from "../utils";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../model";
 
 export const RenameProjectModal = () => {
-  const {
-    projectId,
-    oldName,
-    newName,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    inputsReady,
-  } = useStoreState(
-    (state) => state.userConfirmations.renameProjectInteraction
-  );
-
-  const { attempt, dismiss, setNewName, setInputsReady } = useStoreActions(
-    (actions) => actions.userConfirmations.renameProjectInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.renameProjectFlow);
+  const { setNewName } = useFlowActions((f) => f.renameProjectFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
-  const handleRename = () => attempt({ projectId, newName });
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { oldName, newName } = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const handleKeyPress = submitOnEnterKeyFun(handleRename, inputsReady);
+  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    const value = evt.target.value;
-    setInputsReady(value !== "" && value !== oldName);
-    setNewName(value);
+    setNewName(evt.target.value);
   };
 
   // onChange= set "user has modified suggestion" bit?
 
   return (
-    <Modal show={isActive} onHide={handleClose} animation={false} centered>
-      <Modal.Header closeButton={isInteractable}>
+    <Modal show={true} onHide={settle.cancel} animation={false} centered>
+      <Modal.Header closeButton={isInteractable(activeFsmState)}>
         <Modal.Title>Rename project “{oldName}”</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -58,26 +51,27 @@ export const RenameProjectModal = () => {
         </Form>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Renamed!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button
-          disabled={!isInteractable}
+          disabled={!isInteractable(activeFsmState)}
           variant="secondary"
-          onClick={handleClose}
+          onClick={settle.cancel}
         >
           Cancel
         </Button>
         <Button
-          disabled={!(isInteractable && inputsReady)}
+          disabled={!isSubmittable}
           variant="primary"
-          onClick={handleRename}
+          onClick={settle.submit}
         >
           Rename
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
