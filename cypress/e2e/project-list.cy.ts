@@ -5,6 +5,11 @@ import { WhetherExampleTag } from "../../src/model/project-templates";
 import { hexSHA256 } from "../../src/utils";
 import { launchDropdownAction } from "./utils";
 
+function startCreateProject(name: string) {
+  cy.get("button").contains("Create new").click();
+  cy.get("input[type=text]").clear().type(name);
+}
+
 context("Management of project list", () => {
   beforeEach(() => {
     cy.pytchResetDatabase();
