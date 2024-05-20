@@ -2,23 +2,22 @@ import React, { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { stageWidth, stageHeight } from "../constants";
-import { useStoreActions, useStoreState } from "../store";
 import { failIfNull } from "../utils";
+import {
+  isActive,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { useFlowState } from "../model";
 
 export const DisplayScreenshotModal = () => {
-  const { isActive } = useStoreState(
-    (state) => state.userConfirmations.displayScreenshotInteraction
+  const { fsmState, isSubmittable } = useFlowState(
+    (f) => f.displayScreenshotFlow
   );
-
-  const { dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.displayScreenshotInteraction
-  );
-
-  const handleClose = () => dismiss();
 
   const imgRef: React.RefObject<HTMLImageElement> = React.createRef();
   useEffect(() => {
-    if (isActive) {
+    if (isActive(fsmState)) {
       const img = failIfNull(imgRef.current, "imgRef is null");
       const canvas = failIfNull(
         document.getElementById("pytch-canvas") as HTMLCanvasElement | null,
@@ -28,12 +27,14 @@ export const DisplayScreenshotModal = () => {
     }
   });
 
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const settle = settleFunctions(isSubmittable, activeFsmState);
   return (
     <Modal
       className="DisplayScreenshot"
       size="lg"
-      show={isActive}
-      onHide={handleClose}
+      show={isActive(activeFsmState)}
+      onHide={settle.cancel}
       animation={false}
       centered
     >
@@ -50,10 +51,11 @@ export const DisplayScreenshotModal = () => {
         ></img>
       </Modal.Body>{" "}
       <Modal.Footer>
-        <Button variant="primary" onClick={handleClose}>
+        <Button variant="primary" onClick={settle.cancel}>
           OK
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
