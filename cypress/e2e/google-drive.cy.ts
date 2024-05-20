@@ -116,6 +116,22 @@ context("Google Drive import and export", () => {
         cy.get(".modal").should("not.exist");
         cy.contains("Pytch is a bridge");
       });
+
+      it("can navigate back from auth failure", () => {
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["fail"],
+          getUserInfo: [],
+          exportFile: [],
+          importFiles: [],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-title").contains("Import from Google");
+        cy.get(".modal-body .outcome-summary.failures").contains(
+          "something_went_wrong"
+        );
+        cy.go("back");
+      });
     });
 
     it("shows error if no auth then succeeds on retry", () => {
