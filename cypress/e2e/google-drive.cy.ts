@@ -105,6 +105,19 @@ context("Google Drive import and export", () => {
       cy.get("button").contains("OK").click();
     };
 
+    context("can abandon via navigate-back", () => {
+      function startImportFlow(mockBehaviour: MockApiBehaviour): void {
+        cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
+        cy.contains("My projects").click();
+        cy.contains("Import from Google").click();
+      }
+
+      afterEach(() => {
+        cy.get(".modal").should("not.exist");
+        cy.contains("Pytch is a bridge");
+      });
+    });
+
     it("shows error if no auth then succeeds on retry", () => {
       // The user chooses Cancel in the Google log-in pop-up, thereby
       // denying permission.
