@@ -4,37 +4,29 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
 import { Form } from "react-bootstrap";
-import {
-  assertNever,
-  focusOrBlurFun,
-  onChangeFun,
-  submitOnEnterKeyFun,
-} from "../../utils";
+import { assertNever, onChangeFun, submitOnEnterKeyFun } from "../../utils";
 import { useJrEditActions, useJrEditState } from "./hooks";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 
 export const UpsertSpriteModal = () => {
-  const {
-    upsertionArgs,
-    nameValidity,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    inputsReady,
-  } = useJrEditState((s) => s.upsertSpriteInteraction);
-
-  const { setName, attempt, dismiss } = useJrEditActions(
-    (a) => a.upsertSpriteInteraction
-  );
-
-  const handleNameChange = onChangeFun(setName);
+  const { fsmState, isSubmittable } = useJrEditState((s) => s.upsertSpriteFlow);
+  const { setName } = useJrEditActions((a) => a.upsertSpriteFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
-  const handleCommit = () => attempt(upsertionArgs);
-  const handleKeyPress = submitOnEnterKeyFun(handleCommit, inputsReady);
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { upsertionAction, name, nameValidity } = activeFsmState.runState;
+  const handleNameChange = onChangeFun(setName);
+  const settle = settleFunctions(isSubmittable, activeFsmState);
+  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
   const validityContent = (() => {
     switch (nameValidity.status) {
@@ -50,7 +42,7 @@ export const UpsertSpriteModal = () => {
   })();
 
   const content = (() => {
-    switch (upsertionArgs.kind) {
+    switch (upsertionAction.kind) {
       case "insert":
         return {
           title: <span>Create new sprite</span>,
@@ -60,32 +52,32 @@ export const UpsertSpriteModal = () => {
         return {
           title: (
             <span>
-              Rename <em>{upsertionArgs.previousName}</em>
+              Rename <em>{upsertionAction.previousName}</em>
             </span>
           ),
           messageWhenSuccess: "Renamed!",
         };
       default:
-        return assertNever(upsertionArgs);
+        return assertNever(upsertionAction);
     }
   })();
 
   return (
     <Modal
       className="UpsertSpriteModal"
-      show={isActive}
-      onHide={handleClose}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       centered
     >
-      <Modal.Header closeButton={isInteractable}>
+      <Modal.Header closeButton={isInteractable(activeFsmState)}>
         <Modal.Title>{content.title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Control
             type="text"
-            value={upsertionArgs.name}
+            value={name}
             onChange={handleNameChange}
             onKeyDown={handleKeyPress}
             tabIndex={-1}
@@ -100,26 +92,27 @@ export const UpsertSpriteModal = () => {
         </Alert>
         <MaybeErrorOrSuccessReport
           messageWhenSuccess={content.messageWhenSuccess}
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button
           disabled={!isInteractable}
           variant="secondary"
-          onClick={handleClose}
+          onClick={settle.cancel}
         >
           Cancel
         </Button>
         <Button
-          disabled={!(isInteractable && inputsReady)}
+          disabled={!isSubmittable}
           variant="primary"
-          onClick={handleCommit}
+          onClick={settle.submit}
         >
           OK
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
