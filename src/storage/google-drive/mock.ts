@@ -1,5 +1,5 @@
 import { AsyncFile, GoogleDriveApi, GoogleDriveBootApi } from "./shared";
-import { assertNever, delaySeconds } from "../../utils";
+import { ValueCell, assertNever, delaySeconds } from "../../utils";
 
 type CallBehaviour = {
   boot: "ok" | "fail" | "stall";
@@ -8,7 +8,7 @@ type CallBehaviour = {
   exportFile: "ok" | "fail";
   importFiles:
     | { kind: "fail"; message: string }
-    | { kind: "ok"; files: Array<AsyncFile> };
+    | { kind: "ok"; files: Array<AsyncFile>; wasCancelled: ValueCell<boolean> };
 };
 
 export type MockApiBehaviour = {
