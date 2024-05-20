@@ -398,3 +398,11 @@ export class ScriptOps {
     return idxs.map((i) => ScriptOps.allExtendedHandlerLabels[i]);
   }
 }
+
+/** Assuming that we are in the per-method IDE, click the "Add sprite"
+ * button. */
+export const launchAddSprite = () =>
+  cy
+    .get(".Junior-ActorsList-container .AddSomethingButton")
+    .should("have.length", 1)
+    .click();
