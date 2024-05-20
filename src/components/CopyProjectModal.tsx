@@ -22,63 +22,63 @@ export const CopyProjectModal = () => {
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { nameOfCopy } = activeFsmState.runState;
-  const settle = settleFunctions(isSubmittable, activeFsmState);
+    const { nameOfCopy } = activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setNameOfCopy(evt.target.value);
-  };
-  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
+    const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+      setNameOfCopy(evt.target.value);
+    };
+    const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
-  return (
-    <Modal
-      className="CopyProject"
-      show={true}
-      onHide={settle.cancel}
-      animation={false}
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Copy project</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Control
-              readOnly={!isInteractable(activeFsmState)}
-              type="text"
-              value={nameOfCopy}
-              onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              placeholder="Name for copy of project"
-              tabIndex={-1}
-              ref={inputRef}
-            />
-          </Form.Group>
-        </Form>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Project copied!"
-          attemptSucceeded={isSucceeded(activeFsmState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={settle.cancel}
-          disabled={!isInteractable}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!isSubmittable}
-          variant="primary"
-          onClick={settle.submit}
-        >
-          Make a copy
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    return (
+      <Modal
+        className="CopyProject"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Copy project</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <Form.Control
+                readOnly={!isInteractable(activeFsmState)}
+                type="text"
+                value={nameOfCopy}
+                onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                placeholder="Name for copy of project"
+                tabIndex={-1}
+                ref={inputRef}
+              />
+            </Form.Group>
+          </Form>
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Project copied!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={settle.cancel}
+            disabled={!isInteractable}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            Make a copy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
