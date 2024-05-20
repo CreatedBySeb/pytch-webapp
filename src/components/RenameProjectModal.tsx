@@ -22,56 +22,56 @@ export const RenameProjectModal = () => {
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { oldName, newName } = activeFsmState.runState;
-  const settle = settleFunctions(isSubmittable, activeFsmState);
+    const { oldName, newName } = activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
+    const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setNewName(evt.target.value);
-  };
+    const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+      setNewName(evt.target.value);
+    };
 
-  // onChange= set "user has modified suggestion" bit?
+    // onChange= set "user has modified suggestion" bit?
 
-  return (
-    <Modal show={true} onHide={settle.cancel} animation={false} centered>
-      <Modal.Header closeButton={isInteractable(activeFsmState)}>
-        <Modal.Title>Rename project “{oldName}”</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Control
-            type="text"
-            value={newName}
-            onChange={handleChange}
-            onKeyDown={handleKeyPress}
-            tabIndex={-1}
-            ref={inputRef}
-          ></Form.Control>
-        </Form>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Renamed!"
-          attemptSucceeded={isSucceeded(activeFsmState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          disabled={!isInteractable(activeFsmState)}
-          variant="secondary"
-          onClick={settle.cancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!isSubmittable}
-          variant="primary"
-          onClick={settle.submit}
-        >
-          Rename
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    return (
+      <Modal show={true} onHide={settle.cancel} animation={false} centered>
+        <Modal.Header closeButton={isInteractable(activeFsmState)}>
+          <Modal.Title>Rename project “{oldName}”</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Control
+              type="text"
+              value={newName}
+              onChange={handleChange}
+              onKeyDown={handleKeyPress}
+              tabIndex={-1}
+              ref={inputRef}
+            ></Form.Control>
+          </Form>
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Renamed!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={!isInteractable(activeFsmState)}
+            variant="secondary"
+            onClick={settle.cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            Rename
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
