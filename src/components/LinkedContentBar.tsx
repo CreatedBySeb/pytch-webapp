@@ -1,9 +1,10 @@
 import React from "react";
 import { EmptyProps, assertNever } from "../utils";
-import { useStoreActions, useStoreState } from "../store";
+import { useStoreState } from "../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { codeTextEnsuringFlat, useFlatCodeText } from "./hooks/code-text";
 import { LessonDescriptor } from "../model/linked-content";
+import { useFlowActions } from "../model";
 
 // Not sure about this mixture of props and useStoreState() but it lets
 // us work directly with the LessonDescriptor.
@@ -12,9 +13,7 @@ const LinkedSpecimenContent: React.FC<LinkedSpecimenContentProps> = ({
   lesson,
 }) => {
   const currentCodeText = useFlatCodeText("LinkedSpecimenContent");
-  const launchAction = useStoreActions(
-    (actions) => actions.userConfirmations.viewCodeDiff.launch
-  );
+  const runFlow = useFlowActions((f) => f.viewCodeDiffFlow.run);
 
   const originalCodeText = codeTextEnsuringFlat(
     "LinkedSpecimenContent",
@@ -22,7 +21,7 @@ const LinkedSpecimenContent: React.FC<LinkedSpecimenContentProps> = ({
   );
 
   const launch = () => {
-    launchAction({
+    runFlow({
       textA: originalCodeText,
       textB: currentCodeText,
     });
