@@ -406,3 +406,9 @@ export const launchAddSprite = () =>
     .get(".Junior-ActorsList-container .AddSomethingButton")
     .should("have.length", 1)
     .click();
+
+/** Assuming that we are in the per-method IDE, click one of the "add
+ * something" buttons.  The arg `match` should be contained in the label
+ * of the button to click. */
+export const clickAddSomething = (match: string) =>
+  cy.get("div.tab-pane.active .AddSomethingButton").contains(match).click();
