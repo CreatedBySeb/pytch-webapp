@@ -9,12 +9,18 @@ import {
   ClipArtGalleryEntryId,
   ClipArtGalleryEntry,
   entryMatchesTags,
-  selectedEntries,
 } from "../model/clipart-gallery-core";
 
-import { EmptyProps, assertNever } from "../utils";
+import { assertNever, discardReturnValue } from "../utils";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import {
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
 import { OnTagClickFun } from "../model/user-interactions/clipart-gallery-select";
+import { useFlowActions, useFlowState } from "../model";
 
 const kMaxImageWidthOrHeight = 100;
 
@@ -194,83 +200,50 @@ const ClipArtGalleryPanel: React.FC<SelectionProps> = (selectionProps) => {
 };
 
 export const AddClipartModal = () => {
-  const {
-    operationContext,
-    assetNamePrefix,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    selectedIds,
-  } = useStoreState(
-    (state) => state.userConfirmations.addClipArtItemsInteraction
-  );
-  const { attempt, dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.addClipArtItemsInteraction
+  const { fsmState, isSubmittable } = useFlowState((f) => f.addClipArtFlow);
+  const { selectItemById, deselectItemById, onTagClick } = useFlowActions(
+    (f) => f.addClipArtFlow
   );
 
-  const gallery = useStoreState((state) => state.clipArtGallery.state);
-  const startFetchIfRequired = useStoreActions(
-    (actions) => actions.clipArtGallery.startFetchIfRequired
+  const galleryState = useStoreState((state) => state.clipArtGallery.state);
+
+  const startFetchIfRequired = useStoreActions((actions) =>
+    discardReturnValue(actions.clipArtGallery.startFetchIfRequired)
   );
 
-  const nSelected = nSelectedItemsInGallery(gallery, selectedIds);
+  useEffect(startFetchIfRequired);
+
+  return asyncFlowModal(fsmState, (activeState) => {
+  const { selectedIds, selectedTags } = activeState.runState;
+
+  const settle = settleFunctions(isSubmittable, activeState);
+
+  const nSelected = nSelectedItemsInGallery(galleryState, selectedIds);
   const noneSelected = nSelected === 0;
-
-  const activeProject = useStoreState((state) => state.activeProject.project);
-
-  useEffect(() => {
-    startFetchIfRequired();
-  });
-
-  const projectId = activeProject.id;
-
-  const maybeAttempt = () => {
-    switch (gallery.status) {
-      case "fetch-failed":
-      case "fetch-not-started":
-      case "fetch-pending":
-        // This function should never be called unless the
-        // gallery is in state "ready", because the button
-        // should only be enabled if some items have been
-        // selected, and that in turn is only possible once
-        // the data is ready.
-        console.warn(`unexpected gallery state ${gallery.status}`);
-        break;
-      case "ready": {
-        const allEntries = gallery.entries;
-        const entriesToAdd = selectedEntries(allEntries, selectedIds);
-        attempt({
-          operationContext,
-          assetNamePrefix,
-          entries: entriesToAdd,
-          projectId,
-        });
-        break;
-      }
-      default:
-        assertNever(gallery);
-    }
-  };
 
   const addLabel = noneSelected
     ? "Add to project"
     : `Add ${nSelected} to project`;
 
-  // TODO: Move the none-selected logic into inputsReady?
-  const addButtonIsEnabled = isInteractable && !noneSelected;
+  const selectionProps: SelectionProps = {
+    selectedIds,
+    selectedTags,
+    selectItemById,
+    deselectItemById,
+    onTagClick,
+  };
 
   return (
-    <Modal animation={false} show={isActive} size="xl">
+    <Modal animation={false} show={true} size="xl">
       <Modal.Header>
         <Modal.Title>Choose some images</Modal.Title>
       </Modal.Header>
       <Modal.Body className="clipart-body">
-        <ClipArtGalleryPanel />
+        <ClipArtGalleryPanel {...selectionProps} />
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Added!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeState)}
         />
       </Modal.Body>
       <Modal.Footer className="clipart-footer">
@@ -278,13 +251,13 @@ export const AddClipartModal = () => {
           <p>For copyright and licensing information, see help pages.</p>
         </div>
         <div className="buttons">
-          <Button variant="secondary" onClick={() => dismiss()}>
+          <Button variant="secondary" onClick={settle.cancel}>
             Cancel
           </Button>
           <Button
-            disabled={!addButtonIsEnabled}
+            disabled={!isSubmittable}
             variant="primary"
-            onClick={() => maybeAttempt()}
+            onClick={settle.submit}
           >
             {addLabel}
           </Button>
@@ -292,4 +265,5 @@ export const AddClipartModal = () => {
       </Modal.Footer>
     </Modal>
   );
+  });
 };
