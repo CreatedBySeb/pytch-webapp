@@ -31,7 +31,7 @@ const InvalidMessageCharactersRegExp = new RegExp("[^ _a-zA-Z0-9-]", "g");
 
 type EventKindOptionProps = React.PropsWithChildren<{
   kind: EventDescriptorKind;
-  onDoubleClick?: () => void;
+  onDoubleClick: () => void;
 }>;
 const EventKindOption: React.FC<EventKindOptionProps> = ({
   kind,
@@ -44,11 +44,6 @@ const EventKindOption: React.FC<EventKindOptionProps> = ({
   const setChosenKind = useJrEditActions(
     (a) => a.upsertHatBlockInteraction.setChosenKind
   );
-  const attemptIfReady = useJrEditActions(
-    (a) => a.upsertHatBlockInteraction.attemptIfReady
-  );
-
-  onDoubleClick ??= () => attemptIfReady();
 
   const chosen = chosenKind === kind;
   const classes = classNames("EventKindOption", { chosen });
