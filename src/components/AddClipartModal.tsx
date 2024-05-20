@@ -130,23 +130,24 @@ type SelectionProps = {
   onTagClick: OnTagClickFun;
 };
 
-type ClipArtGalleryPanelReadyProps = { gallery: ClipArtGalleryData };
+type ClipArtGalleryPanelReadyProps = {
+  gallery: ClipArtGalleryData;
+} & SelectionProps;
+
 const ClipArtGalleryPanelReady: React.FC<ClipArtGalleryPanelReadyProps> = ({
   gallery,
+  selectedIds,
+  selectedTags,
+  selectItemById,
+  deselectItemById,
+  onTagClick,
 }) => {
-  const { selectedIds, selectedTags } = useStoreState(
-    (state) => state.userConfirmations.addClipArtItemsInteraction
-  );
-  const { selectItemById, deselectItemById } = useStoreActions(
-    (actions) => actions.userConfirmations.addClipArtItemsInteraction
-  );
-
   const selectedIdsSet = new Set(selectedIds);
   const selectedTagsSet = new Set<string>(selectedTags);
 
   return (
     <>
-      <ClipArtTagButtonCollection {...{ gallery }} />
+      <ClipArtTagButtonCollection {...{ gallery, selectedTags, onTagClick }} />
       <div className="modal-separator" />
       <div className="clipart-gallery">
         <ul>
