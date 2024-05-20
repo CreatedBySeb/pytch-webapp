@@ -8,6 +8,7 @@ type CallBehaviour = {
   exportFile: "ok" | "fail";
   importFiles:
     | { kind: "fail"; message: string }
+    | { kind: "wait"; wasCancelled: ValueCell<boolean> }
     | { kind: "ok"; files: Array<AsyncFile>; wasCancelled: ValueCell<boolean> };
 };
 
@@ -81,6 +82,13 @@ function mockApi(spec: MockApiBehaviour): GoogleDriveApi {
     switch (behaviour.kind) {
       case "fail":
         throw new Error(behaviour.message);
+      case "wait":
+        return {
+          cancel: () => behaviour.wasCancelled.set(true),
+          files: new Promise<Array<AsyncFile>>((/* resolve, reject */) => {
+            // Never do anything.
+          }),
+        };
       case "ok":
         return {
           cancel: () => behaviour.wasCancelled.set(true),
