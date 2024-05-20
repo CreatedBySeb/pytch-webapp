@@ -18,19 +18,11 @@ import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
 const kMaxImageWidthOrHeight = 100;
 
 const styleClampingToSize = (width: number, height: number): CSSProperties => {
-  if (width > height) {
-    if (width > kMaxImageWidthOrHeight) {
-      return { width: kMaxImageWidthOrHeight };
-    } else {
-      return {};
-    }
-  } else {
-    if (height > kMaxImageWidthOrHeight) {
-      return { height: kMaxImageWidthOrHeight };
-    } else {
-      return {};
-    }
-  }
+  if (width > height && width > kMaxImageWidthOrHeight)
+    return { width: kMaxImageWidthOrHeight };
+  if (height >= width && height > kMaxImageWidthOrHeight)
+    return { height: kMaxImageWidthOrHeight };
+  return {};
 };
 
 type ClipArtTagButtonProps = {
