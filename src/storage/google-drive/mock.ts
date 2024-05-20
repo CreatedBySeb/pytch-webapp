@@ -76,13 +76,16 @@ function mockApi(spec: MockApiBehaviour): GoogleDriveApi {
     }
   };
 
-  const importFiles: GoogleDriveApi["importFiles"] = async (/* tokInfo */) => {
+  const importFiles: GoogleDriveApi["importFiles"] = (/* tokInfo */) => {
     const behaviour = shiftBehaviourOrFail(spec, "importFiles");
     switch (behaviour.kind) {
       case "fail":
         throw new Error(behaviour.message);
       case "ok":
-        return behaviour.files;
+        return {
+          cancel: () => behaviour.wasCancelled.set(true),
+          files: Promise.resolve(behaviour.files),
+        };
       default:
         return assertNever(behaviour);
     }
