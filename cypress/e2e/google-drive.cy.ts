@@ -71,6 +71,15 @@ context("Google Drive import and export", () => {
   });
 
   context("with successful boot", () => {
+    const okBootBehaviour = (
+      remainingBehaviour: Omit<MockApiBehaviour, "boot">
+    ): MockApiBehaviour => {
+      return {
+        boot: ["ok"],
+        ...remainingBehaviour,
+      };
+    };
+
     const assertExportFailureShown = (expMessage: string) => {
       cy.get(".modal-header").contains("Export to Google");
       cy.get(".modal-body")
