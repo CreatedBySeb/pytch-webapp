@@ -41,7 +41,7 @@ const EventKindOption: React.FC<EventKindOptionProps> = ({
   children,
 }) => {
   const setChosenKind = useJrEditActions(
-    (a) => a.upsertHatBlockInteraction.setChosenKind
+    (a) => a.upsertHatBlockFlow.setChosenKind
   );
 
   const chosen = chosenKind === kind;
