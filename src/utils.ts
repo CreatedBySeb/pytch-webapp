@@ -193,6 +193,21 @@ export function valueCell<ValueT>(initialValue: ValueT) {
 
 ////////////////////////////////////////////////////////////////////////
 
+type PromiseAndResolve = {
+  promise: Promise<void>;
+  resolve: () => void;
+};
+
+export function promiseAndResolve(): PromiseAndResolve {
+  let resolve: () => void = () => void 0;
+  const promise = new Promise<void>((innerResolve) => {
+    resolve = innerResolve;
+  });
+  return { promise, resolve };
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const _octetStringOfU8: Array<string> = (() => {
   const strings = [];
   for (let i = 0; i <= 0xff; ++i) strings.push(i.toString(16).padStart(2, "0"));
