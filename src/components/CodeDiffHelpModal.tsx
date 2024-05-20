@@ -1,24 +1,21 @@
 import React from "react";
 import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
-import { useStoreActions, useStoreState } from "../store";
 import RawElement from "./RawElement";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { settleFunctions } from "../model/user-interactions/async-user-flow";
+import { useFlowState } from "../model";
 
 export const CodeDiffHelpModal = () => {
-  const { isActive, samples } = useStoreState(
-    (state) => state.userConfirmations.codeDiffHelpInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.codeDiffHelpFlow);
 
-  const { dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.codeDiffHelpInteraction
-  );
-
-  const handleClose = () => dismiss();
-
+  return asyncFlowModal(fsmState, (activeState) => {
+  const { samples } = activeState.runState;
+  const settle = settleFunctions(isSubmittable, activeState);
   return (
     <Modal
-      show={isActive}
-      onHide={handleClose}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       centered
       size="lg"
@@ -75,4 +72,5 @@ export const CodeDiffHelpModal = () => {
       </Modal.Body>
     </Modal>
   );
+  });
 };
