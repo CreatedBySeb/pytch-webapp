@@ -105,13 +105,12 @@ context("Google Drive import and export", () => {
     it("shows error if no auth then succeeds on retry", () => {
       // The user chooses Cancel in the Google log-in pop-up, thereby
       // denying permission.
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["fail", "ok"],
         getUserInfo: ["ok"],
         exportFile: ["ok"],
         importFiles: [],
-      };
+      });
 
       cy.pytchExactlyOneProject(setApiBehaviourOpts(mockBehaviour));
       assertExportFails("Could not log in");
@@ -119,13 +118,12 @@ context("Google Drive import and export", () => {
     });
 
     it("shows error if no user info then succeeds on retry", () => {
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["ok", "ok"],
         getUserInfo: ["fail", "ok"],
         exportFile: ["ok"],
         importFiles: [],
-      };
+      });
 
       cy.pytchExactlyOneProject(setApiBehaviourOpts(mockBehaviour));
       assertExportFails("Could not get user information");
@@ -136,13 +134,12 @@ context("Google Drive import and export", () => {
       // The Google auth pop-up appears but is then closed by the user,
       // leaving the user looking at the "authenticating..." modal with
       // its cancel button.  The user has to click "Cancel".
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["wait"],
         getUserInfo: [],
         exportFile: [],
         importFiles: [],
-      };
+      });
 
       cy.pytchExactlyOneProject(setApiBehaviourOpts(mockBehaviour));
       cy.pytchChooseDropdownEntry("Export");
@@ -195,13 +192,12 @@ context("Google Drive import and export", () => {
     };
 
     function successfulExportMockBehaviour(nExports: number): MockApiBehaviour {
-      return {
-        boot: ["ok"],
+      return okBootBehaviour({
         acquireToken: ["ok"],
         getUserInfo: ["ok"],
         exportFile: new Array(nExports).fill("ok"),
         importFiles: [],
-      };
+      });
     }
 
     it("can export (accepting suggested filename)", () => {
@@ -259,13 +255,12 @@ context("Google Drive import and export", () => {
     });
 
     it("shows error if export fails", () => {
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["ok"],
         getUserInfo: ["ok"],
         exportFile: ["fail"],
         importFiles: [],
-      };
+      });
 
       cy.pytchExactlyOneProject(setApiBehaviourOpts(mockBehaviour));
       cy.pytchChooseDropdownEntry("Export");
@@ -281,13 +276,12 @@ context("Google Drive import and export", () => {
     });
 
     it("shows error if import fails", () => {
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["ok"],
         getUserInfo: ["ok"],
         exportFile: [],
         importFiles: [{ kind: "fail", message: "Moon phase wrong" }],
-      };
+      });
 
       cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
       cy.contains("My projects").click();
@@ -320,13 +314,12 @@ context("Google Drive import and export", () => {
       cy.fixture("project-zipfiles/hello-again-world.zip", "binary").then(
         (strData: string) => {
           const goodFile = newAsyncFile("hello-world-123.zip", strData);
-          const mockBehaviour: MockApiBehaviour = {
-            boot: ["ok"],
+          const mockBehaviour = okBootBehaviour({
             acquireToken: ["ok"],
             getUserInfo: ["ok"],
             exportFile: [],
             importFiles: [{ kind: "ok", files: [goodFile] }],
-          };
+          });
 
           cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
           cy.contains("My projects").click();
@@ -347,13 +340,12 @@ context("Google Drive import and export", () => {
     });
 
     it("handles user-cancelled import", () => {
-      const mockBehaviour: MockApiBehaviour = {
-        boot: ["ok"],
+      const mockBehaviour = okBootBehaviour({
         acquireToken: ["ok"],
         getUserInfo: ["ok"],
         exportFile: [],
         importFiles: [{ kind: "ok", files: [] }],
-      };
+      });
 
       cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
       cy.contains("My projects").click();
@@ -378,13 +370,12 @@ context("Google Drive import and export", () => {
           cy.fixture("project-zipfiles/no-meta-json.zip", "binary").then(
             (strData: string) => {
               const badFile = newAsyncFile("bad-file.zip", strData);
-              const mockBehaviour: MockApiBehaviour = {
-                boot: ["ok"],
+              const mockBehaviour = okBootBehaviour({
                 acquireToken: ["ok"],
                 getUserInfo: ["ok"],
                 exportFile: [],
                 importFiles: [{ kind: "ok", files: [goodFile, badFile] }],
-              };
+              });
 
               cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
               cy.contains("My projects").click();
