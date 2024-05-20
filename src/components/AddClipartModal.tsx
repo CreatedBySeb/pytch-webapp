@@ -214,56 +214,56 @@ export const AddClipartModal = () => {
   useEffect(startFetchIfRequired);
 
   return asyncFlowModal(fsmState, (activeState) => {
-  const { selectedIds, selectedTags } = activeState.runState;
+    const { selectedIds, selectedTags } = activeState.runState;
 
-  const settle = settleFunctions(isSubmittable, activeState);
+    const settle = settleFunctions(isSubmittable, activeState);
 
-  const nSelected = nSelectedItemsInGallery(galleryState, selectedIds);
-  const noneSelected = nSelected === 0;
+    const nSelected = nSelectedItemsInGallery(galleryState, selectedIds);
+    const noneSelected = nSelected === 0;
 
-  const addLabel = noneSelected
-    ? "Add to project"
-    : `Add ${nSelected} to project`;
+    const addLabel = noneSelected
+      ? "Add to project"
+      : `Add ${nSelected} to project`;
 
-  const selectionProps: SelectionProps = {
-    selectedIds,
-    selectedTags,
-    selectItemById,
-    deselectItemById,
-    onTagClick,
-  };
+    const selectionProps: SelectionProps = {
+      selectedIds,
+      selectedTags,
+      selectItemById,
+      deselectItemById,
+      onTagClick,
+    };
 
-  return (
-    <Modal animation={false} show={true} size="xl">
-      <Modal.Header>
-        <Modal.Title>Choose some images</Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="clipart-body">
-        <ClipArtGalleryPanel {...selectionProps} />
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Added!"
-          attemptSucceeded={isSucceeded(activeState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeState)}
-        />
-      </Modal.Body>
-      <Modal.Footer className="clipart-footer">
-        <div className="licence-info">
-          <p>For copyright and licensing information, see help pages.</p>
-        </div>
-        <div className="buttons">
-          <Button variant="secondary" onClick={settle.cancel}>
-            Cancel
-          </Button>
-          <Button
-            disabled={!isSubmittable}
-            variant="primary"
-            onClick={settle.submit}
-          >
-            {addLabel}
-          </Button>
-        </div>
-      </Modal.Footer>
-    </Modal>
-  );
+    return (
+      <Modal animation={false} show={true} size="xl">
+        <Modal.Header>
+          <Modal.Title>Choose some images</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="clipart-body">
+          <ClipArtGalleryPanel {...selectionProps} />
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Added!"
+            attemptSucceeded={isSucceeded(activeState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeState)}
+          />
+        </Modal.Body>
+        <Modal.Footer className="clipart-footer">
+          <div className="licence-info">
+            <p>For copyright and licensing information, see help pages.</p>
+          </div>
+          <div className="buttons">
+            <Button variant="secondary" onClick={settle.cancel}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!isSubmittable}
+              variant="primary"
+              onClick={settle.submit}
+            >
+              {addLabel}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
