@@ -145,6 +145,26 @@ context("Google Drive import and export", () => {
         cy.get(".modal-title").contains("Connecting to Google");
         cy.go("back");
       });
+
+      it("can navigate back from picker", () => {
+        let wasCancelled = valueCell(false);
+
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["ok"],
+          getUserInfo: ["ok"],
+          exportFile: [],
+          importFiles: [{ kind: "wait", wasCancelled }],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".GoogleTaskStatusModal-already-modal");
+        cy.go("back");
+        cy.get(".GoogleTaskStatusModal-already-modal")
+          .should("not.exist")
+          .then(() => {
+            expect(wasCancelled.get()).eq(true);
+          });
+      });
     });
 
     it("shows error if no auth then succeeds on retry", () => {
