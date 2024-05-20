@@ -9,14 +9,14 @@ export const ChooseFiles: React.FC<{
   titleText: string;
   introText: string;
   actionButtonText: string;
-  status: "awaiting-user-choice" | "trying-to-process";
+  status: "interacting" | "attempting";
   chosenFiles: FileList | null;
   setChosenFiles: (files: FileList) => void;
   tryProcess: (files: FileList) => void;
   dismiss: () => void;
 }> = (props) => {
-  const isAwaiting = props.status === "awaiting-user-choice";
-  const isTrying = props.status === "trying-to-process";
+  const isAwaiting = props.status === "interacting";
+  const isTrying = props.status === "attempting";
 
   const spinnerExtraClass = isTrying ? "shown" : "hidden";
   const modalContentClass = isAwaiting ? "shown" : "hidden";
