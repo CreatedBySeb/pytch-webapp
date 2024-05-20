@@ -1,6 +1,7 @@
 import { ActorKind } from "../../../src/model/junior/structured-program";
 import { range } from "../../../src/utils";
 import {
+  addFromMediaLib,
   assertBackdropNames,
   assertCostumeNames,
   assertSoundNames,
@@ -23,12 +24,6 @@ context("Working with assets of an actor", () => {
     initiateAddFromMediaLib(matches);
     const expButtonMatch = `Add ${matches.length}`;
     clickUniqueButton(expButtonMatch);
-  };
-
-  const addFromMediaLib = (matches: Array<string>) => {
-    initiateAddFromMediaLib(matches);
-    const expButtonMatch = `Add ${matches.length}`;
-    settleModalDialog(expButtonMatch);
   };
 
   const addAllFromMediaLibEntry = (entry: string, expNItems: number) => {

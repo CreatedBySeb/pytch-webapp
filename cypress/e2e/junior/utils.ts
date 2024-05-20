@@ -428,3 +428,12 @@ export const initiateAddFromMediaLib = (matches: Array<string>) => {
       .click({ force: true });
   }
 };
+
+/** Assuming that we are in the per-method IDE, launch the "add from
+ * media library" modal dialog, select the card matching each of the
+ * given `matches`, add add those assets. */
+export const addFromMediaLib = (matches: Array<string>) => {
+  initiateAddFromMediaLib(matches);
+  const expButtonMatch = `Add ${matches.length}`;
+  settleModalDialog(expButtonMatch);
+};
