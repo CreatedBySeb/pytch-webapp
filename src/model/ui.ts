@@ -43,7 +43,10 @@ import {
   IShareTutorialInteraction,
   shareTutorialInteraction,
 } from "./user-interactions/share-tutorial";
-import { ViewCodeDiff, viewCodeDiff } from "./user-interactions/view-code-diff";
+import {
+  ViewCodeDiffFlow,
+  viewCodeDiffFlow,
+} from "./user-interactions/view-code-diff";
 
 import { uploadZipfilesInteraction } from "./user-interactions/upload-zipfiles";
 import { IHelpSidebar, helpSidebar } from "./help-sidebar";
@@ -417,10 +420,10 @@ export interface IUserConfirmations {
   cropScaleImageInteraction: ICropScaleImageInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
-  viewCodeDiff: ViewCodeDiff;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
+  viewCodeDiffFlow: ViewCodeDiffFlow;
 }
 
 // TODO: Better name than 'confirmations'.
@@ -529,10 +532,10 @@ export const userConfirmations: IUserConfirmations = {
   cropScaleImageInteraction,
   shareTutorialInteraction,
 
-  viewCodeDiff,
   addAssetsFlow,
   addClipArtFlow,
   codeDiffHelpFlow,
+  viewCodeDiffFlow,
 };
 
 export interface IPlainTextPane {
