@@ -61,3 +61,9 @@ type AsyncFlowPrepareFun<RunArgsT, AppModelT extends object, RunStateT> = (
   storeActions: Actions<AppModelT>,
   navigationGuard: NavigationAbandonmentGuard
 ) => Promise<RunStateT>;
+
+type AsyncFlowAttemptFun<RunStateT, AppModelT extends object> = (
+  runState: RunStateT,
+  storeActions: Actions<AppModelT>,
+  navigationGuard: NavigationAbandonmentGuard
+) => Promise<void>;
