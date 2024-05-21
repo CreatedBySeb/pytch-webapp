@@ -226,6 +226,9 @@ export function asyncUserFlowSlice<
 ////////////////////////////////////////////////////////////////////////
 // Helpers for extracting properties of fsmState
 
+// TODO: Would it be cleaner for these to be computed properties on the
+// slice, sibling to isSubmittable?
+
 export function isSucceeded<RunStateT>(
   fsmState: AsyncUserFlowFsmState<RunStateT>
 ): boolean {
