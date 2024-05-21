@@ -1,95 +1,78 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect } from "react";
 import Button from "react-bootstrap/Button";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-bootstrap/Modal";
-import { useStoreActions, useStoreState } from "../store";
-import { focusOrBlurFun } from "../utils";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
 import { CompoundTextInput } from "./CompoundTextInput";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { useFlowActions, useFlowState } from "../model";
 
 export const DownloadZipfileModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    fileContents,
-    formatSpecifier,
-  } = useStoreState(
-    (state) => state.userConfirmations.downloadZipfileInteraction
+  const { fsmState, isSubmittable } = useFlowState(
+    (f) => f.downloadZipfileFlow
   );
-
-  const { dismiss, attempt, setUiFragmentValue, attemptArgs } = useStoreActions(
-    (actions) => actions.userConfirmations.downloadZipfileInteraction
-  );
+  const { setUiFragmentValue } = useFlowActions((f) => f.downloadZipfileFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
-  const handleDownload = () => attempt(attemptArgs());
-
-  const handleEnterKey = () => {
-    if (inputsReady) {
-      handleDownload();
-    }
-  };
-
-  const haveFileContents = fileContents != null;
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { formatSpecifier } = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
 
   return (
     <Modal
       className="DownloadZipfile"
-      show={isActive}
-      onHide={handleClose}
+      show={true}
+      onHide={settle.cancel}
       animation={false}
       centered
     >
       <Modal.Header>
-        <Modal.Title>
-          {haveFileContents ? "Download zipfile" : "Preparing zipfile..."}
-        </Modal.Title>
+        <Modal.Title>Download zipfile</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="icon-container">
-          {haveFileContents ? (
-            <FontAwesomeIcon className="fa-5x" icon="file-archive" />
-          ) : (
-            <Spinner animation="border" />
-          )}
+          <FontAwesomeIcon className="fa-4x" icon="file-archive" />
         </div>
 
         <CompoundTextInput
           formatSpecifier={formatSpecifier}
           onNewUiFragmentValue={setUiFragmentValue}
-          onEnterKey={handleEnterKey}
+          onEnterKey={settle.submit}
           ref={inputRef}
         />
 
         <MaybeErrorOrSuccessReport
           messageWhenSuccess="Downloading!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
+          attemptSucceeded={isSucceeded(activeFsmState)}
+          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button
-          disabled={!isInteractable}
+          disabled={!isInteractable(activeFsmState)}
           variant="secondary"
-          onClick={handleClose}
+          onClick={settle.cancel}
         >
           Cancel
         </Button>
         <Button
-          disabled={!(isInteractable && inputsReady)}
+          disabled={!isSubmittable}
           variant="primary"
-          onClick={handleDownload}
+          onClick={settle.submit}
         >
           Download
         </Button>
       </Modal.Footer>
     </Modal>
   );
+  });
 };
