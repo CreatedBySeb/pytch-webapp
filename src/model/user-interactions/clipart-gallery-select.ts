@@ -1,138 +1,121 @@
-import { Action, action, Actions, Thunk, thunk } from "easy-peasy";
-import { IPytchAppModel } from "..";
-import { IModalUserInteraction, modalUserInteraction } from ".";
+import { Action } from "easy-peasy";
+import { IPytchAppModel, PytchAppModelActions } from "..";
 import {
   ClipArtGalleryEntry,
   ClipArtGalleryEntryId,
 } from "../clipart-gallery-core";
 import { ProjectId } from "../project-core";
 import { addRemoteAssetToProject } from "../../database/indexed-db";
-import { propSetterAction } from "../../utils";
 import {
   AssetOperationContext,
   assetOperationContextFromKey,
   AssetOperationContextKey,
-  unknownAssetOperationContext,
 } from "../asset";
 import { addAssetErrorMessageFromError } from "./add-assets";
+import {
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  runStateAction,
+} from "./async-user-flow";
+import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
-type SelectClipArtDescriptor = {
-  operationContext: AssetOperationContext;
-  assetNamePrefix: string;
-  entries: Array<ClipArtGalleryEntry>;
+type AddClipArtRunArgs = {
   projectId: ProjectId;
-};
-type IAddClipArtItemsBase = IModalUserInteraction<SelectClipArtDescriptor>;
-
-type OnClickArgs = {
-  tag: string;
-  isMultiSelect: boolean;
-};
-
-type AddClipArtLaunchArgs = {
   operationContextKey: AssetOperationContextKey;
   assetNamePrefix: string;
 };
 
-export interface IAddClipArtItemsSpecific {
+type AddClipArtRunState = {
   operationContext: AssetOperationContext;
-  setOperationContext: Action<IAddClipArtItemsSpecific, AssetOperationContext>;
   assetNamePrefix: string;
-  setAssetNamePrefix: Action<IAddClipArtItemsSpecific, string>;
-  selectedIds: Array<ClipArtGalleryEntryId>;
-  selectItemById: Action<IAddClipArtItemsSpecific, ClipArtGalleryEntryId>;
-  deselectItemById: Action<IAddClipArtItemsSpecific, ClipArtGalleryEntryId>;
+  projectId: ProjectId;
   selectedTags: Array<string>;
-  onTagClick: Action<IAddClipArtItemsSpecific, OnClickArgs>;
-  clear: Action<IAddClipArtItemsSpecific>;
-  launch: Thunk<
-    IAddClipArtItemsBase & IAddClipArtItemsSpecific,
-    AddClipArtLaunchArgs
-  >;
+  selectedIds: Array<ClipArtGalleryEntryId>;
+};
+
+type AddClipArtBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  AddClipArtRunArgs,
+  AddClipArtRunState
+>;
+
+type OnTagClickArgs = {
+  tag: string;
+  isMultiSelect: boolean;
+};
+
+export type OnTagClickFun = (args: OnTagClickArgs) => void;
+
+type SAction<ArgT> = Action<AddClipArtBase, ArgT>;
+
+type AddClipArtActions = {
+  selectItemById: SAction<ClipArtGalleryEntryId>;
+  deselectItemById: SAction<ClipArtGalleryEntryId>;
+  onTagClick: SAction<OnTagClickArgs>;
+};
+
+export type AddClipArtFlow = AddClipArtBase & AddClipArtActions;
+
+async function prepare(args: AddClipArtRunArgs): Promise<AddClipArtRunState> {
+  const operationContext = assetOperationContextFromKey(
+    args.operationContextKey
+  );
+  return {
+    projectId: args.projectId,
+    operationContext,
+    assetNamePrefix: args.assetNamePrefix,
+    selectedTags: [], // TODO: Can we preserve from one run to the next?
+    selectedIds: [],
+  };
 }
 
-export const addClipArtItemsSpecific: IAddClipArtItemsSpecific = {
-  operationContext: unknownAssetOperationContext,
-  setOperationContext: propSetterAction("operationContext"),
-
-  assetNamePrefix: "",
-  setAssetNamePrefix: propSetterAction("assetNamePrefix"),
-
-  selectedIds: [],
-  selectItemById: action((state, itemId) => {
-    if (state.selectedIds.indexOf(itemId) === -1)
-      state.selectedIds.push(itemId);
-  }),
-  deselectItemById: action((state, itemId) => {
-    const index = state.selectedIds.indexOf(itemId);
-    if (index !== -1) state.selectedIds.splice(index, 1);
-  }),
-
-  selectedTags: [],
-  onTagClick: action((state, { tag, isMultiSelect }) => {
-    if (tag === "--all--") {
-      state.selectedTags = [];
-    } else {
-      if (isMultiSelect) {
-        const mExistingIndex = state.selectedTags.indexOf(tag);
-        if (mExistingIndex === -1) {
-          state.selectedTags.push(tag);
-        } else {
-          state.selectedTags.splice(mExistingIndex, 1);
-        }
-      } else {
-        state.selectedTags = [tag];
-      }
-    }
-  }),
-
-  clear: action((state) => {
-    state.selectedIds = [];
-    // Leave selectedTags alone; likely that user will want to select
-    // more media under the same set of tags as they set up last time
-    // they use the dialog.
-  }),
-
-  launch: thunk((actions, { operationContextKey, assetNamePrefix }) => {
-    const opContext = assetOperationContextFromKey(operationContextKey);
-    actions.setOperationContext(opContext);
-    actions.setAssetNamePrefix(assetNamePrefix);
-    actions.clear();
-    actions.superLaunch();
-  }),
-};
+function isSubmittable(runState: AddClipArtRunState) {
+  return runState.selectedIds.length > 0;
+}
 
 const attemptAddOneEntry = async (
   projectId: ProjectId,
   assetNamePrefix: string,
-  entry: ClipArtGalleryEntry
+  entry: ClipArtGalleryEntry,
+  navGuard: NavigationAbandonmentGuard
 ) => {
   // Iterate with "for" --- rather than Promise.all() --- to make sure
   // the items are added to the project in the same order that they
   // appear in in the entry.
   for (const item of entry.items) {
     const fullName = `${assetNamePrefix}${item.name}`;
-    await addRemoteAssetToProject(projectId, item.url, fullName);
+    await navGuard.throwIfAbandoned(
+      addRemoteAssetToProject(projectId, item.url, fullName)
+    );
   }
 };
 
-const attemptAddItems = async (
-  actions: Actions<IPytchAppModel>,
-  descriptor: SelectClipArtDescriptor
-) => {
-  // TODO: Give type:
-  let failures = [];
+type AddItemFailure = {
+  itemName: string;
+  message: string;
+};
 
-  for (const entry of descriptor.entries) {
+async function attempt(
+  runState: AddClipArtRunState,
+  actions: PytchAppModelActions,
+  navGuard: NavigationAbandonmentGuard
+) {
+  let failures: Array<AddItemFailure> = [];
+
+  const entries = actions.clipArtGallery.selectedEntries(runState.selectedIds);
+  for (const entry of entries) {
     try {
       await attemptAddOneEntry(
-        descriptor.projectId,
-        descriptor.assetNamePrefix,
-        entry
+        runState.projectId,
+        runState.assetNamePrefix,
+        entry,
+        navGuard
       );
     } catch (err) {
+      if (navGuard.wasAbandoned(err)) throw err;
+
       const message = addAssetErrorMessageFromError(
-        descriptor.operationContext,
+        runState.operationContext,
         entry.name,
         err as Error
       );
@@ -144,10 +127,12 @@ const attemptAddItems = async (
     }
   }
 
-  await actions.activeProject.syncAssetsFromStorage();
+  await navGuard.throwIfAbandoned(
+    actions.activeProject.syncAssetsFromStorage()
+  );
 
   if (failures.length > 0) {
-    let nbSuccess = descriptor.entries.length - failures.length;
+    let nbSuccess = entries.length - failures.length;
     let clipArtMsg: string;
     if (nbSuccess === 0) {
       let msg = "There was a problem: ";
@@ -211,11 +196,34 @@ const attemptAddItems = async (
       throw new Error(msg);
     }
   }
-};
+}
 
-export type IAddClipArtItemsInteraction = IAddClipArtItemsBase &
-  IAddClipArtItemsSpecific;
-export const addClipArtItemsInteraction = modalUserInteraction(
-  attemptAddItems,
-  addClipArtItemsSpecific
-);
+export let addClipArtFlow: AddClipArtFlow = (() => {
+  const specificSlice: AddClipArtActions = {
+    onTagClick: runStateAction((state, { tag, isMultiSelect }) => {
+      if (tag === "--all--") {
+        state.selectedTags = [];
+      } else {
+        if (isMultiSelect) {
+          const mExistingIndex = state.selectedTags.indexOf(tag);
+          if (mExistingIndex === -1) {
+            state.selectedTags.push(tag);
+          } else {
+            state.selectedTags.splice(mExistingIndex, 1);
+          }
+        } else {
+          state.selectedTags = [tag];
+        }
+      }
+    }),
+    selectItemById: runStateAction((state, itemId) => {
+      if (state.selectedIds.indexOf(itemId) === -1)
+        state.selectedIds.push(itemId);
+    }),
+    deselectItemById: runStateAction((state, itemId) => {
+      const index = state.selectedIds.indexOf(itemId);
+      if (index !== -1) state.selectedIds.splice(index, 1);
+    }),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();
