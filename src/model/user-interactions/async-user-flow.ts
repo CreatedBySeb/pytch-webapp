@@ -67,3 +67,11 @@ type AsyncFlowAttemptFun<RunStateT, AppModelT extends object> = (
   storeActions: Actions<AppModelT>,
   navigationGuard: NavigationAbandonmentGuard
 ) => Promise<void>;
+
+export type AsyncUserFlowOptions = {
+  pulseSuccessMessage: boolean;
+};
+
+const kDefaultAsyncUserFlowOptions: AsyncUserFlowOptions = {
+  pulseSuccessMessage: true,
+};
