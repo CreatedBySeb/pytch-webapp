@@ -1,24 +1,26 @@
-import { Thunk, thunk } from "easy-peasy";
-import { IModalUserInteraction, modalUserInteraction, doNothing } from ".";
+import {
+  AsyncUserFlowSlice,
+  alwaysSubmittable,
+  asyncUserFlowSlice,
+  emptyAttempt,
+} from "./async-user-flow";
+import { IPytchAppModel } from "..";
 
-// It's a bit sledgehammer/nut to use this machinery for the simple
-// "display screenshot" modal, since there is no action to attempt, but
-// doing so keeps the approach consistent.
+type DisplayScreenshotRunArgs = void;
 
-type IDisplayScreenshotBase = IModalUserInteraction<void>;
+type DisplayScreenshotRunState = object;
 
-interface IDisplayScreenshotSpecific {
-  launch: Thunk<IDisplayScreenshotBase & IDisplayScreenshotSpecific>;
+// No actions:
+export type DisplayScreenshotFlow = AsyncUserFlowSlice<
+  IPytchAppModel,
+  DisplayScreenshotRunArgs,
+  DisplayScreenshotRunState
+>;
+
+async function prepare(): Promise<DisplayScreenshotRunState> {
+  return {};
 }
 
-const displayScreenshotSpecific: IDisplayScreenshotSpecific = {
-  launch: thunk((actions) => actions.superLaunch()),
-};
-
-export type IDisplayScreenshotInteraction = IDisplayScreenshotBase &
-  IDisplayScreenshotSpecific;
-
-export const displayScreenshotInteraction = modalUserInteraction(
-  doNothing<void>,
-  displayScreenshotSpecific
-);
+export let displayScreenshotFlow: DisplayScreenshotFlow = (() => {
+  return asyncUserFlowSlice({}, prepare, alwaysSubmittable, emptyAttempt);
+})();
