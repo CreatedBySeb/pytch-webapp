@@ -31,4 +31,9 @@ export class NavigationAbandonmentGuard {
       return outcome as ResultT;
     }
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  wasAbandoned(err: any) {
+    return Object.is(err, kAbandonedError);
+  }
 }
