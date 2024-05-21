@@ -312,3 +312,23 @@ export function flowFocusOrBlurFun<Elt extends HTMLElement, RunStateT>(
     }
   };
 }
+
+////////////////////////////////////////////////////////////////////////
+// Helpers for writing actions which operate on the RunStateT
+
+type RunStateAction<RunStateT, PayloadT> = (
+  runState: RunStateT,
+  payload: PayloadT
+) => void;
+
+export function runStateAction<RunStateT, PayloadT>(
+  actionFun: RunStateAction<RunStateT, PayloadT>
+) {
+  return action<AsyncUserFlowState<RunStateT>, PayloadT>((state, payload) => {
+    const fsmState_ = state.fsmState;
+    const fsmState = fsmState_ as AsyncUserFlowFsmState<RunStateT>;
+
+    assertInteracting(fsmState);
+    actionFun(fsmState.runState, payload);
+  });
+}
