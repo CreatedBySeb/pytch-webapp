@@ -16,8 +16,8 @@ import {
   renameAssetInteraction,
 } from "./user-interactions/rename-asset";
 import {
-  IRenameProjectInteraction,
-  renameProjectInteraction,
+  RenameProjectFlow,
+  renameProjectFlow,
 } from "./user-interactions/rename-project";
 import {
   DisplayScreenshotFlow,
@@ -411,7 +411,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
   renameAssetInteraction: IRenameAssetInteraction;
-  renameProjectInteraction: IRenameProjectInteraction;
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   copyProjectInteraction: ICopyProjectInteraction;
   uploadZipfilesInteraction: IProcessFilesInteraction;
@@ -420,6 +419,7 @@ export interface IUserConfirmations {
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
+  renameProjectFlow: RenameProjectFlow;
   displayScreenshotFlow: DisplayScreenshotFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
@@ -523,7 +523,6 @@ export const userConfirmations: IUserConfirmations = {
   }),
 
   renameAssetInteraction,
-  renameProjectInteraction,
   downloadZipfileInteraction,
   copyProjectInteraction,
   uploadZipfilesInteraction,
@@ -532,6 +531,7 @@ export const userConfirmations: IUserConfirmations = {
   createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
+  renameProjectFlow,
   displayScreenshotFlow,
   codeDiffHelpFlow,
   cropScaleImageFlow,

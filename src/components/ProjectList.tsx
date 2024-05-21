@@ -25,9 +25,7 @@ const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   const launchDeleteAction = useStoreActions(
     (actions) => actions.userConfirmations.launchDeleteProject
   );
-  const launchRename = useStoreActions(
-    (actions) => actions.userConfirmations.renameProjectInteraction.launch
-  );
+  const launchRename = useFlowActions((f) => f.renameProjectFlow.run);
   const toggleSelected = useStoreActions(
     (actions) => actions.projectCollection.toggleProjectSelected
   );
@@ -66,7 +64,10 @@ const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   };
 
   const onRename = () => {
-    launchRename({ id: project.summary.id, name: project.summary.name });
+    launchRename({
+      projectId: project.summary.id,
+      oldName: project.summary.name,
+    });
   };
 
   const maybeSelectedExtraClass = project.isSelected ? " selected" : "";

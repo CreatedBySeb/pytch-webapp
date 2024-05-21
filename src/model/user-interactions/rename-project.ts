@@ -1,55 +1,60 @@
-import { Action, action, Thunk, thunk } from "easy-peasy";
-import { PytchAppModelActions } from "..";
-import { IRenameProjectDescriptor } from "../project";
-import { IModalUserInteraction, modalUserInteraction } from ".";
+import { Action } from "easy-peasy";
 import { ProjectId } from "../project-core";
-import { RenameProjectArgs } from "../projects";
+import {
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  setRunStateProp,
+} from "./async-user-flow";
+import { IPytchAppModel, PytchAppModelActions } from "..";
 
-type IRenameProjectBase = IModalUserInteraction<IRenameProjectDescriptor>;
+type RenameProjectRunArgs = {
+  projectId: ProjectId;
+  oldName: string;
+};
 
-interface IRenameProjectSpecific {
+type RenameProjectRunState = {
   projectId: ProjectId;
   oldName: string;
   newName: string;
-  setProjectId: Action<IRenameProjectSpecific, ProjectId>;
-  setOldName: Action<IRenameProjectSpecific, string>;
-  setNewName: Action<IRenameProjectSpecific, string>;
-  launch: Thunk<IRenameProjectBase & IRenameProjectSpecific, RenameProjectArgs>;
-}
-
-const attemptRename = (
-  actions: PytchAppModelActions,
-  renameDescriptor: IRenameProjectDescriptor
-) =>
-  actions.projectCollection.requestRenameProjectThenResync({
-    id: renameDescriptor.projectId,
-    name: renameDescriptor.newName,
-  });
-
-const renameProjectSpecific: IRenameProjectSpecific = {
-  projectId: -1,
-  oldName: "",
-  newName: "",
-  setProjectId: action((state, projectId) => {
-    state.projectId = projectId;
-  }),
-  setOldName: action((state, oldName) => {
-    state.oldName = oldName;
-  }),
-  setNewName: action((state, newName) => {
-    state.newName = newName;
-  }),
-  launch: thunk((actions, projectSummary) => {
-    actions.setProjectId(projectSummary.id);
-    actions.setOldName(projectSummary.name);
-    actions.setNewName(projectSummary.name);
-    actions.superLaunch();
-  }),
 };
 
-export type IRenameProjectInteraction = IRenameProjectBase &
-  IRenameProjectSpecific;
-export const renameProjectInteraction = modalUserInteraction(
-  attemptRename,
-  renameProjectSpecific
-);
+type RenameProjectBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  RenameProjectRunArgs,
+  RenameProjectRunState
+>;
+
+type SAction<ArgT> = Action<RenameProjectBase, ArgT>;
+
+type RenameProjectActions = {
+  setNewName: SAction<string>;
+};
+
+export type RenameProjectFlow = RenameProjectBase & RenameProjectActions;
+
+async function prepare(
+  args: RenameProjectRunArgs
+): Promise<RenameProjectRunState> {
+  return { ...args, newName: args.oldName };
+}
+
+function isSubmittable(runState: RenameProjectRunState): boolean {
+  return runState.newName !== "";
+}
+
+async function attempt(
+  runState: RenameProjectRunState,
+  actions: PytchAppModelActions
+): Promise<void> {
+  await actions.projectCollection.requestRenameProjectThenResync({
+    id: runState.projectId,
+    name: runState.newName,
+  });
+}
+
+export let renameProjectFlow: RenameProjectFlow = (() => {
+  const specificSlice: RenameProjectActions = {
+    setNewName: setRunStateProp("newName"),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();
