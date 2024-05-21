@@ -1,30 +1,31 @@
-import { Action, Thunk, thunk } from "easy-peasy";
-import { propSetterAction } from "../../utils";
 import { CodeDiffHunk, diffFromTexts } from "../code-diff";
+import {
+  AsyncUserFlowSlice,
+  alwaysSubmittable,
+  asyncUserFlowSlice,
+  emptyAttempt,
+} from "./async-user-flow";
+import { IPytchAppModel } from "..";
 
-type ViewCodeDiffState =
-  | { kind: "idle" }
-  | { kind: "active"; hunks: Array<CodeDiffHunk> };
+type ViewCodeDiffRunArgs = { textA: string; textB: string };
 
-type ViewCodeDiffArgs = { textA: string; textB: string };
-
-export type ViewCodeDiff = {
-  state: ViewCodeDiffState;
-  setState: Action<ViewCodeDiff, ViewCodeDiffState>;
-  launch: Thunk<ViewCodeDiff, ViewCodeDiffArgs>;
-  dismiss: Thunk<ViewCodeDiff, void>;
+type ViewCodeDiffRunState = {
+  hunks: Array<CodeDiffHunk>;
 };
 
-export let viewCodeDiff: ViewCodeDiff = {
-  state: { kind: "idle" },
-  setState: propSetterAction("state"),
+export type ViewCodeDiffFlow = AsyncUserFlowSlice<
+  IPytchAppModel,
+  ViewCodeDiffRunArgs,
+  ViewCodeDiffRunState
+>;
 
-  launch: thunk((actions, texts) => {
-    const hunks = diffFromTexts(texts.textA, texts.textB);
-    actions.setState({ kind: "active", hunks });
-  }),
+async function prepare(
+  args: ViewCodeDiffRunArgs
+): Promise<ViewCodeDiffRunState> {
+  const hunks = diffFromTexts(args.textA, args.textB);
+  return { hunks };
+}
 
-  dismiss: thunk((actions) => {
-    actions.setState({ kind: "idle" });
-  }),
-};
+export let viewCodeDiffFlow: ViewCodeDiffFlow = (() => {
+  return asyncUserFlowSlice({}, prepare, alwaysSubmittable, emptyAttempt);
+})();
