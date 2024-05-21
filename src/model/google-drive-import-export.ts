@@ -410,8 +410,8 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         failures: taskFailures,
       };
 
-      const nSuccesses = successfulImports.length;
-      const nFailures = failures.length;
+      const nSuccesses = taskSuccesses.length;
+      const nFailures = taskFailures.length;
 
       if (nSuccesses > 0) {
         allActions.projectCollection.noteDatabaseChange();
