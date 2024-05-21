@@ -175,10 +175,8 @@ export const HatBlock: React.FC<HatBlockProps> = ({
     });
   };
 
-  const deleteAction = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteJuniorHandler
-  );
-  const onDelete = () => deleteAction({ actorId, handlerId });
+  const runDeleteFlow = useJrEditActions((a) => a.deleteHandlerFlow.run);
+  const onDelete = () => runDeleteFlow({ actorId, handlerId });
 
   return (
     <div className="HatBlock" onDoubleClick={onChangeHatBlock}>
