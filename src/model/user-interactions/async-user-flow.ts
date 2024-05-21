@@ -75,3 +75,14 @@ export type AsyncUserFlowOptions = {
 const kDefaultAsyncUserFlowOptions: AsyncUserFlowOptions = {
   pulseSuccessMessage: true,
 };
+
+function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
+  prepare: AsyncFlowPrepareFun<RunArgsT, AppModelT, RunStateT>,
+  isSubmittable: (runState: RunStateT) => boolean,
+  attempt: AsyncFlowAttemptFun<RunStateT, AppModelT>,
+  options: AsyncUserFlowOptions
+): AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT> {
+  return {
+    fsmState: { kind: "idle" },
+  };
+}
