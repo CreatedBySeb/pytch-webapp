@@ -21,13 +21,13 @@ import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-obs
 
 const AddHandlerButton: React.FC<EmptyProps> = () => {
   const focusedActorId = useJrEditState((s) => s.focusedActor);
-  const launchUpsertAction = useJrEditActions(
-    (a) => a.upsertHatBlockInteraction.launch
-  );
+  const launchUpsertAction = useJrEditActions((a) => a.upsertHatBlockFlow.run);
   const codingDragInProgress = useJrEditState((s) => s.scriptDragInProgress);
 
   const launchAdd = () => {
-    launchUpsertAction({ actorId: focusedActorId, action: { kind: "insert" } });
+    launchUpsertAction({
+      operation: { actorId: focusedActorId, action: { kind: "insert" } },
+    });
   };
 
   const classes = classNames({ codingDragInProgress });
