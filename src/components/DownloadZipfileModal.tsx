@@ -24,55 +24,55 @@ export const DownloadZipfileModal = () => {
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { formatSpecifier } = activeFsmState.runState;
-  const settle = settleFunctions(isSubmittable, activeFsmState);
+    const { formatSpecifier } = activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  return (
-    <Modal
-      className="DownloadZipfile"
-      show={true}
-      onHide={settle.cancel}
-      animation={false}
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Download zipfile</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="icon-container">
-          <FontAwesomeIcon className="fa-4x" icon="file-archive" />
-        </div>
+    return (
+      <Modal
+        className="DownloadZipfile"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Download zipfile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="icon-container">
+            <FontAwesomeIcon className="fa-4x" icon="file-archive" />
+          </div>
 
-        <CompoundTextInput
-          formatSpecifier={formatSpecifier}
-          onNewUiFragmentValue={setUiFragmentValue}
-          onEnterKey={settle.submit}
-          ref={inputRef}
-        />
+          <CompoundTextInput
+            formatSpecifier={formatSpecifier}
+            onNewUiFragmentValue={setUiFragmentValue}
+            onEnterKey={settle.submit}
+            ref={inputRef}
+          />
 
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Downloading!"
-          attemptSucceeded={isSucceeded(activeFsmState)}
-          maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          disabled={!isInteractable(activeFsmState)}
-          variant="secondary"
-          onClick={settle.cancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!isSubmittable}
-          variant="primary"
-          onClick={settle.submit}
-        >
-          Download
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Downloading!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={!isInteractable(activeFsmState)}
+            variant="secondary"
+            onClick={settle.cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            Download
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
