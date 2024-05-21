@@ -27,8 +27,8 @@ import {
   downloadZipfileInteraction,
 } from "./user-interactions/download-zipfile";
 import {
-  ICopyProjectInteraction,
-  copyProjectInteraction,
+  SaveProjectAsFlow,
+  saveProjectAsFlow,
 } from "./user-interactions/save-project-as";
 import {
   CodeDiffHelpFlow,
@@ -414,7 +414,6 @@ export interface IUserConfirmations {
 
   renameAssetInteraction: IRenameAssetInteraction;
   downloadZipfileInteraction: IDownloadZipfileInteraction;
-  copyProjectInteraction: ICopyProjectInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
   createProjectFlow: CreateProjectFlow;
@@ -422,6 +421,7 @@ export interface IUserConfirmations {
   addClipArtFlow: AddClipArtFlow;
   renameProjectFlow: RenameProjectFlow;
   displayScreenshotFlow: DisplayScreenshotFlow;
+  saveProjectAsFlow: SaveProjectAsFlow;
   uploadZipfilesFlow: UploadZipfilesFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
@@ -526,7 +526,6 @@ export const userConfirmations: IUserConfirmations = {
 
   renameAssetInteraction,
   downloadZipfileInteraction,
-  copyProjectInteraction,
   shareTutorialInteraction,
 
   createProjectFlow,
@@ -534,6 +533,7 @@ export const userConfirmations: IUserConfirmations = {
   addClipArtFlow,
   renameProjectFlow,
   displayScreenshotFlow,
+  saveProjectAsFlow,
   uploadZipfilesFlow,
   codeDiffHelpFlow,
   cropScaleImageFlow,
