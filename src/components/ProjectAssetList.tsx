@@ -1,5 +1,5 @@
 import React from "react";
-import { useStoreState, useStoreActions } from "../store";
+import { useStoreState } from "../store";
 import { AssetPresentation } from "../model/asset";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -15,10 +15,7 @@ type AssetCardProps = {
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
 
-  const launchDeleteAction = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteAsset
-  );
-
+  const launchDeleteAction = useFlowActions((f) => f.deleteAssetFlow.run);
   const launchRename = useFlowActions((f) => f.renameAssetFlow.run);
   const launchCropScale = useFlowActions((f) => f.cropScaleImageFlow.run);
 
@@ -27,9 +24,9 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
   const onDelete = () =>
     launchDeleteAction({
-      assetKindDisplayName: presentation.kind,
-      assetName: asset.name,
-      assetDisplayName: asset.name,
+      kindDisplayName: presentation.kind,
+      name: asset.name,
+      displayName: asset.name,
     });
 
   const onCopy = () => navigator.clipboard.writeText(`"${asset.name}"`);
