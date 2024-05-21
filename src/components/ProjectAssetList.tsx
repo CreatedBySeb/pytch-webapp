@@ -19,10 +19,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
     (actions) => actions.userConfirmations.launchDeleteAsset
   );
 
-  const launchRename = useStoreActions(
-    (actions) => actions.userConfirmations.renameAssetInteraction.launch
-  );
-
+  const launchRename = useFlowActions((f) => f.renameAssetFlow.run);
   const launchCropScale = useFlowActions((f) => f.cropScaleImageFlow.run);
 
   const presentation = asset.presentation;
