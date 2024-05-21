@@ -338,11 +338,13 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         formatSpecifier
       );
 
-      if (chooseFilenameOutcome.kind === "cancelled")
-        return {
+      if (chooseFilenameOutcome.kind === "cancelled") {
+        const cancelledOutcome: TaskOutcome = {
           successes: [],
           failures: ["User cancelled export"],
         };
+        return cancelledOutcome;
+      }
 
       const rawFilename = chooseFilenameOutcome.filename;
       const filename = rawFilename.endsWith(".zip")
@@ -357,10 +359,11 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       await api.exportFile(tokenInfo, file);
 
-      return {
+      const successOutcome: TaskOutcome = {
         successes: [`Project exported to "${filename}"`],
         failures: [],
       };
+      return successOutcome;
     };
 
     actions.doTask({ summary: "Export to Google Drive", run });
