@@ -222,3 +222,36 @@ export function asyncUserFlowSlice<
   );
   return Object.assign({}, specificSlice, asyncFlowModelSlice);
 }
+
+////////////////////////////////////////////////////////////////////////
+// Helpers for extracting properties of fsmState
+
+export function isSucceeded<RunStateT>(
+  fsmState: AsyncUserFlowFsmState<RunStateT>
+): boolean {
+  return fsmState.kind === "succeeded";
+}
+
+export function maybeLastFailureMessage<RunStateT>(
+  fsmState: AsyncUserFlowFsmState<RunStateT>
+): string | null {
+  return fsmState.kind === "interacting" && fsmState.maybeLastFailure != null
+    ? fsmState.maybeLastFailure.message ?? "an unknown error occurred"
+    : null;
+}
+
+export function isInteractable<RunStateT>(
+  fsmState: AsyncUserFlowFsmState<RunStateT>
+): boolean {
+  return fsmState.kind === "interacting";
+}
+
+export function isActive<RunStateT>(
+  fsmState: AsyncUserFlowFsmState<RunStateT>
+): fsmState is ActiveAsyncUserFlowFsmState<RunStateT> {
+  return (
+    fsmState.kind === "interacting" ||
+    fsmState.kind === "attempting" ||
+    fsmState.kind === "succeeded"
+  );
+}
