@@ -13,3 +13,8 @@ export type ActiveAsyncUserFlowFsmState<RunStateT> =
   | InteractingAsyncUserFlowFsmState<RunStateT>
   | { kind: "attempting"; runState: RunStateT }
   | { kind: "succeeded"; runState: RunStateT };
+
+export type AsyncUserFlowFsmState<RunStateT> =
+  | { kind: "idle" }
+  | { kind: "preparing" }
+  | ActiveAsyncUserFlowFsmState<RunStateT>;
