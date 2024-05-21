@@ -2,87 +2,83 @@ import React, { ChangeEvent, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { useStoreActions, useStoreState } from "../store";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { focusOrBlurFun, submitOnEnterKeyFun } from "../utils";
+import { submitOnEnterKeyFun } from "../utils";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { useFlowActions, useFlowState } from "../model";
 
 export const CopyProjectModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    sourceProjectId,
-    nameOfCopy,
-  } = useStoreState((state) => state.userConfirmations.copyProjectInteraction);
-
-  const { dismiss, attempt, setNameOfCopy, refreshInputsReady } =
-    useStoreActions(
-      (actions) => actions.userConfirmations.copyProjectInteraction
-    );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.saveProjectAsFlow);
+  const { setNameOfCopy } = useFlowActions((f) => f.saveProjectAsFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    setNameOfCopy(evt.target.value);
-    refreshInputsReady();
-  };
-  const handleSaveAs = () => {
-    attempt({ sourceProjectId, nameOfCopy });
-  };
-  const handleKeyPress = submitOnEnterKeyFun(handleSaveAs, inputsReady);
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+    const { nameOfCopy } = activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  return (
-    <Modal
-      className="CopyProject"
-      show={isActive}
-      onHide={handleClose}
-      animation={false}
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Copy project</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Control
-              readOnly={!isInteractable}
-              type="text"
-              value={nameOfCopy}
-              onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              placeholder="Name for copy of project"
-              tabIndex={-1}
-              ref={inputRef}
-            />
-          </Form.Group>
-        </Form>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Project copied!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={handleClose}
-          disabled={!isInteractable}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!(isInteractable && inputsReady)}
-          variant="primary"
-          onClick={handleSaveAs}
-        >
-          Make a copy
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+      setNameOfCopy(evt.target.value);
+    };
+    const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
+
+    return (
+      <Modal
+        className="CopyProject"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Copy project</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <Form.Control
+                readOnly={!isInteractable(activeFsmState)}
+                type="text"
+                value={nameOfCopy}
+                onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                placeholder="Name for copy of project"
+                tabIndex={-1}
+                ref={inputRef}
+              />
+            </Form.Group>
+          </Form>
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Project copied!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={settle.cancel}
+            disabled={!isInteractable}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            Make a copy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  });
 };
