@@ -1,4 +1,6 @@
 import {
+  Action,
+  Thunk,
   Computed,
 } from "easy-peasy";
 
@@ -33,4 +35,21 @@ function assertInteracting<RunStateT>(
 export type AsyncUserFlowState<RunStateT> = {
   fsmState: AsyncUserFlowFsmState<RunStateT>;
   isSubmittable: Computed<AsyncUserFlowState<RunStateT>, boolean>;
+};
+
+export type AsyncUserFlowSlice<
+  AppModelT extends object,
+  RunArgsT,
+  RunStateT,
+> = AsyncUserFlowState<RunStateT> & {
+  setFsmState: Action<
+    AsyncUserFlowState<RunStateT>,
+    AsyncUserFlowFsmState<RunStateT>
+  >;
+  run: Thunk<
+    AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT>,
+    RunArgsT,
+    void,
+    AppModelT
+  >;
 };
