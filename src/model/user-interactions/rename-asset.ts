@@ -1,46 +1,44 @@
-import { Action, action, computed, Computed, Thunk, thunk } from "easy-peasy";
-import { PytchAppModelActions } from "..";
-import { IRenameAssetDescriptor } from "../project";
-import { IModalUserInteraction, modalUserInteraction } from ".";
-import { propSetterAction } from "../../utils";
+import { Action } from "easy-peasy";
+import { IPytchAppModel, PytchAppModelActions } from "..";
+
 import {
   AssetOperationContext,
   assetOperationContextFromKey,
   AssetOperationContextKey,
-  unknownAssetOperationContext,
 } from "../asset";
+import {
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  setRunStateProp,
+} from "./async-user-flow";
 
-type IRenameAssetBase = IModalUserInteraction<IRenameAssetDescriptor>;
-
-type RenameAssetLaunchArgs = {
+type RenameAssetRunArgs = {
   operationContextKey: AssetOperationContextKey;
   fixedPrefix: string;
   oldNameSuffix: string;
 };
 
-interface IRenameAssetSpecific {
+type RenameAssetRunState = {
   operationContext: AssetOperationContext;
   fixedPrefix: string;
   oldStem: string;
   newStem: string;
   fixedSuffix: string;
+};
 
-  setOperationContext: Action<IRenameAssetSpecific, AssetOperationContext>;
-  setFixedPrefix: Action<IRenameAssetSpecific, string>;
-  setOldStem: Action<IRenameAssetSpecific, string>;
-  _setNewStem: Action<IRenameAssetSpecific, string>;
-  setNewStem: Thunk<IRenameAssetSpecific, string>;
-  setFixedSuffix: Action<IRenameAssetSpecific, string>;
+type RenameAssetBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  RenameAssetRunArgs,
+  RenameAssetRunState
+>;
 
-  refreshInputsReady: Action<IRenameAssetBase & IRenameAssetSpecific>;
-  launch: Thunk<IRenameAssetBase & IRenameAssetSpecific, RenameAssetLaunchArgs>;
-  attemptArgs: Computed<IRenameAssetSpecific, IRenameAssetDescriptor>;
-}
+type SAction<ArgT> = Action<RenameAssetBase, ArgT>;
 
-const attemptRename = (
-  actions: PytchAppModelActions,
-  renameDescriptor: IRenameAssetDescriptor
-) => actions.activeProject.renameAssetAndSync(renameDescriptor);
+type RenameAssetActions = {
+  setNewStem: SAction<string>;
+};
+
+export type RenameAssetFlow = RenameAssetBase & RenameAssetActions;
 
 type FilenameParts = { stem: string; extension: string };
 const filenameParts = (name: string): FilenameParts => {
@@ -61,57 +59,46 @@ const filenameParts = (name: string): FilenameParts => {
   return { stem, extension };
 };
 
-const renameAssetSpecific: IRenameAssetSpecific = {
-  operationContext: unknownAssetOperationContext,
-  fixedPrefix: "",
-  oldStem: "",
-  newStem: "",
-  fixedSuffix: "",
-  setOperationContext: propSetterAction("operationContext"),
-  setFixedPrefix: propSetterAction("fixedPrefix"),
-  setOldStem: propSetterAction("oldStem"),
+async function prepare(args: RenameAssetRunArgs): Promise<RenameAssetRunState> {
+  const operationContext = assetOperationContextFromKey(
+    args.operationContextKey
+  );
+  const { stem, extension } = filenameParts(args.oldNameSuffix);
+  return {
+    operationContext,
+    fixedPrefix: args.fixedPrefix,
+    oldStem: stem,
+    newStem: stem,
+    fixedSuffix: extension,
+  };
+}
 
-  _setNewStem: propSetterAction("newStem"),
-  setNewStem: thunk((actions, newStem) => {
-    actions._setNewStem(newStem);
-    actions.refreshInputsReady();
-  }),
+function isSubmittable(runState: RenameAssetRunState): boolean {
+  const newStem = runState.newStem;
+  return newStem !== "" && newStem !== runState.oldStem;
+}
 
-  setFixedSuffix: propSetterAction("fixedSuffix"),
+async function attempt(
+  runState: RenameAssetRunState,
+  actions: PytchAppModelActions
+): Promise<void> {
+  const suffix = runState.fixedSuffix;
+  const oldNameSuffix = `${runState.oldStem}${suffix}`;
+  const newNameSuffix = `${runState.newStem}${suffix}`;
 
-  refreshInputsReady: action((state) => {
-    const newStem = state.newStem;
-    state.inputsReady = newStem !== "" && newStem !== state.oldStem;
-  }),
+  const renameDescriptor = {
+    operationContext: runState.operationContext,
+    fixedPrefix: runState.fixedPrefix,
+    oldNameSuffix,
+    newNameSuffix,
+  };
 
-  launch: thunk(
-    (actions, { operationContextKey, fixedPrefix, oldNameSuffix }) => {
-      const opContext = assetOperationContextFromKey(operationContextKey);
-      actions.setOperationContext(opContext);
+  await actions.activeProject.renameAssetAndSync(renameDescriptor);
+}
 
-      actions.setFixedPrefix(fixedPrefix);
-
-      const { stem, extension } = filenameParts(oldNameSuffix);
-      actions.setOldStem(stem);
-      actions.setNewStem(stem);
-      actions.setFixedSuffix(extension);
-
-      actions.superLaunch();
-    }
-  ),
-
-  attemptArgs: computed((state) => {
-    const operationContext = state.operationContext;
-    const fixedPrefix = state.fixedPrefix;
-    const suffix = state.fixedSuffix;
-    const oldNameSuffix = `${state.oldStem}${suffix}`;
-    const newNameSuffix = `${state.newStem}${suffix}`;
-    return { operationContext, fixedPrefix, oldNameSuffix, newNameSuffix };
-  }),
-};
-
-export type IRenameAssetInteraction = IRenameAssetBase & IRenameAssetSpecific;
-export const renameAssetInteraction = modalUserInteraction(
-  attemptRename,
-  renameAssetSpecific
-);
+export let renameAssetFlow: RenameAssetFlow = (() => {
+  const specificSlice: RenameAssetActions = {
+    setNewStem: setRunStateProp("newStem"),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();

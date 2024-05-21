@@ -1,85 +1,76 @@
 import React, { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { useStoreActions, useStoreState } from "../store";
 import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { focusOrBlurFun } from "../utils";
 import { CompoundTextInput } from "./CompoundTextInput";
 import { FormatSpecifier } from "../model/compound-text-input";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { useFlowActions, useFlowState } from "../model";
 
 export const RenameAssetModal = () => {
-  const {
-    oldStem,
-    fixedSuffix,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    inputsReady,
-    attemptArgs,
-  } = useStoreState((state) => state.userConfirmations.renameAssetInteraction);
-
-  const { attempt, dismiss, setNewStem } = useStoreActions(
-    (actions) => actions.userConfirmations.renameAssetInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.renameAssetFlow);
+  const { setNewStem } = useFlowActions((f) => f.renameAssetFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const oldBasename = `${oldStem}${fixedSuffix}`;
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+    const { oldStem, fixedSuffix } = activeFsmState.runState;
+    const oldBasename = `${oldStem}${fixedSuffix}`;
 
-  const handleClose = () => dismiss();
-  const handleRename = () => attempt(attemptArgs);
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const handleEnterKey = () => {
-    if (inputsReady) {
-      handleRename();
-    }
-  };
+    const formatSpecifier: FormatSpecifier = [
+      {
+        kind: "user-input",
+        placeholder: "new filename",
+        initialValue: oldStem,
+      },
+      { kind: "literal", value: fixedSuffix },
+    ];
 
-  const formatSpecifier: FormatSpecifier = [
-    {
-      kind: "user-input",
-      placeholder: "new filename",
-      initialValue: oldStem,
-    },
-    { kind: "literal", value: fixedSuffix },
-  ];
-
-  return (
-    <Modal show={isActive} onHide={handleClose} animation={false} centered>
-      <Modal.Header closeButton={isInteractable}>
-        <Modal.Title>Rename “{oldBasename}”</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <CompoundTextInput
-          formatSpecifier={formatSpecifier}
-          onNewUiFragmentValue={setNewStem}
-          onEnterKey={handleEnterKey}
-          ref={inputRef}
-        />
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Renamed!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          disabled={!isInteractable}
-          variant="secondary"
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!(isInteractable && inputsReady)}
-          variant="primary"
-          onClick={handleRename}
-        >
-          Rename
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    return (
+      <Modal show={true} onHide={settle.cancel} animation={false} centered>
+        <Modal.Header closeButton={isInteractable(activeFsmState)}>
+          <Modal.Title>Rename “{oldBasename}”</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <CompoundTextInput
+            formatSpecifier={formatSpecifier}
+            onNewUiFragmentValue={setNewStem}
+            onEnterKey={settle.submit}
+            ref={inputRef}
+          />
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Renamed!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={!isInteractable}
+            variant="secondary"
+            onClick={settle.cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            Rename
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  });
 };
