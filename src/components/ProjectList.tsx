@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { EmptyProps, assertNever } from "../utils";
 import { MtimeDisplay } from "./MtimeDisplay";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
+import { useFlowActions } from "../model";
 
 type ProjectCardProps = {
   project: IDisplayedProjectSummary;
@@ -146,9 +147,10 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const selectedIds = useStoreState(
     (state) => state.projectCollection.availableSelectedIds
   );
-  const launchCreate = useStoreActions(
-    (actions) => actions.userConfirmations.createProjectInteraction.launch
+  const activeUiVersion = useStoreState(
+    (state) => state.versionOptIn.activeUiVersion
   );
+  const launchCreate = useFlowActions((f) => f.createProjectFlow.run);
   const launchUpload = useStoreActions(
     (actions) => actions.userConfirmations.uploadZipfilesInteraction.launch
   );
@@ -180,7 +182,7 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
       </div>
     );
   } else {
-    const showCreateModal = () => launchCreate();
+    const showCreateModal = () => launchCreate({ activeUiVersion });
     const showUploadModal = () => launchUpload();
     return (
       <div className="buttons">
