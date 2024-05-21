@@ -373,7 +373,10 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     const allActions = helpers.getStoreActions();
 
     // Any errors thrown from run() will be caught by doTask().
-    const run: GoogleDriveTask = async (api, tokenInfo) => {
+    const run: GoogleDriveTask = async (
+      api,
+      tokenInfo
+    ): Promise<TaskOutcome> => {
       const savedTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
