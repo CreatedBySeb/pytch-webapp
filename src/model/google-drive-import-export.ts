@@ -377,14 +377,14 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       api,
       tokenInfo
     ): Promise<TaskOutcome> => {
-      const savedTaskState = helpers.getState().taskState;
+      const pendingTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
       const { files: filesPromise } = api.importFiles(tokenInfo);
 
       const files = await filesPromise;
 
-      actions.setTaskState(savedTaskState);
+      actions.setTaskState(pendingTaskState);
 
       let successfulImports: Array<SuccessfulFileImport> = [];
       let failures: Array<FileProcessingFailure> = [];
