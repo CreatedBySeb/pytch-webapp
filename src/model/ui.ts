@@ -20,8 +20,8 @@ import {
   renameProjectInteraction,
 } from "./user-interactions/rename-project";
 import {
-  IDisplayScreenshotInteraction,
-  displayScreenshotInteraction,
+  DisplayScreenshotFlow,
+  displayScreenshotFlow,
 } from "./user-interactions/display-screenshot";
 import {
   IDownloadZipfileInteraction,
@@ -412,7 +412,6 @@ export interface IUserConfirmations {
 
   renameAssetInteraction: IRenameAssetInteraction;
   renameProjectInteraction: IRenameProjectInteraction;
-  displayScreenshotInteraction: IDisplayScreenshotInteraction;
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   copyProjectInteraction: ICopyProjectInteraction;
   uploadZipfilesInteraction: IProcessFilesInteraction;
@@ -421,6 +420,7 @@ export interface IUserConfirmations {
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
+  displayScreenshotFlow: DisplayScreenshotFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
   viewCodeDiffFlow: ViewCodeDiffFlow;
@@ -524,7 +524,6 @@ export const userConfirmations: IUserConfirmations = {
 
   renameAssetInteraction,
   renameProjectInteraction,
-  displayScreenshotInteraction,
   downloadZipfileInteraction,
   copyProjectInteraction,
   uploadZipfilesInteraction,
@@ -533,6 +532,7 @@ export const userConfirmations: IUserConfirmations = {
   createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
+  displayScreenshotFlow,
   codeDiffHelpFlow,
   cropScaleImageFlow,
   viewCodeDiffFlow,
