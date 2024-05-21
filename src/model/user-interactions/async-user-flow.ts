@@ -1,3 +1,7 @@
+import {
+  Computed,
+} from "easy-peasy";
+
 type UserSettleResult = "cancel" | "submit";
 type UserSettleFun = (result: UserSettleResult) => void;
 const kIgnoreSettleResult: UserSettleFun = () => void 0;
@@ -25,3 +29,8 @@ function assertInteracting<RunStateT>(
   if (fsmState.kind !== "interacting")
     throw new Error('FSM-state should be "interacting"');
 }
+
+export type AsyncUserFlowState<RunStateT> = {
+  fsmState: AsyncUserFlowFsmState<RunStateT>;
+  isSubmittable: Computed<AsyncUserFlowState<RunStateT>, boolean>;
+};
