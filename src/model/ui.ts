@@ -36,8 +36,8 @@ import {
   codeDiffHelpFlow,
 } from "./user-interactions/code-diff-help";
 import {
-  ICropScaleImageInteraction,
-  cropScaleImageInteraction,
+  CropScaleImageFlow,
+  cropScaleImageFlow,
 } from "./user-interactions/crop-scale-image";
 import {
   IShareTutorialInteraction,
@@ -416,13 +416,13 @@ export interface IUserConfirmations {
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   copyProjectInteraction: ICopyProjectInteraction;
   uploadZipfilesInteraction: IProcessFilesInteraction;
-  cropScaleImageInteraction: ICropScaleImageInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
+  cropScaleImageFlow: CropScaleImageFlow;
   viewCodeDiffFlow: ViewCodeDiffFlow;
 }
 
@@ -528,13 +528,13 @@ export const userConfirmations: IUserConfirmations = {
   downloadZipfileInteraction,
   copyProjectInteraction,
   uploadZipfilesInteraction,
-  cropScaleImageInteraction,
   shareTutorialInteraction,
 
   createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
   codeDiffHelpFlow,
+  cropScaleImageFlow,
   viewCodeDiffFlow,
 };
 

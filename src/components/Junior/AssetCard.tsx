@@ -18,6 +18,7 @@ import SoundAssetPreview from "../../images/sound-wave-w96.png";
 import { DragPreviewImage } from "react-dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
+import { useFlowActions } from "../../model";
 
 type RenameDropdownItemProps = {
   actorKind: ActorKind;
@@ -91,9 +92,7 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
   projectId,
   presentation,
 }) => {
-  const launchCropScale = useStoreActions(
-    (actions) => actions.userConfirmations.cropScaleImageInteraction.launch
-  );
+  const launchCropScale = useFlowActions((f) => f.cropScaleImageFlow.run);
 
   if (presentation.presentation.kind !== "image") {
     return;

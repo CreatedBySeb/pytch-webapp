@@ -23,9 +23,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
     (actions) => actions.userConfirmations.renameAssetInteraction.launch
   );
 
-  const launchCropScale = useStoreActions(
-    (actions) => actions.userConfirmations.cropScaleImageInteraction.launch
-  );
+  const launchCropScale = useFlowActions((f) => f.cropScaleImageFlow.run);
 
   const presentation = asset.presentation;
   const isImage = presentation.kind === "image";

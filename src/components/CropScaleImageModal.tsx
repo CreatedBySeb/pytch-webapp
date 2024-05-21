@@ -1,5 +1,4 @@
 import React from "react";
-import { useStoreActions, useStoreState } from "../store";
 import Modal from "react-bootstrap/Modal";
 import ReactCrop from "react-image-crop";
 import Form from "react-bootstrap/Form";
@@ -9,9 +8,20 @@ import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
 
 import { Crop as ReactCropSpec } from "react-image-crop";
 import { ImageCropSourceDescriptor, ImageDimensions } from "../model/asset";
-import { zeroCrop } from "../model/user-interactions/crop-scale-image";
+import {
+  effectiveCropFromDisplayedCrop,
+  zeroCrop,
+} from "../model/user-interactions/crop-scale-image";
 
 import "react-image-crop/dist/ReactCrop.css";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import {
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../model";
 
 // The react-image-crop interface works in percentages but the model
 // state and the transformation functions work in proportions.  And the
@@ -135,119 +145,104 @@ const UnitRangeFormControl: React.FC<{
 };
 
 export const CropScaleImageModal = () => {
-  const {
-    isActive,
-    inputsReady,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    displayedNewCrop,
-    effectiveNewCrop,
-    newScale,
-    sourceURL,
-    originalSize,
-    descriptorForAttempt,
-  } = useStoreState(
-    (state) => state.userConfirmations.cropScaleImageInteraction
-  );
+  const { fsmState, isSubmittable } = useFlowState((f) => f.cropScaleImageFlow);
+  const { setNewScale, setDisplayedNewCrop, setEffectiveNewCrop } =
+    useFlowActions((f) => f.cropScaleImageFlow);
 
-  const {
-    dismiss,
-    attempt,
-    setDisplayedNewCrop,
-    setEffectiveNewCrop,
-    setNewScale,
-  } = useStoreActions(
-    (actions) => actions.userConfirmations.cropScaleImageInteraction
-  );
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+    const { sourceURL, originalSize, newScale, displayedNewCrop } =
+      activeFsmState.runState;
+    const effectiveNewCrop = effectiveCropFromDisplayedCrop(displayedNewCrop);
+    const settle = settleFunctions(isSubmittable, activeFsmState);
 
-  const handleClose = () => dismiss();
+    const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (
+      event
+    ) => {
+      const rangeValue = parseFloat(event.target.value);
+      setNewScale(scaleForRangeValue(rangeValue));
+    };
 
-  const setScaleFromEvent: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const rangeValue = parseFloat(e.target.value);
-    setNewScale(scaleForRangeValue(rangeValue));
-  };
+    const pctCrop = percentCropFromProportionCrop(displayedNewCrop);
 
-  const pctCrop = percentCropFromProportionCrop(displayedNewCrop);
-
-  return (
-    <Modal
-      className="CropScaleImage"
-      show={isActive}
-      onHide={handleClose}
-      animation={false}
-      backdrop="static"
-      centered
-    >
-      <Modal.Header>
-        <Modal.Title>Adjust image</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="outer-content">
-          <div className="left-content">
-            <h2>Crop and scale:</h2>
-            <div className="crop-container">
-              <ReactCrop
-                crop={pctCrop}
-                onChange={(_pxCrop, pctCrop) =>
-                  setDisplayedNewCrop(proportionCropFromPercentCrop(pctCrop))
-                }
-                onComplete={(_pxCrop, pctCrop) =>
-                  setEffectiveNewCrop(proportionCropFromPercentCrop(pctCrop))
-                }
-              >
-                <img alt="Full source" src={sourceURL.toString()} />
-              </ReactCrop>
+    return (
+      <Modal
+        className="CropScaleImage"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        backdrop="static"
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title>Adjust image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="outer-content">
+            <div className="left-content">
+              <h2>Crop and scale:</h2>
+              <div className="crop-container">
+                <ReactCrop
+                  crop={pctCrop}
+                  onChange={(_pxCrop, pctCrop) =>
+                    setDisplayedNewCrop(proportionCropFromPercentCrop(pctCrop))
+                  }
+                  onComplete={(_pxCrop, pctCrop) =>
+                    setEffectiveNewCrop(proportionCropFromPercentCrop(pctCrop))
+                  }
+                >
+                  <img alt="Full source" src={sourceURL.toString()} />
+                </ReactCrop>
+              </div>
+              <UnitRangeFormControl
+                value={rangeValueForScale(newScale)}
+                onChange={setScaleFromEvent}
+              />
             </div>
-            <UnitRangeFormControl
-              value={rangeValueForScale(newScale)}
-              onChange={setScaleFromEvent}
-            />
-          </div>
-          <div className="right-content">
-            <h2>Preview on Stage:</h2>
-            <StageMockup
-              sourceURL={sourceURL}
-              sourceCrop={effectiveNewCrop}
-              originalSize={originalSize}
-              scale={newScale}
-            />
-            <div className="buttons">
-              <Button
-                disabled={!isInteractable}
-                variant="outline-success"
-                onClick={() => {
-                  setDisplayedNewCrop(zeroCrop);
-                  setNewScale(1.0);
-                }}
-              >
-                Reset
-              </Button>
-              <div className="main">
+            <div className="right-content">
+              <h2>Preview on Stage:</h2>
+              <StageMockup
+                sourceURL={sourceURL}
+                sourceCrop={effectiveNewCrop}
+                originalSize={originalSize}
+                scale={newScale}
+              />
+              <div className="buttons">
                 <Button
-                  disabled={!isInteractable}
-                  variant="secondary"
-                  onClick={handleClose}
+                  disabled={!isInteractable(activeFsmState)}
+                  variant="outline-success"
+                  onClick={() => {
+                    setDisplayedNewCrop(zeroCrop);
+                    setNewScale(1.0);
+                  }}
                 >
-                  Cancel
+                  Reset
                 </Button>
-                <Button
-                  disabled={!(isInteractable && inputsReady)}
-                  variant="primary"
-                  onClick={() => attempt(descriptorForAttempt)}
-                >
-                  OK
-                </Button>
+                <div className="main">
+                  <Button
+                    disabled={!isInteractable(activeFsmState)}
+                    variant="secondary"
+                    onClick={settle.cancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!isSubmittable}
+                    variant="primary"
+                    onClick={settle.submit}
+                  >
+                    OK
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess="Updated!"
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
-        />
-      </Modal.Body>
-    </Modal>
-  );
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess="Updated!"
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+      </Modal>
+    );
+  });
 };
