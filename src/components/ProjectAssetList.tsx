@@ -121,12 +121,10 @@ const ProjectAssetList = () => {
   const launchUploadModal = () =>
     launchAdd({ projectId, operationContextKey, assetNamePrefix: "" });
 
-  const showClipArtModal = useStoreActions(
-    (actions) => actions.userConfirmations.addClipArtItemsInteraction.launch
-  );
+  const showClipArtModal = useFlowActions((f) => f.addClipArtFlow.run);
 
   const launchClipArtModal = () =>
-    showClipArtModal({ operationContextKey, assetNamePrefix: "" });
+    showClipArtModal({ projectId, operationContextKey, assetNamePrefix: "" });
 
   switch (loadState) {
     case "pending":
