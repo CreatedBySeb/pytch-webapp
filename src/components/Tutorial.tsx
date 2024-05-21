@@ -8,11 +8,12 @@ import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
 import { assertNever, failIfNull, isDivOfClass } from "../utils";
-import { IDiffHelpSamples } from "../model/user-interactions/code-diff-help";
+import { DiffHelpSamples } from "../model/user-interactions/code-diff-help";
 import { makeScratchSVG } from "../model/scratchblocks-render";
 
 import "../pytch-tutorial.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useFlowActions } from "../model";
 
 type NavigationDirection = "prev" | "next";
 
@@ -274,7 +275,7 @@ const diffSampleOfClass = (
   return table;
 };
 
-const diffSamples = (tables: Array<HTMLTableElement>): IDiffHelpSamples => {
+const diffSamples = (tables: Array<HTMLTableElement>): DiffHelpSamples => {
   return {
     unchanged: diffSampleOfClass(tables, "diff-unch"),
     deleted: diffSampleOfClass(tables, "diff-del"),
@@ -283,9 +284,7 @@ const diffSamples = (tables: Array<HTMLTableElement>): IDiffHelpSamples => {
 };
 
 const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
-  const showHelp = useStoreActions(
-    (actions) => actions.userConfirmations.codeDiffHelpInteraction.launch
-  );
+  const showHelp = useFlowActions((f) => f.codeDiffHelpFlow.run);
 
   let divCopy = div.cloneNode(true) as HTMLDivElement;
 
@@ -338,7 +337,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
     <div className="patch-container" onCopy={convertDotsToSpaces}>
       <div className="header">
         <h1 className="decoration">Change the code like this:</h1>
-        <Button onClick={() => showHelp(samples)}>
+        <Button onClick={() => showHelp({ samples })}>
           <FontAwesomeIcon icon="question-circle" />
         </Button>
       </div>
