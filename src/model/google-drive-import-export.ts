@@ -385,13 +385,15 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
   exportProject: thunk(async (actions, descriptor) => {
     // Any errors thrown from run() will be caught by doTask().
     const run: GoogleDriveTask = async (api, tokenInfo) => {
+      const navGuard = new NavigationAbandonmentGuard();
       const formatSpecifier = filenameFormatSpecifier(
         descriptor.linkedContentLoadingState
       );
-      const chooseFilenameOutcome = await actions.chooseFilenameFlow.outcome(
-        formatSpecifier
-      );
 
+      try {
+      const chooseFilenameOutcome = await navGuard.throwIfAbandoned(
+        actions.chooseFilenameFlow.outcome(formatSpecifier)
+      );
       if (chooseFilenameOutcome.kind === "cancelled") {
         const cancelledOutcome: TaskOutcome = {
           successes: [],
@@ -411,13 +413,16 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         data: () => zipfileDataFromProject(descriptor.project),
       };
 
-      await api.exportFile(tokenInfo, file);
+      await navGuard.throwIfAbandoned(api.exportFile(tokenInfo, file));
 
       const successOutcome: TaskOutcome = {
         successes: [`Project exported to "${filename}"`],
         failures: [],
       };
       return successOutcome;
+      } finally {
+        navGuard.exit();
+      }
     };
 
     actions.doTask({ summary: "Export to Google Drive", run });
