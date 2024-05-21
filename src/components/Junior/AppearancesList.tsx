@@ -14,7 +14,7 @@ import classNames from "classnames";
 
 import { NoContentHelp } from "./NoContentHelp";
 import { useJrEditState, useMappedProgram } from "./hooks";
-import { useStoreActions, useStoreState } from "../../store";
+import { useStoreState } from "../../store";
 import { useFlowActions } from "../../model";
 
 type AppearancesContentProps = {
@@ -92,12 +92,9 @@ export const AppearancesList = () => {
   const addFromDevice = () =>
     showAddModal({ projectId, operationContextKey, assetNamePrefix });
 
-  const launchAddFromMediaLibraryAction = useStoreActions(
-    (actions) => actions.userConfirmations.addClipArtItemsInteraction.launch
-  );
-
+  const addClipArt = useFlowActions((f) => f.addClipArtFlow.run);
   const addFromMediaLibrary = () =>
-    launchAddFromMediaLibraryAction({ operationContextKey, assetNamePrefix });
+    addClipArt({ projectId, operationContextKey, assetNamePrefix });
 
   const classes = classNames(
     "Junior-AssetsList",

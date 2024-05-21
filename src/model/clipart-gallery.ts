@@ -8,6 +8,9 @@ import {
   unionAllTags,
   populateUrlOfItems,
   nSelectedItemsInEntries,
+  ClipArtGalleryEntryId,
+  ClipArtGalleryEntry,
+  selectedEntries,
 } from "./clipart-gallery-core";
 
 export type ClipArtGalleryState =
@@ -32,11 +35,38 @@ export const nSelectedItemsInGallery = (
   }
 };
 
+const selectedEntriesInGallery = (
+  galleryState: ClipArtGalleryState,
+  selectedIds: Array<number>
+): Array<ClipArtGalleryEntry> => {
+  switch (galleryState.status) {
+    case "fetch-failed":
+    case "fetch-not-started":
+    case "fetch-pending":
+      // This function should never be called unless we're "ready".
+      console.warn(`unexpected gallery state ${galleryState.status}`);
+      return [];
+    case "ready": {
+      const allEntries = galleryState.entries;
+      return selectedEntries(allEntries, selectedIds);
+    }
+    default:
+      return assertNever(galleryState);
+  }
+};
+
 export interface IClipArtGallery {
   state: ClipArtGalleryState;
   setState: Action<IClipArtGallery, ClipArtGalleryState>;
 
   startFetchIfRequired: Thunk<IClipArtGallery, void, void, IPytchAppModel>;
+  selectedEntries: Thunk<
+    IClipArtGallery,
+    Array<ClipArtGalleryEntryId>,
+    void,
+    IPytchAppModel,
+    Array<ClipArtGalleryEntry>
+  >;
 }
 
 export const clipArtGallery: IClipArtGallery = {
@@ -71,5 +101,9 @@ export const clipArtGallery: IClipArtGallery = {
         message: "There was an error fetching the media library.",
       });
     }
+  }),
+
+  selectedEntries: thunk((_actions, selectedIds, helpers) => {
+    return selectedEntriesInGallery(helpers.getState().state, selectedIds);
   }),
 };
