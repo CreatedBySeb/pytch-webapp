@@ -8,6 +8,7 @@ import {
   unionAllTags,
   populateUrlOfItems,
   nSelectedItemsInEntries,
+  ClipArtGalleryEntryId,
   ClipArtGalleryEntry,
   selectedEntries,
 } from "./clipart-gallery-core";
@@ -59,6 +60,13 @@ export interface IClipArtGallery {
   setState: Action<IClipArtGallery, ClipArtGalleryState>;
 
   startFetchIfRequired: Thunk<IClipArtGallery, void, void, IPytchAppModel>;
+  selectedEntries: Thunk<
+    IClipArtGallery,
+    Array<ClipArtGalleryEntryId>,
+    void,
+    IPytchAppModel,
+    Array<ClipArtGalleryEntry>
+  >;
 }
 
 export const clipArtGallery: IClipArtGallery = {
@@ -93,5 +101,9 @@ export const clipArtGallery: IClipArtGallery = {
         message: "There was an error fetching the media library.",
       });
     }
+  }),
+
+  selectedEntries: thunk((_actions, selectedIds, helpers) => {
+    return selectedEntriesInGallery(helpers.getState().state, selectedIds);
   }),
 };
