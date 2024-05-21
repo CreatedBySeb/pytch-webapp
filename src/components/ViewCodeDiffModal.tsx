@@ -91,25 +91,25 @@ export const ViewCodeDiffModal: React.FC<EmptyProps> = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.viewCodeDiffFlow);
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-  const { hunks } = activeFsmState.runState;
-  const settle = settleFunctions(isSubmittable, activeFsmState);
-  return (
-    <Modal
-      className="ViewCodeDiffModal"
-      show={true}
-      animation={false}
-      size="xl"
-    >
-      <Modal.Header>
-        <Modal.Title>Compare your code against original</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <SideBySideDiff changes={hunks} />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={settle.cancel}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    const { hunks } = activeFsmState.runState;
+    const settle = settleFunctions(isSubmittable, activeFsmState);
+    return (
+      <Modal
+        className="ViewCodeDiffModal"
+        show={true}
+        animation={false}
+        size="xl"
+      >
+        <Modal.Header>
+          <Modal.Title>Compare your code against original</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <SideBySideDiff changes={hunks} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={settle.cancel}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
   });
 };
