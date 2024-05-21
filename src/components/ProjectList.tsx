@@ -22,9 +22,7 @@ type ProjectCardProps = {
 const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   const navigate = useNavigate();
 
-  const launchDeleteAction = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteProject
-  );
+  const launchDeleteAction = useFlowActions((f) => f.deleteProjectFlow.run);
   const launchRename = useFlowActions((f) => f.renameProjectFlow.run);
   const toggleSelected = useStoreActions(
     (actions) => actions.projectCollection.toggleProjectSelected
@@ -42,8 +40,8 @@ const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
 
   const onDelete = () => {
     launchDeleteAction({
-      projectName: project.summary.name,
-      projectId: project.summary.id,
+      id: project.summary.id,
+      name: project.summary.name,
     });
   };
 
