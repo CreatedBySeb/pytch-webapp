@@ -1,8 +1,10 @@
 import {
+  Actions,
   Action,
   Thunk,
   Computed,
 } from "easy-peasy";
+import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
 type UserSettleResult = "cancel" | "submit";
 type UserSettleFun = (result: UserSettleResult) => void;
@@ -53,3 +55,9 @@ export type AsyncUserFlowSlice<
     AppModelT
   >;
 };
+
+type AsyncFlowPrepareFun<RunArgsT, AppModelT extends object, RunStateT> = (
+  args: RunArgsT,
+  storeActions: Actions<AppModelT>,
+  navigationGuard: NavigationAbandonmentGuard
+) => Promise<RunStateT>;
