@@ -1,218 +1,168 @@
+import { Action } from "easy-peasy";
+import { assertNever } from "../../utils";
+import { IPytchAppModel, PytchAppModelActions } from "../../model";
 import {
-  action,
-  Action,
-  Actions,
-  computed,
-  Computed,
-  thunk,
-  Thunk,
-} from "easy-peasy";
-
-import { IPytchAppModel } from "..";
-import { assertNever, propSetterAction } from "../../utils";
-
-import {
-  IModalUserInteraction,
-  modalUserInteraction,
-} from "../user-interactions";
+  AsyncUserFlowOptions,
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  setRunStateProp,
+} from "../user-interactions/async-user-flow";
 import { EventDescriptorKind } from "./structured-program/event";
-import {
-  HandlerUpsertionAction,
-  HandlerUpsertionDescriptor,
-  HandlerUpsertionOperation,
-} from "./structured-program/program";
-import { Uuid } from "./structured-program/core-types";
+import { HandlerUpsertionOperation } from "./structured-program/program";
 import { descriptorFromBrowserKeyName, KeyDescriptor } from "./keyboard-layout";
 
-type IUpsertHatBlockBase = IModalUserInteraction<HandlerUpsertionOperation>;
 type HandlerUpsertionMode = "choosing-hat-block" | "choosing-key";
 
 const kSpaceKeyDescriptor = descriptorFromBrowserKeyName(" ");
 const kDefaultWhenIReceiveMessage = "message-1";
 
-// Any better way to represent the key-pressed and message-received
-// arguments?
+type UpsertHatBlockRunArgs = {
+  operation: HandlerUpsertionOperation;
+};
 
-type IUpsertHatBlockSpecific = {
-  // We provide feedback by pulsing a glow around the upserted script,
-  // so don't also pulse a message in the modal:
-  _pulseSuccessMessage: false;
-
+type UpsertHatBlockRunState = {
   operation: HandlerUpsertionOperation;
   mode: HandlerUpsertionMode;
   chosenKind: EventDescriptorKind;
   keyIfChosen: KeyDescriptor;
   messageIfChosen: string;
-  upsertionDescriptor: Computed<
-    IUpsertHatBlockSpecific,
-    HandlerUpsertionDescriptor
-  >;
-
-  setActorId: Action<IUpsertHatBlockSpecific, Uuid>;
-  setAction: Action<IUpsertHatBlockSpecific, HandlerUpsertionAction>;
-  setMode: Action<IUpsertHatBlockSpecific, HandlerUpsertionMode>;
-  _setChosenKind: Action<IUpsertHatBlockSpecific, EventDescriptorKind>;
-  setChosenKind: Thunk<IUpsertHatBlockSpecific, EventDescriptorKind>;
-  setKeyIfChosen: Action<IUpsertHatBlockSpecific, KeyDescriptor>;
-  _setMessageIfChosen: Action<IUpsertHatBlockSpecific, string>;
-  setMessageIfChosen: Thunk<IUpsertHatBlockSpecific, string>;
-  refreshInputsReady: Action<IUpsertHatBlockBase & IUpsertHatBlockSpecific>;
-
-  launch: Thunk<
-    IUpsertHatBlockBase & IUpsertHatBlockSpecific,
-    HandlerUpsertionOperation
-  >;
-  attemptIfReady: Thunk<IUpsertHatBlockInteraction, void, void, IPytchAppModel>;
 };
 
-const upsertHatBlockSpecific: IUpsertHatBlockSpecific = {
-  _pulseSuccessMessage: false,
+type UpsertHatBlockBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  UpsertHatBlockRunArgs,
+  UpsertHatBlockRunState
+>;
 
-  operation: { actorId: "", action: { kind: "insert" } },
-  mode: "choosing-hat-block",
-  chosenKind: "green-flag",
-  keyIfChosen: kSpaceKeyDescriptor,
-  messageIfChosen: "",
+type SAction<ArgT> = Action<UpsertHatBlockBase, ArgT>;
 
-  upsertionDescriptor: computed((state) => {
-    const eventDescriptor = (() => {
-      switch (state.chosenKind) {
+type UpsertHatBlockActions = {
+  setMode: SAction<HandlerUpsertionMode>;
+  setChosenKind: SAction<EventDescriptorKind>;
+  setKeyIfChosen: SAction<KeyDescriptor>;
+  setMessageIfChosen: SAction<string>;
+};
+
+export type UpsertHatBlockFlow = UpsertHatBlockBase & UpsertHatBlockActions;
+
+async function prepare(
+  args: UpsertHatBlockRunArgs
+): Promise<UpsertHatBlockRunState> {
+  const { operation } = args;
+
+  // Ensure sensible starting values; these will be overwritten in the
+  // case of an update to an existing key-pressed or message-received
+  // hat-block.
+  let keyIfChosen = kSpaceKeyDescriptor;
+  let messageIfChosen = kDefaultWhenIReceiveMessage;
+  let chosenKind: EventDescriptorKind = "green-flag";
+
+  switch (operation.action.kind) {
+    case "insert":
+      // Default chosenKind is correct.
+      break;
+    case "update": {
+      // Set starting kind and (if relevant) "key" and "message"
+      // values to the existing event handler.
+      const prevEvent = operation.action.previousEvent;
+      const prevKind = prevEvent.kind;
+      chosenKind = prevKind;
+      switch (prevKind) {
         case "green-flag":
         case "clicked":
         case "start-as-clone":
-          return { kind: state.chosenKind };
+          // Nothing further required.
+          break;
 
-        case "key-pressed":
-          return {
-            kind: state.chosenKind,
-            keyName: state.keyIfChosen.browserKeyName,
-          };
-
-        case "message-received":
-          return { kind: state.chosenKind, message: state.messageIfChosen };
-
-        default:
-          return assertNever(state.chosenKind);
-      }
-    })();
-
-    return {
-      ...state.operation,
-      eventDescriptor,
-    };
-  }),
-
-  setActorId: action((state, actorId) => {
-    state.operation.actorId = actorId;
-  }),
-  setAction: action((state, action) => {
-    state.operation.action = action;
-  }),
-
-  setMode: propSetterAction("mode"),
-
-  _setChosenKind: propSetterAction("chosenKind"),
-  setChosenKind: thunk((actions, chosenKind) => {
-    actions._setChosenKind(chosenKind);
-    actions.refreshInputsReady();
-  }),
-
-  setKeyIfChosen: propSetterAction("keyIfChosen"),
-
-  _setMessageIfChosen: propSetterAction("messageIfChosen"),
-  setMessageIfChosen: thunk((actions, message) => {
-    actions._setMessageIfChosen(message);
-    actions.refreshInputsReady();
-  }),
-
-  refreshInputsReady: action((state) => {
-    state.inputsReady = (() => {
-      switch (state.chosenKind) {
-        case "green-flag":
-        case "clicked":
-        case "start-as-clone":
-        case "key-pressed":
-          return true;
-
-        case "message-received":
-          return state.messageIfChosen !== "";
-
-        default:
-          return assertNever(state.chosenKind);
-      }
-    })();
-  }),
-
-  launch: thunk((actions, { actorId, action }) => {
-    actions.setMode("choosing-hat-block");
-    actions.setAction(action);
-    actions.setActorId(actorId);
-
-    // Ensure sensible starting values; these will be overwritten in the
-    // case of an update to an existing key-pressed or message-received
-    // hat-block.
-    actions.setKeyIfChosen(kSpaceKeyDescriptor);
-    actions.setMessageIfChosen(kDefaultWhenIReceiveMessage);
-
-    switch (action.kind) {
-      case "insert":
-        actions.setChosenKind("green-flag");
-        break;
-      case "update": {
-        // Set starting kind and (if relevant) "key" and "message"
-        // values to the existing event handler.
-        const prevEvent = action.previousEvent;
-        const prevKind = prevEvent.kind;
-        actions.setChosenKind(prevKind);
-        switch (prevKind) {
-          case "green-flag":
-          case "clicked":
-          case "start-as-clone":
-            // Nothing further required.
-            break;
-
-          case "key-pressed": {
-            const descr = descriptorFromBrowserKeyName(prevEvent.keyName);
-            actions.setKeyIfChosen(descr);
-            break;
-          }
-
-          case "message-received":
-            actions.setMessageIfChosen(prevEvent.message);
-            break;
-
-          default:
-            assertNever(prevKind);
+        case "key-pressed": {
+          const descr = descriptorFromBrowserKeyName(prevEvent.keyName);
+          keyIfChosen = descr;
+          break;
         }
-        break;
+
+        case "message-received":
+          messageIfChosen = prevEvent.message;
+          break;
+
+        default:
+          assertNever(prevKind);
       }
+      break;
+    }
+    default:
+      assertNever(operation.action);
+  }
+
+  return {
+    operation,
+    mode: "choosing-hat-block",
+    chosenKind,
+    keyIfChosen,
+    messageIfChosen,
+  };
+}
+
+function isSubmittable(runState: UpsertHatBlockRunState): boolean {
+  switch (runState.chosenKind) {
+    case "green-flag":
+    case "clicked":
+    case "start-as-clone":
+    case "key-pressed":
+      return true;
+
+    case "message-received":
+      return runState.messageIfChosen !== "";
+
+    default:
+      return assertNever(runState.chosenKind);
+  }
+}
+
+async function attempt(
+  runState: UpsertHatBlockRunState,
+  actions: PytchAppModelActions
+): Promise<void> {
+  const eventDescriptor = (() => {
+    switch (runState.chosenKind) {
+      case "green-flag":
+      case "clicked":
+      case "start-as-clone":
+        return { kind: runState.chosenKind };
+
+      case "key-pressed":
+        return {
+          kind: runState.chosenKind,
+          keyName: runState.keyIfChosen.browserKeyName,
+        };
+
+      case "message-received":
+        return { kind: runState.chosenKind, message: runState.messageIfChosen };
+
       default:
-        assertNever(action);
+        return assertNever(runState.chosenKind);
     }
+  })();
 
-    actions.superLaunch();
-    actions.refreshInputsReady();
-  }),
-
-  attemptIfReady: thunk((actions, _voidPayload, helpers) => {
-    const state = helpers.getState();
-    if (state.inputsReady) {
-      actions.attempt(state.upsertionDescriptor);
-    }
-  }),
-};
-
-const attemptUpsertion = async (
-  actions: Actions<IPytchAppModel>,
-  upsertionDescriptor: HandlerUpsertionDescriptor
-) => {
+  const upsertionDescriptor = { ...runState.operation, eventDescriptor };
   actions.activeProject.upsertHandler(upsertionDescriptor);
-};
+}
 
-export type IUpsertHatBlockInteraction = IUpsertHatBlockBase &
-  IUpsertHatBlockSpecific;
+export let upsertHatBlockFlow: UpsertHatBlockFlow = (() => {
+  const specificSlice: UpsertHatBlockActions = {
+    setMode: setRunStateProp("mode"),
+    setChosenKind: setRunStateProp("chosenKind"),
+    setKeyIfChosen: setRunStateProp("keyIfChosen"),
+    setMessageIfChosen: setRunStateProp("messageIfChosen"),
+  };
+  // We provide feedback by pulsing a glow around the upserted script,
+  // so don't also pulse a message in the modal:
+  const flowOptions: AsyncUserFlowOptions = { pulseSuccessMessage: false };
 
-export const upsertHatBlockInteraction = modalUserInteraction(
-  attemptUpsertion,
-  upsertHatBlockSpecific
-);
+  return asyncUserFlowSlice(
+    specificSlice,
+    prepare,
+    isSubmittable,
+    attempt,
+    flowOptions
+  );
+})();
