@@ -399,7 +399,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
           e: any
         ) {
           console.error("importProjects():", filename, e);
-          failures.push({ fileName: filename.get(), reason: e.message });
+          failures.push({ filename: filename.get(), reason: e.message });
         }
       }
 
@@ -408,7 +408,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         (success) => `Imported "${success.filename}"`
       );
       const taskFailures = failures.map(
-        (failure) => `"${failure.fileName}" — ${failure.reason}`
+        (failure) => `"${failure.filename}" — ${failure.reason}`
       );
       const outcome: TaskOutcome = {
         message,

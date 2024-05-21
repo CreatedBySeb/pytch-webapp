@@ -82,7 +82,7 @@ async function attempt(
       }
 
       console.error("upload-zipfiles::attempt():", error);
-      failures.push({ fileName: file.name, reason: (error as Error).message });
+      failures.push({ filename: file.name, reason: (error as Error).message });
     }
   }
 

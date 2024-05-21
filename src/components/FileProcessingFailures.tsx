@@ -9,8 +9,8 @@ export const FileProcessingFailures: React.FC<{
   dismiss: () => void;
 }> = (props) => {
   const failureEntries = props.failures.map((failure) => (
-    <li key={failure.fileName}>
-      <code>{failure.fileName}</code> — {failure.reason}
+    <li key={failure.filename}>
+      <code>{failure.filename}</code> — {failure.reason}
     </li>
   ));
 
