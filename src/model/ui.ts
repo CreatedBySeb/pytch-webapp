@@ -11,8 +11,8 @@ import {
   addClipArtFlow,
 } from "./user-interactions/clipart-gallery-select";
 import {
-  IRenameAssetInteraction,
-  renameAssetInteraction,
+  renameAssetFlow,
+  RenameAssetFlow,
 } from "./user-interactions/rename-asset";
 import {
   RenameProjectFlow,
@@ -412,13 +412,13 @@ export interface IUserConfirmations {
   launchDeleteJuniorSprite: DangerousActionThunk<DeleteJuniorSpriteDescriptor>;
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
-  renameAssetInteraction: IRenameAssetInteraction;
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
+  renameAssetFlow: RenameAssetFlow;
   renameProjectFlow: RenameProjectFlow;
   displayScreenshotFlow: DisplayScreenshotFlow;
   saveProjectAsFlow: SaveProjectAsFlow;
@@ -524,13 +524,13 @@ export const userConfirmations: IUserConfirmations = {
     });
   }),
 
-  renameAssetInteraction,
   downloadZipfileInteraction,
   shareTutorialInteraction,
 
   createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
+  renameAssetFlow,
   renameProjectFlow,
   displayScreenshotFlow,
   saveProjectAsFlow,
