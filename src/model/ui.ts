@@ -8,8 +8,8 @@ import {
 import { IProcessFilesInteraction } from "./user-interactions/process-files";
 import { AddAssetsFlow, addAssetsFlow } from "./user-interactions/add-assets";
 import {
-  IAddClipArtItemsInteraction,
-  addClipArtItemsInteraction,
+  AddClipArtFlow,
+  addClipArtFlow,
 } from "./user-interactions/clipart-gallery-select";
 import {
   IRenameAssetInteraction,
@@ -408,7 +408,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
   createProjectInteraction: ICreateProjectInteraction;
-  addClipArtItemsInteraction: IAddClipArtItemsInteraction;
   renameAssetInteraction: IRenameAssetInteraction;
   renameProjectInteraction: IRenameProjectInteraction;
   displayScreenshotInteraction: IDisplayScreenshotInteraction;
@@ -421,6 +420,7 @@ export interface IUserConfirmations {
 
   viewCodeDiff: ViewCodeDiff;
   addAssetsFlow: AddAssetsFlow;
+  addClipArtFlow: AddClipArtFlow;
 }
 
 // TODO: Better name than 'confirmations'.
@@ -520,7 +520,6 @@ export const userConfirmations: IUserConfirmations = {
   }),
 
   createProjectInteraction,
-  addClipArtItemsInteraction,
   renameAssetInteraction,
   renameProjectInteraction,
   displayScreenshotInteraction,
@@ -533,6 +532,7 @@ export const userConfirmations: IUserConfirmations = {
 
   viewCodeDiff,
   addAssetsFlow,
+  addClipArtFlow,
 };
 
 export interface IPlainTextPane {
