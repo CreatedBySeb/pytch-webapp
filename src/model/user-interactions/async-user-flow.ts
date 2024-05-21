@@ -8,3 +8,8 @@ type InteractingAsyncUserFlowFsmState<RunStateT> = {
   runState: RunStateT;
   userSettle: UserSettleFun;
 };
+
+export type ActiveAsyncUserFlowFsmState<RunStateT> =
+  | InteractingAsyncUserFlowFsmState<RunStateT>
+  | { kind: "attempting"; runState: RunStateT }
+  | { kind: "succeeded"; runState: RunStateT };
