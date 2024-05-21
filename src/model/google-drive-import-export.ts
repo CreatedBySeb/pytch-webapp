@@ -58,6 +58,7 @@ type TaskState =
       user: GoogleUserInfo;
       summary: string;
       outcome: TaskOutcome;
+      dismissNotification: () => void;
     };
 
 type GoogleDriveTask = (
