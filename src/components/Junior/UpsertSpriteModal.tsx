@@ -4,122 +4,117 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
 import { Form } from "react-bootstrap";
-import {
-  assertNever,
-  focusOrBlurFun,
-  onChangeFun,
-  submitOnEnterKeyFun,
-} from "../../utils";
+import { assertNever, onChangeFun, submitOnEnterKeyFun } from "../../utils";
 import { useJrEditActions, useJrEditState } from "./hooks";
+import {
+  flowFocusOrBlurFun,
+  isInteractable,
+  isSucceeded,
+  maybeLastFailureMessage,
+  settleFunctions,
+} from "../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 
 export const UpsertSpriteModal = () => {
-  const {
-    upsertionArgs,
-    nameValidity,
-    isActive,
-    isInteractable,
-    attemptSucceeded,
-    maybeLastFailureMessage,
-    inputsReady,
-  } = useJrEditState((s) => s.upsertSpriteInteraction);
-
-  const { setName, attempt, dismiss } = useJrEditActions(
-    (a) => a.upsertSpriteInteraction
-  );
-
-  const handleNameChange = onChangeFun(setName);
+  const { fsmState, isSubmittable } = useJrEditState((s) => s.upsertSpriteFlow);
+  const { setName } = useJrEditActions((a) => a.upsertSpriteFlow);
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
-  useEffect(focusOrBlurFun(inputRef, isActive, isInteractable));
+  useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
-  const handleClose = () => dismiss();
-  const handleCommit = () => attempt(upsertionArgs);
-  const handleKeyPress = submitOnEnterKeyFun(handleCommit, inputsReady);
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+    const { upsertionAction, name, nameValidity } = activeFsmState.runState;
+    const handleNameChange = onChangeFun(setName);
+    const settle = settleFunctions(isSubmittable, activeFsmState);
+    const handleKeyPress = submitOnEnterKeyFun(settle.submit, isSubmittable);
 
-  const validityContent = (() => {
-    switch (nameValidity.status) {
-      case "valid":
-        // Even though this won't be shown, we need some content for the
-        // <P> to have non-zero height:
-        return <p>OK</p>;
-      case "invalid":
-        return <p>That name cannot be used, because {nameValidity.reason}.</p>;
-      default:
-        return assertNever(nameValidity);
-    }
-  })();
+    const validityContent = (() => {
+      switch (nameValidity.status) {
+        case "valid":
+          // Even though this won't be shown, we need some content for the
+          // <P> to have non-zero height:
+          return <p>OK</p>;
+        case "invalid":
+          return (
+            <p>That name cannot be used, because {nameValidity.reason}.</p>
+          );
+        default:
+          return assertNever(nameValidity);
+      }
+    })();
 
-  const content = (() => {
-    switch (upsertionArgs.kind) {
-      case "insert":
-        return {
-          title: <span>Create new sprite</span>,
-          messageWhenSuccess: "Created!",
-        };
-      case "update":
-        return {
-          title: (
-            <span>
-              Rename <em>{upsertionArgs.previousName}</em>
-            </span>
-          ),
-          messageWhenSuccess: "Renamed!",
-        };
-      default:
-        return assertNever(upsertionArgs);
-    }
-  })();
+    const content = (() => {
+      switch (upsertionAction.kind) {
+        case "insert":
+          return {
+            title: <span>Create new sprite</span>,
+            messageWhenSuccess: "Created!",
+          };
+        case "update":
+          return {
+            title: (
+              <span>
+                Rename <em>{upsertionAction.previousName}</em>
+              </span>
+            ),
+            messageWhenSuccess: "Renamed!",
+          };
+        default:
+          return assertNever(upsertionAction);
+      }
+    })();
 
-  return (
-    <Modal
-      className="UpsertSpriteModal"
-      show={isActive}
-      onHide={handleClose}
-      animation={false}
-      centered
-    >
-      <Modal.Header closeButton={isInteractable}>
-        <Modal.Title>{content.title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Control
-            type="text"
-            value={upsertionArgs.name}
-            onChange={handleNameChange}
-            onKeyDown={handleKeyPress}
-            tabIndex={-1}
-            ref={inputRef}
-          ></Form.Control>
-        </Form>
-        <Alert
-          variant="danger"
-          className={`validity-assessment ${nameValidity.status}`}
-        >
-          {validityContent}
-        </Alert>
-        <MaybeErrorOrSuccessReport
-          messageWhenSuccess={content.messageWhenSuccess}
-          attemptSucceeded={attemptSucceeded}
-          maybeLastFailureMessage={maybeLastFailureMessage}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          disabled={!isInteractable}
-          variant="secondary"
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={!(isInteractable && inputsReady)}
-          variant="primary"
-          onClick={handleCommit}
-        >
-          OK
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+    return (
+      <Modal
+        className="UpsertSpriteModal"
+        show={true}
+        onHide={settle.cancel}
+        animation={false}
+        centered
+      >
+        <Modal.Header closeButton={isInteractable(activeFsmState)}>
+          <Modal.Title>{content.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Control
+              type="text"
+              value={name}
+              onChange={handleNameChange}
+              onKeyDown={handleKeyPress}
+              tabIndex={-1}
+              ref={inputRef}
+            ></Form.Control>
+          </Form>
+          <Alert
+            variant="danger"
+            className={`validity-assessment ${nameValidity.status}`}
+          >
+            {validityContent}
+          </Alert>
+          <MaybeErrorOrSuccessReport
+            messageWhenSuccess={content.messageWhenSuccess}
+            attemptSucceeded={isSucceeded(activeFsmState)}
+            maybeLastFailureMessage={maybeLastFailureMessage(activeFsmState)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            disabled={!isInteractable}
+            variant="secondary"
+            onClick={settle.cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={!isSubmittable}
+            variant="primary"
+            onClick={settle.submit}
+          >
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  });
 };
