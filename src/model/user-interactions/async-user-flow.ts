@@ -197,6 +197,56 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
   };
 }
 
+/** Construct a model slice for managing an asynchronous user flow which
+    can be abandoned if the user navigates backward/forward in the
+    browser. The flow is described in terms of any flow-specific
+    actions, its "prepare" phase, its "attempt" phase, a predicate
+    saying whether the "attempt" action is currently permissible, and
+    the relevant types.  This information should be provided in the
+    following arguments:
+
+    - `specificSlice` — Object containing `Action`s relevant for
+      mutating the flow's run-state (usually as a result of user
+      actions, for example typing into an input box).
+
+    - `prepare()` — Run at the start of the flow.  Its job is to convert
+      the "run arguments" (which should be convenient for the caller of
+      `run()` to construct) into "run state" (which can transform those
+      arguments to make them more convenient for the flow logic).  The
+      flow's `prepare()` function is given arguments:
+
+      - `runArgs` — The arguments (bundled into a single object) which
+        were given to the top-level `run()` thunk.
+
+      - `storeActions` — The top-level store actions.
+
+      - `navigationGuard` — If the `prepare()` function uses `await`, it
+        should wrap the awaited promise using
+        `navigationGuard.throwIfAbandoned()` and let any "abandoned"
+        error escape to the caller.
+
+      A `prepare()` function might not need `storeActions` or
+      `navigationGuard`.
+
+    - `isSubmittable()` — Predicate computing whether the action of the
+      flow can be attempted, based on the run-state of the flow.  For
+      example, a filename might need to be non-empty.
+
+    - `attempt()` — Run to attempt the action of the flow based on the
+      current run-state.  The `attempt()` function is given arguments:
+
+      - `runState` — The run-state of the interaction.
+
+      - `storeActions` — The top-level store actions.
+
+      - `navigationGuard` — If the `attempt()` function uses `await`, it
+        should wrap the awaited promise using
+        `navigationGuard.throwIfAbandoned()` and let any "abandoned"
+        error escape to the caller.
+
+      An `attempt()` function might not need `storeActions` or
+      `navigationGuard`.
+*/
 export function asyncUserFlowSlice<
   AppModelT extends object,
   SpecificSliceT,
