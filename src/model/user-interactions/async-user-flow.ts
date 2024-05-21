@@ -3,9 +3,11 @@ import {
   Action,
   action,
   Thunk,
+  thunk,
   Computed,
   computed,
 } from "easy-peasy";
+import { delaySeconds } from "../../utils";
 import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
 type UserSettleResult = "cancel" | "submit";
@@ -97,6 +99,100 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
     // such that I can't use propSetterAction() here.
     setFsmState: action((s, val) => {
       s.fsmState = val;
+    }),
+
+    run: thunk(async (actions, args, helpers) => {
+      const fsmStateKind = helpers.getState().fsmState.kind;
+      if (fsmStateKind !== "idle") {
+        console.log(
+          `AsyncUserFlowSlice.run(): expecting FSM to be in state "idle"` +
+            ` but is in state "${fsmStateKind}"`
+        );
+        return;
+      }
+
+      const storeActions = helpers.getStoreActions();
+
+      const navigationGuard = new NavigationAbandonmentGuard();
+      function throwIfAbandoned<ResultT>(
+        p: Promise<ResultT>
+      ): Promise<ResultT> {
+        return navigationGuard.throwIfAbandoned(p);
+      }
+
+      try {
+        actions.setFsmState({ kind: "preparing" });
+
+        const preparePromise = prepare(args, storeActions, navigationGuard);
+        let runState: RunStateT = await throwIfAbandoned(preparePromise);
+
+        let maybeLastFailure: Error | null = null;
+
+        let hasSucceeded = false;
+        while (!hasSucceeded) {
+          let userSettle = kIgnoreSettleResult;
+          const userSettlePromise = new Promise<UserSettleResult>((resolve) => {
+            userSettle = resolve;
+          });
+
+          actions.setFsmState({
+            kind: "interacting",
+            maybeLastFailure,
+            runState,
+            userSettle,
+          });
+
+          const settleResult = await throwIfAbandoned(userSettlePromise);
+          if (settleResult === "cancel") {
+            return;
+          }
+
+          try {
+            // Unsure what Easy-Peasy is doing with types here such that
+            // this cast is required.
+            const fsmState_ = helpers.getState().fsmState;
+            const fsmState = fsmState_ as AsyncUserFlowFsmState<RunStateT>;
+
+            assertInteracting(fsmState);
+            runState = fsmState.runState;
+
+            actions.setFsmState({ kind: "attempting", runState });
+
+            // The promise returned from this attempt() call can reject
+            // (either as a "business logic" error, or by back/fwd
+            // abandonment).
+            const attemptPromise = attempt(
+              runState,
+              storeActions,
+              navigationGuard
+            );
+            await navigationGuard.throwIfAbandoned(attemptPromise);
+
+            actions.setFsmState({ kind: "succeeded", runState });
+
+            if (options.pulseSuccessMessage) {
+              // Whether the delay is cancelled by navigation or runs to
+              // completion, we're finished, so we can ignore the return
+              // value of resultOrAbandoned().
+              await navigationGuard.throwIfAbandoned(delaySeconds(1.0));
+            }
+
+            hasSucceeded = true;
+          } catch (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            err: any
+          ) {
+            maybeLastFailure = err;
+          }
+        }
+      } catch (err) {
+        if (!navigationGuard.wasAbandoned(err)) {
+          throw err;
+        }
+      } finally {
+        actions.setFsmState({ kind: "idle" });
+        navigationGuard.exit();
+      }
     }),
   };
 }
