@@ -10,10 +10,7 @@ import {
   upsertSpriteInteraction,
   UpsertSpriteInteraction,
 } from "./upsert-sprite";
-import {
-  IUpsertHatBlockInteraction,
-  upsertHatBlockInteraction,
-} from "./upsert-hat-block";
+import { UpsertHatBlockFlow, upsertHatBlockFlow } from "./upsert-hat-block";
 import { LinkedContentKind } from "../linked-content";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
@@ -102,7 +99,7 @@ export type EditState = {
   setAssetReorderInProgress: Action<EditState, boolean>;
 
   upsertSpriteInteraction: UpsertSpriteInteraction;
-  upsertHatBlockInteraction: IUpsertHatBlockInteraction;
+  upsertHatBlockFlow: UpsertHatBlockFlow;
 };
 
 export const editState: EditState = {
@@ -215,5 +212,5 @@ export const editState: EditState = {
   setAssetReorderInProgress: propSetterAction("assetReorderInProgress"),
 
   upsertSpriteInteraction,
-  upsertHatBlockInteraction,
+  upsertHatBlockFlow,
 };
