@@ -398,3 +398,42 @@ export class ScriptOps {
     return idxs.map((i) => ScriptOps.allExtendedHandlerLabels[i]);
   }
 }
+
+/** Assuming that we are in the per-method IDE, click the "Add sprite"
+ * button. */
+export const launchAddSprite = () =>
+  cy
+    .get(".Junior-ActorsList-container .AddSomethingButton")
+    .should("have.length", 1)
+    .click();
+
+/** Assuming that we are in the per-method IDE, click one of the "add
+ * something" buttons.  The arg `match` should be contained in the label
+ * of the button to click. */
+export const clickAddSomething = (match: string) =>
+  cy.get("div.tab-pane.active .AddSomethingButton").contains(match).click();
+
+/** Assuming that we are in the per-method IDE, launch the "add from
+ * media library" modal dialog, and for each of the given `matches`,
+ * select the matching card. */
+export const initiateAddFromMediaLib = (matches: Array<string>) => {
+  clickAddSomething("from media library");
+
+  for (const match of matches) {
+    // Sometimes the media library is scrolled such that the chosen
+    // image is out of view.  Force Cypress to click it:
+    cy.get(".clipart-card .clipart-name")
+      .contains(match)
+      .should("have.length", 1)
+      .click({ force: true });
+  }
+};
+
+/** Assuming that we are in the per-method IDE, launch the "add from
+ * media library" modal dialog, select the card matching each of the
+ * given `matches`, add add those assets. */
+export const addFromMediaLib = (matches: Array<string>) => {
+  initiateAddFromMediaLib(matches);
+  const expButtonMatch = `Add ${matches.length}`;
+  settleModalDialog(expButtonMatch);
+};
