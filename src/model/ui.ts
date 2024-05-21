@@ -39,8 +39,8 @@ import {
   cropScaleImageFlow,
 } from "./user-interactions/crop-scale-image";
 import {
-  IShareTutorialInteraction,
-  shareTutorialInteraction,
+  ShareTutorialFlow,
+  shareTutorialFlow,
 } from "./user-interactions/share-tutorial";
 import {
   ViewCodeDiffFlow,
@@ -413,7 +413,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
   downloadZipfileInteraction: IDownloadZipfileInteraction;
-  shareTutorialInteraction: IShareTutorialInteraction;
 
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
@@ -425,6 +424,7 @@ export interface IUserConfirmations {
   uploadZipfilesFlow: UploadZipfilesFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
+  shareTutorialFlow: ShareTutorialFlow;
   viewCodeDiffFlow: ViewCodeDiffFlow;
 }
 
@@ -525,7 +525,6 @@ export const userConfirmations: IUserConfirmations = {
   }),
 
   downloadZipfileInteraction,
-  shareTutorialInteraction,
 
   createProjectFlow,
   addAssetsFlow,
@@ -537,6 +536,7 @@ export const userConfirmations: IUserConfirmations = {
   uploadZipfilesFlow,
   codeDiffHelpFlow,
   cropScaleImageFlow,
+  shareTutorialFlow,
   viewCodeDiffFlow,
 };
 
