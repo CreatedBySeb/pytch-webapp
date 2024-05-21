@@ -347,11 +347,6 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
     // Any errors thrown from run() will be caught by doTask().
     const run: GoogleDriveTask = async (api, tokenInfo) => {
-      type SuccessfulImport = {
-        filename: string;
-        projectId: ProjectId;
-      };
-
       const savedTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
@@ -361,7 +356,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       actions.setTaskState(savedTaskState);
 
-      let successfulImports: Array<SuccessfulImport> = [];
+      let successfulImports: Array<SuccessfulFileImport> = [];
       let failures: Array<FileProcessingFailure> = [];
 
       for (const file of files) {
