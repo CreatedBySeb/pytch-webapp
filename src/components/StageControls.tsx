@@ -141,12 +141,9 @@ export const StageControls: React.FC<EmptyProps> = () => {
   const launchScreenshot = useFlowActions((f) => f.displayScreenshotFlow.run);
   const onScreenshot = () => launchScreenshot();
 
-  const launchDownloadZipfile = useStoreActions(
-    (actions) => actions.userConfirmations.downloadZipfileInteraction.launch
-  );
-
+  const launchDownloadZip = useFlowActions((f) => f.downloadZipfileFlow.run);
   const formatSpecifier = filenameFormatSpecifier(linkedContentLoadingState);
-  const onDownload = () => launchDownloadZipfile({ formatSpecifier });
+  const onDownload = () => launchDownloadZip({ project, formatSpecifier });
 
   const initiateButtonTour = useStoreActions(
     (actions) => actions.ideLayout.initiateButtonTour

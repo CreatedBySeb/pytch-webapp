@@ -1,12 +1,5 @@
-import { Action, action, Thunk, thunk } from "easy-peasy";
-import { IPytchAppModel, PytchAppModelActions } from "..";
-import { IModalUserInteraction, modalUserInteraction } from ".";
-import {
-  delaySeconds,
-  propSetterAction,
-  failIfNull,
-  PYTCH_CYPRESS,
-} from "../../utils";
+import { Action } from "easy-peasy";
+import { delaySeconds, PYTCH_CYPRESS } from "../../utils";
 import { saveAs } from "file-saver";
 import { zipfileDataFromProject } from "../../storage/zipfile";
 import {
@@ -14,69 +7,84 @@ import {
   FormatSpecifier,
   uniqueUserInputFragment,
 } from "../compound-text-input";
+import {
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  setRunStateProp,
+} from "./async-user-flow";
+import { StoredProjectContent } from "../project";
+import { IPytchAppModel, PytchAppModelActions } from "../../model";
+import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
-interface IDownloadZipfileDescriptor {
-  filename: string;
-  data: Uint8Array;
-}
-
-type IDownloadZipfileBase = IModalUserInteraction<IDownloadZipfileDescriptor>;
-
-export type DownloadZipfileLaunchArgs = {
+type DownloadZipfileRunArgs = {
+  project: StoredProjectContent;
   formatSpecifier: FormatSpecifier;
 };
 
-interface IDownloadZipfileSpecific {
-  liveCreationSeqnum: number;
-  incrementLiveCreationSeqnum: Action<IDownloadZipfileSpecific>;
-
+type DownloadZipfileRunState = {
   formatSpecifier: FormatSpecifier;
-  setFormatSpecifier: Action<IDownloadZipfileSpecific, FormatSpecifier>;
-
+  fileContents: Uint8Array;
   uiFragmentValue: string; // "ui" = "user input"
-  _setUiFragmentValue: Action<IDownloadZipfileSpecific, string>;
-  setUiFragmentValue: Thunk<IDownloadZipfileSpecific, string>;
+};
 
-  fileContents: Uint8Array | null;
-  _setFileContents: Action<IDownloadZipfileSpecific, Uint8Array | null>;
-  setFileContents: Thunk<IDownloadZipfileSpecific, Uint8Array | null>;
+type DownloadZipfileBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  DownloadZipfileRunArgs,
+  DownloadZipfileRunState
+>;
 
-  refreshInputsReady: Thunk<IDownloadZipfileBase & IDownloadZipfileSpecific>;
-  createContents: Thunk<
-    IDownloadZipfileBase & IDownloadZipfileSpecific,
-    number,
-    void,
-    IPytchAppModel
-  >;
-  launch: Thunk<
-    IDownloadZipfileBase & IDownloadZipfileSpecific,
-    DownloadZipfileLaunchArgs
-  >;
-  attemptArgs: Thunk<
-    IDownloadZipfileSpecific,
-    void,
-    void,
-    IPytchAppModel,
-    IDownloadZipfileDescriptor
-  >;
-}
+type SAction<ArgT> = Action<DownloadZipfileBase, ArgT>;
 
-const attemptDownload = async (
-  _actions: PytchAppModelActions,
-  descriptor: IDownloadZipfileDescriptor
-) => {
-  console.log(
-    "attemptDownload(): entering; data byte-length",
-    descriptor.data.byteLength
+type DownloadZipfileActions = {
+  setUiFragmentValue: SAction<string>;
+};
+
+export type DownloadZipfileFlow = DownloadZipfileBase & DownloadZipfileActions;
+
+async function prepare(
+  args: DownloadZipfileRunArgs,
+  actions: PytchAppModelActions,
+  navigationGuard: NavigationAbandonmentGuard
+): Promise<DownloadZipfileRunState> {
+  await navigationGuard.throwIfAbandoned(
+    actions.activeProject.requestSyncToStorage()
   );
 
-  const zipBlob = new Blob([descriptor.data], { type: "application/zip" });
-  console.log("attemptDownload(): created blob of size", zipBlob.size);
+  const uiFragment = uniqueUserInputFragment(args.formatSpecifier);
+  const uiFragmentValue = uiFragment.initialValue;
 
-  // Add ".zip" extension if not already present.
-  const alreadyHaveExtension = descriptor.filename.endsWith(".zip");
+  // Avoid flash of the "Working" spinner.
+  await navigationGuard.throwIfAbandoned(delaySeconds(1.0));
+
+  const fileContents = await navigationGuard.throwIfAbandoned(
+    zipfileDataFromProject(args.project)
+  );
+
+  return {
+    formatSpecifier: args.formatSpecifier,
+    fileContents,
+    uiFragmentValue,
+  };
+}
+
+function isSubmittable(runState: DownloadZipfileRunState) {
+  return runState.uiFragmentValue !== "";
+}
+
+async function attempt(runState: DownloadZipfileRunState): Promise<void> {
+  const mimeTypeOption = { type: "application/zip" };
+  const zipBlob = new Blob([runState.fileContents], mimeTypeOption);
+
+  const rawFilename = applyFormatSpecifier(
+    runState.formatSpecifier,
+    runState.uiFragmentValue
+  );
+
+  // Add ".zip" extension if not already present.  (Clients should
+  // be using a format-specifier which ensures this, but don't assume.)
+  const alreadyHaveExtension = rawFilename.endsWith(".zip");
   const extraExtension = alreadyHaveExtension ? "" : ".zip";
-  const downloadFilename = `${descriptor.filename}${extraExtension}`;
+  const filename = `${rawFilename}${extraExtension}`;
 
   // Currently no easy way to automate testing of downloaded files, so
   // at least make it so we can test up to the point of creating the blob
@@ -84,103 +92,17 @@ const attemptDownload = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((window as any).Cypress) {
     PYTCH_CYPRESS()["latestDownloadZipfile"] = {
-      filename: downloadFilename,
+      filename,
       blob: zipBlob,
     };
   } else {
-    saveAs(zipBlob, downloadFilename);
+    saveAs(zipBlob, filename);
   }
-};
+}
 
-const downloadZipfileSpecific: IDownloadZipfileSpecific = {
-  liveCreationSeqnum: 0,
-  incrementLiveCreationSeqnum: action((state) => {
-    state.liveCreationSeqnum += 1;
-  }),
-
-  formatSpecifier: [], // Set properly in launch()
-  setFormatSpecifier: propSetterAction("formatSpecifier"),
-
-  uiFragmentValue: "",
-  _setUiFragmentValue: propSetterAction("uiFragmentValue"),
-  setUiFragmentValue: thunk((actions, uiFragmentValue) => {
-    actions._setUiFragmentValue(uiFragmentValue);
-    actions.refreshInputsReady();
-  }),
-
-  fileContents: null,
-  _setFileContents: propSetterAction("fileContents"),
-  setFileContents: thunk((actions, fileContents) => {
-    actions._setFileContents(fileContents);
-    actions.refreshInputsReady();
-  }),
-
-  refreshInputsReady: thunk((actions, _payload, helpers) => {
-    const state = helpers.getState();
-    actions.setInputsReady(
-      state.uiFragmentValue !== "" && state.fileContents != null
-    );
-  }),
-
-  createContents: thunk(async (actions, workingCreationSeqnum, helpers) => {
-    console.log("createContents(): working on seqnum", workingCreationSeqnum);
-
-    // TODO: Should we SAVE the project code first?
-
-    // Delay briefly, otherwise we get a flash of the spinner, which
-    // looks odd.
-    await delaySeconds(1.0);
-
-    const project = helpers.getStoreState().activeProject.project;
-    if (project == null) {
-      // Maybe the user cancelled and then went back to "my stuff";
-      // abandon creation attempt.
-      console.log("createContents(): no project; abandoning");
-      return;
-    }
-
-    const zipContents = await zipfileDataFromProject(project);
-
-    if (workingCreationSeqnum === helpers.getState().liveCreationSeqnum) {
-      // We're still interested in this result; deploy it.
-      actions.setFileContents(zipContents);
-    } else {
-      // Another request was launched while we were busy; just throw
-      // away what we've computed.
-    }
-  }),
-
-  launch: thunk((actions, { formatSpecifier }, helpers) => {
-    actions.setFormatSpecifier(formatSpecifier);
-    actions.incrementLiveCreationSeqnum();
-    const uiValue = uniqueUserInputFragment(formatSpecifier).initialValue;
-    actions.setUiFragmentValue(uiValue);
-    actions.setFileContents(null);
-    const workingCreationSeqnum = helpers.getState().liveCreationSeqnum;
-
-    // Do not await createContents(); let it run in its own time.
-    actions.createContents(workingCreationSeqnum);
-    actions.superLaunch();
-  }),
-
-  attemptArgs: thunk((_actions, _voidPayload, helpers) => {
-    const state = helpers.getState();
-    const filename = applyFormatSpecifier(
-      state.formatSpecifier,
-      state.uiFragmentValue
-    );
-    const data = failIfNull(
-      state.fileContents,
-      "cannot attempt download if file contents null"
-    );
-    return { filename, data };
-  }),
-};
-
-export type IDownloadZipfileInteraction = IDownloadZipfileBase &
-  IDownloadZipfileSpecific;
-
-export const downloadZipfileInteraction = modalUserInteraction(
-  attemptDownload,
-  downloadZipfileSpecific
-);
+export let downloadZipfileFlow: DownloadZipfileFlow = (() => {
+  const specificSlice: DownloadZipfileActions = {
+    setUiFragmentValue: setRunStateProp("uiFragmentValue"),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();

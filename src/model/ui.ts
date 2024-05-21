@@ -23,8 +23,8 @@ import {
   displayScreenshotFlow,
 } from "./user-interactions/display-screenshot";
 import {
-  IDownloadZipfileInteraction,
-  downloadZipfileInteraction,
+  DownloadZipfileFlow,
+  downloadZipfileFlow,
 } from "./user-interactions/download-zipfile";
 import {
   SaveProjectAsFlow,
@@ -412,8 +412,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorSprite: DangerousActionThunk<DeleteJuniorSpriteDescriptor>;
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
-  downloadZipfileInteraction: IDownloadZipfileInteraction;
-
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
@@ -425,6 +423,9 @@ export interface IUserConfirmations {
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
   shareTutorialFlow: ShareTutorialFlow;
+
+  downloadZipfileFlow: DownloadZipfileFlow;
+
   viewCodeDiffFlow: ViewCodeDiffFlow;
 }
 
@@ -524,8 +525,6 @@ export const userConfirmations: IUserConfirmations = {
     });
   }),
 
-  downloadZipfileInteraction,
-
   createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
@@ -537,6 +536,9 @@ export const userConfirmations: IUserConfirmations = {
   codeDiffHelpFlow,
   cropScaleImageFlow,
   shareTutorialFlow,
+
+  downloadZipfileFlow,
+
   viewCodeDiffFlow,
 };
 
