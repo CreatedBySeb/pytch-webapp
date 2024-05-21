@@ -1,16 +1,81 @@
-import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
-import { IModalUserInteraction, modalUserInteraction } from ".";
+import { Action } from "easy-peasy";
 import { AssetLocator, UpdateAssetTransformDescriptor } from "../project";
 import {
   ImageCropSourceDescriptor,
   ImageCropDescriptor,
   ImageDimensions,
 } from "../asset";
-import { ProjectId } from "../project-core";
-import { PytchAppModelActions } from "..";
+import { IPytchAppModel, PytchAppModelActions } from "..";
+import {
+  alwaysSubmittable,
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  runStateAction,
+  setRunStateProp,
+} from "./async-user-flow";
 
-type ICropScaleImageBase =
-  IModalUserInteraction<UpdateAssetTransformDescriptor>;
+type CropScaleImageRunArgs = AssetLocator & {
+  existingCrop: ImageCropDescriptor;
+  sourceURL: URL;
+  originalSize: ImageDimensions;
+};
+
+type CropScaleImageRunState = CropScaleImageRunArgs & {
+  displayedNewCrop: ImageCropSourceDescriptor;
+  newScale: number;
+};
+
+type CropScaleImageBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  CropScaleImageRunArgs,
+  CropScaleImageRunState
+>;
+
+type SAction<ArgT> = Action<CropScaleImageBase, ArgT>;
+
+type CropScaleImageActions = {
+  setNewScale: SAction<number>;
+  setDisplayedNewCrop: SAction<ImageCropSourceDescriptor>;
+  setEffectiveNewCrop: SAction<ImageCropSourceDescriptor>;
+};
+
+export type CropScaleImageFlow = CropScaleImageBase & CropScaleImageActions;
+
+async function prepare(
+  args: CropScaleImageRunArgs
+): Promise<CropScaleImageRunState> {
+  const existingCropIsIdentity = eqCropSources(args.existingCrop, identityCrop);
+  const initialDisplayCrop = existingCropIsIdentity
+    ? zeroCrop
+    : args.existingCrop;
+
+  return {
+    ...args,
+    displayedNewCrop: initialDisplayCrop,
+    newScale: args.existingCrop.scale,
+  };
+}
+
+async function attempt(
+  runState: CropScaleImageRunState,
+  actions: PytchAppModelActions
+): Promise<void> {
+  const effectiveNewCrop = cropIsZeroSize(runState.displayedNewCrop)
+    ? identityCrop
+    : runState.displayedNewCrop;
+
+  const descriptor: UpdateAssetTransformDescriptor = {
+    projectId: runState.projectId,
+    assetName: runState.assetName,
+    newTransform: {
+      targetType: "image",
+      ...effectiveNewCrop,
+      scale: runState.newScale,
+    },
+  };
+
+  await actions.activeProject.updateAssetTransformAndSync(descriptor);
+}
 
 // We keep track of the existing crop and scale, to be able to offer the user
 // this as the starting point for their adjustment.  A wrinkle is that if the
@@ -29,47 +94,29 @@ type ICropScaleImageBase =
 // assumption that a "nothing" crop is meaningless in that the user can not
 // actually use a zero-area rectangle of the source image as an asset.
 
-type CropScaleImageInitState = AssetLocator & {
-  existingCrop: ImageCropDescriptor;
-  sourceURL: URL;
-  originalSize: ImageDimensions;
-};
-
-interface ICropScaleImageSpecific extends CropScaleImageInitState {
-  setProjectId: Action<ICropScaleImageSpecific, ProjectId>;
-  setAssetName: Action<ICropScaleImageSpecific, string>;
-  setExistingCrop: Action<ICropScaleImageSpecific, ImageCropDescriptor>;
-  setSourceURL: Action<ICropScaleImageSpecific, URL>;
-  setOriginalSize: Action<ICropScaleImageSpecific, ImageDimensions>;
-
-  displayedNewCrop: ImageCropSourceDescriptor;
-  setDisplayedNewCrop: Action<
-    ICropScaleImageSpecific,
-    ImageCropSourceDescriptor
-  >;
-
-  effectiveNewCrop: Computed<
-    ICropScaleImageSpecific,
-    ImageCropSourceDescriptor
-  >;
-  setEffectiveNewCrop: Action<
-    ICropScaleImageSpecific,
-    ImageCropSourceDescriptor
-  >;
-
-  newScale: number;
-  setNewScale: Action<ICropScaleImageSpecific, number>;
-
-  descriptorForAttempt: Computed<
-    ICropScaleImageSpecific,
-    UpdateAssetTransformDescriptor
-  >;
-
-  launch: Thunk<
-    ICropScaleImageBase & ICropScaleImageSpecific,
-    CropScaleImageInitState
-  >;
+export function effectiveCropFromDisplayedCrop(
+  displayedCrop: ImageCropSourceDescriptor
+) {
+  return cropIsZeroSize(displayedCrop) ? identityCrop : displayedCrop;
 }
+
+export let cropScaleImageFlow: CropScaleImageFlow = (() => {
+  const specificSlice: CropScaleImageActions = {
+    setNewScale: setRunStateProp("newScale"),
+    setDisplayedNewCrop: setRunStateProp("displayedNewCrop"),
+    setEffectiveNewCrop: runStateAction((state, crop) => {
+      const cropIsIdentity = eqCropSources(crop, identityCrop);
+      state.displayedNewCrop = cropIsIdentity ? zeroCrop : crop;
+    }),
+  };
+
+  return asyncUserFlowSlice(
+    specificSlice,
+    prepare,
+    alwaysSubmittable, // Crop/scale are always valid.
+    attempt
+  );
+})();
 
 export const zeroCrop: ImageCropSourceDescriptor = {
   originX: 0.5,
@@ -103,105 +150,3 @@ const eqCropSources = (
 // Exact float comparison against zero is OK here.  (I think.)
 const cropIsZeroSize = (crop: ImageCropSourceDescriptor): boolean =>
   crop.width === 0.0 && crop.height === 0.0;
-
-const cropScaleImageSpecific: ICropScaleImageSpecific = {
-  // Will be overwritten on launch():
-  projectId: -1,
-  setProjectId: action((state, projectId) => {
-    state.projectId = projectId;
-  }),
-
-  // Will be overwritten on launch():
-  assetName: "",
-  setAssetName: action((state, assetName) => {
-    state.assetName = assetName;
-  }),
-
-  // Will be overwritten on launch():
-  existingCrop: identityCrop,
-  setExistingCrop: action((state, existingCrop) => {
-    state.existingCrop = existingCrop;
-  }),
-
-  // Will be overwritten on launch():
-  sourceURL: new URL("data:,"),
-  setSourceURL: action((state, sourceURL) => {
-    state.sourceURL = sourceURL;
-  }),
-
-  // Will be overwritten on launch():
-  originalSize: { width: 1, height: 1 },
-  setOriginalSize: action((state, originalSize) => {
-    state.originalSize = originalSize;
-  }),
-
-  descriptorForAttempt: computed((state) => ({
-    projectId: state.projectId,
-    assetName: state.assetName,
-    newTransform: {
-      targetType: "image",
-      ...state.effectiveNewCrop,
-      scale: state.newScale,
-    },
-  })),
-
-  // Will be overwritten on launch():
-  displayedNewCrop: zeroCrop,
-  setDisplayedNewCrop: action((state, crop) => {
-    state.displayedNewCrop = crop;
-  }),
-
-  effectiveNewCrop: computed((state) =>
-    cropIsZeroSize(state.displayedNewCrop)
-      ? identityCrop
-      : state.displayedNewCrop
-  ),
-  setEffectiveNewCrop: action((state, crop) => {
-    const cropIsIdentity = eqCropSources(crop, identityCrop);
-    state.displayedNewCrop = cropIsIdentity ? zeroCrop : crop;
-  }),
-
-  newScale: 1.0,
-  setNewScale: action((state, scale) => {
-    state.newScale = scale;
-  }),
-
-  launch: thunk(async (actions, initState) => {
-    actions.setProjectId(initState.projectId);
-    actions.setAssetName(initState.assetName);
-    actions.setExistingCrop(initState.existingCrop);
-    actions.setSourceURL(initState.sourceURL);
-    actions.setOriginalSize(initState.originalSize);
-
-    const existingCropIsIdentity = eqCropSources(
-      initState.existingCrop,
-      identityCrop
-    );
-    const initialDisplayCrop = existingCropIsIdentity
-      ? zeroCrop
-      : initState.existingCrop;
-    actions.setDisplayedNewCrop(initialDisplayCrop);
-
-    actions.setNewScale(initState.existingCrop.scale);
-
-    actions.superLaunch();
-
-    // The crop and scale are always valid:
-    actions.setInputsReady(true);
-  }),
-};
-
-const attemptCropScale = async (
-  actions: PytchAppModelActions,
-  descriptor: UpdateAssetTransformDescriptor
-) => {
-  await actions.activeProject.updateAssetTransformAndSync(descriptor);
-};
-
-export type ICropScaleImageInteraction = ICropScaleImageBase &
-  ICropScaleImageSpecific;
-
-export const cropScaleImageInteraction = modalUserInteraction(
-  attemptCropScale,
-  cropScaleImageSpecific
-);
