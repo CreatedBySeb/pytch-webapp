@@ -258,3 +258,30 @@ export function isActive<RunStateT>(
     fsmState.kind === "succeeded"
   );
 }
+
+////////////////////////////////////////////////////////////////////////
+// Helpers for settling (cancelling or submitting) the modal
+
+type SettleFunctions = {
+  cancel: () => void;
+  submit: () => void;
+};
+
+export function settleFunctions<RunStateT>(
+  isSubmittable: boolean,
+  fsmState: AsyncUserFlowFsmState<RunStateT>
+): SettleFunctions {
+  return fsmState.kind === "interacting"
+    ? {
+        cancel: () => fsmState.userSettle("cancel"),
+        submit: () => {
+          if (isSubmittable) {
+            fsmState.userSettle("submit");
+          }
+        },
+      }
+    : {
+        cancel: () => void 0,
+        submit: () => void 0,
+      };
+}
