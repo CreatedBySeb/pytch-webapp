@@ -3,6 +3,7 @@ import {
   Action,
   Thunk,
   Computed,
+  computed,
 } from "easy-peasy";
 import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
@@ -84,5 +85,11 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
 ): AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT> {
   return {
     fsmState: { kind: "idle" },
+    isSubmittable: computed((state) => {
+      const fsmState = state.fsmState as AsyncUserFlowFsmState<RunStateT>;
+      return (
+        fsmState.kind === "interacting" && isSubmittable(fsmState.runState)
+      );
+    }),
   };
 }
