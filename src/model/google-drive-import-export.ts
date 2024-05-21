@@ -6,7 +6,7 @@ import {
   wrappedError,
   zipfileDataFromProject,
 } from "../storage/zipfile";
-import { assertNever, propSetterAction } from "../utils";
+import { ValueCell, assertNever, propSetterAction } from "../utils";
 import { LinkedContentLoadingState, StoredProjectContent } from "./project";
 import { ProjectId } from "./project-core";
 import { FileProcessingFailure } from "./user-interactions/process-files";
@@ -215,6 +215,30 @@ type SuccessfulFileImport = {
   filename: string;
   projectId: ProjectId;
 };
+
+async function tryImportAsyncFile(
+  fileNameCell: ValueCell<string>,
+  file: AsyncFile
+): Promise<SuccessfulFileImport> {
+  // Any of the following might throw an error:
+  const fileName = await file.name();
+  fileNameCell.set(fileName);
+
+  const zipData = await file.data();
+  const projectInfo = await projectDescriptor(fileName, zipData);
+
+  // This clunky try/catch ensures consistency in how we
+  // present error messages to the user in case of errors
+  // occurring during project or asset creation.
+  try {
+    // The types overlap so can use projectInfo as creationOptions:
+    const project = await createNewProject(projectInfo.name, projectInfo);
+    const projectId = project.id;
+    return { filename: fileName, projectId };
+  } catch (err) {
+    throw wrappedError(err as Error);
+  }
+}
 
 export let googleDriveIntegration: GoogleDriveIntegration = {
   apiBootStatus: { kind: "not-yet-started" },
