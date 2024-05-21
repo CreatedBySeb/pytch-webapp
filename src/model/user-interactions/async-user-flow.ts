@@ -247,6 +247,8 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
       An `attempt()` function might not need `storeActions` or
       `navigationGuard`.
 */
+// TODO: If SpecificSliceT is always a collection of Actions, rename
+// type param to sth like SpecificActions.
 export function asyncUserFlowSlice<
   AppModelT extends object,
   SpecificSliceT,
