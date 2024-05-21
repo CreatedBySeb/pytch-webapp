@@ -1,39 +1,32 @@
-import { Action, action, Thunk, thunk } from "easy-peasy";
-import { IModalUserInteraction, modalUserInteraction, doNothing } from ".";
+import {
+  alwaysSubmittable,
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  emptyAttempt,
+  idPrepare,
+} from "./async-user-flow";
+import { IPytchAppModel } from "..";
 
-// It's a bit sledgehammer/nut to use this machinery for the simple
-// "display code-diff help" modal, since there is no action to attempt,
-// but doing so keeps the approach consistent.
-
-export interface IDiffHelpSamples {
+export interface DiffHelpSamples {
   unchanged: HTMLTableElement | null;
   deleted: HTMLTableElement | null;
   added: HTMLTableElement | null;
 }
 
-type ICodeDiffHelpBase = IModalUserInteraction<void>;
+type CodeDiffHelpRunArgs = { samples: DiffHelpSamples };
 
-interface ICodeDiffHelpSpecific {
-  samples: IDiffHelpSamples;
-  setSamples: Action<ICodeDiffHelpSpecific, IDiffHelpSamples>;
-  launch: Thunk<ICodeDiffHelpBase & ICodeDiffHelpSpecific, IDiffHelpSamples>;
-}
+type CodeDiffHelpRunState = CodeDiffHelpRunArgs;
 
-const codeDiffHelpSpecific: ICodeDiffHelpSpecific = {
-  samples: { unchanged: null, deleted: null, added: null },
-  setSamples: action((state, samples) => {
-    state.samples = samples;
-  }),
-  launch: thunk((actions, samples) => {
-    actions.setSamples(samples);
-    actions.superLaunch();
-  }),
-};
+type CodeDiffHelpBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  CodeDiffHelpRunArgs,
+  CodeDiffHelpRunState
+>;
 
-export type ICodeDiffHelpInteraction = ICodeDiffHelpBase &
-  ICodeDiffHelpSpecific;
+type CodeDiffHelpActions = object;
 
-export const codeDiffHelpInteraction = modalUserInteraction(
-  doNothing<void>,
-  codeDiffHelpSpecific
-);
+export type CodeDiffHelpFlow = CodeDiffHelpBase & CodeDiffHelpActions;
+
+export let codeDiffHelpFlow: CodeDiffHelpFlow = (() => {
+  return asyncUserFlowSlice({}, idPrepare, alwaysSubmittable, emptyAttempt);
+})();
