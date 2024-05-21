@@ -164,14 +164,14 @@ export const HatBlock: React.FC<HatBlockProps> = ({
   nextHandlerId,
   event,
 }) => {
-  const launchUpsertAction = useJrEditActions(
-    (a) => a.upsertHatBlockInteraction.launch
-  );
+  const launchUpsertAction = useJrEditActions((a) => a.upsertHatBlockFlow.run);
 
   const onChangeHatBlock = () => {
     launchUpsertAction({
-      actorId,
-      action: { kind: "update", handlerId, previousEvent: event },
+      operation: {
+        actorId,
+        action: { kind: "update", handlerId, previousEvent: event },
+      },
     });
   };
 
