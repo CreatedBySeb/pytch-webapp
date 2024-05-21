@@ -151,11 +151,9 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   );
   const launchCreate = useFlowActions((f) => f.createProjectFlow.run);
   const launchUpload = useFlowActions((f) => f.uploadZipfilesFlow.run);
+  const runDelete = useFlowActions((f) => f.deleteManyProjectsFlow.run);
   const clearAllSelected = useStoreActions(
     (actions) => actions.projectCollection.clearAllSelected
-  );
-  const launchDeleteAction = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteManyProjects
   );
 
   // TODO: Clear all "isSelected" when leaving project list page?
@@ -163,7 +161,7 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const nSelected = selectedIds.length;
 
   if (nSelected > 0) {
-    const onDelete = () => launchDeleteAction({ projectIds: selectedIds });
+    const onDelete = () => runDelete({ ids: selectedIds });
 
     return (
       <div className="buttons some-selected">
