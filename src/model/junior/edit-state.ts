@@ -6,10 +6,7 @@ import { Uuid } from "./structured-program/core-types";
 import { StructuredProgram } from "./structured-program/program";
 import { IPytchAppModel } from "..";
 import { assertNever, propSetterAction } from "../../utils";
-import {
-  upsertSpriteInteraction,
-  UpsertSpriteInteraction,
-} from "./upsert-sprite";
+import { upsertSpriteFlow, UpsertSpriteFlow } from "./upsert-sprite";
 import { UpsertHatBlockFlow, upsertHatBlockFlow } from "./upsert-hat-block";
 import { LinkedContentKind } from "../linked-content";
 
@@ -98,7 +95,7 @@ export type EditState = {
   assetReorderInProgress: boolean;
   setAssetReorderInProgress: Action<EditState, boolean>;
 
-  upsertSpriteInteraction: UpsertSpriteInteraction;
+  upsertSpriteFlow: UpsertSpriteFlow;
   upsertHatBlockFlow: UpsertHatBlockFlow;
 };
 
@@ -211,6 +208,6 @@ export const editState: EditState = {
   assetReorderInProgress: false,
   setAssetReorderInProgress: propSetterAction("assetReorderInProgress"),
 
-  upsertSpriteInteraction,
+  upsertSpriteFlow,
   upsertHatBlockFlow,
 };
