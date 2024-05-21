@@ -1,47 +1,54 @@
-import React, { useState } from "react";
-import { useStoreActions, useStoreState } from "../store";
-import { assertNever } from "../utils";
-import { ChooseFiles, tmpStatusFromOld } from "./ChooseFiles";
+import React from "react";
+import { ChooseFiles } from "./ChooseFiles";
 import { FileProcessingFailures } from "./FileProcessingFailures";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { settleFunctions } from "../model/user-interactions/async-user-flow";
+import { FileFailureError } from "../model/user-interactions/process-files";
+import { GenericWorkingModal } from "./async-flow-modals/GenericWorkingModal";
+import { useFlowActions, useFlowState } from "../model";
 
 export const UploadZipfilesModal = () => {
-  const state = useStoreState(
-    (state) => state.userConfirmations.uploadZipfilesInteraction.state
-  );
-  const { tryProcess, dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.uploadZipfilesInteraction
-  );
-  const [chosenFiles, setChosenFiles] = useState<FileList | null>(null);
+  const { fsmState, isSubmittable } = useFlowState((f) => f.uploadZipfilesFlow);
+  const { setChosenFiles } = useFlowActions((f) => f.uploadZipfilesFlow);
 
-  switch (state.status) {
-    case "idle":
-      // Ensure state has been reset ready for next time:
-      if (chosenFiles != null) setChosenFiles(null);
-      return null;
-    case "awaiting-user-choice":
-    case "trying-to-process":
+  return asyncFlowModal(fsmState, (activeFsmState) => {
+  const { chosenFiles } = activeFsmState.runState;
+  const settle = settleFunctions(isSubmittable, activeFsmState);
+
+  if (
+    activeFsmState.kind === "interacting" &&
+    activeFsmState.maybeLastFailure != null
+  ) {
+    const error = activeFsmState.maybeLastFailure as FileFailureError;
+    return (
+      <FileProcessingFailures
+        titleText="Problem uploading project zipfiles"
+        introText="Sorry, there was a problem uploading the projects:"
+        failures={error.fileFailures}
+        dismiss={settle.cancel}
+      />
+    );
+  }
+
+  switch (activeFsmState.kind) {
+    case "interacting":
+    case "attempting": {
       return (
         <ChooseFiles
-          {...{ chosenFiles, setChosenFiles }}
           titleText="Upload project zipfiles"
           introText="Choose zipfiles to upload as new projects."
           actionButtonText="Upload"
-          status={tmpStatusFromOld(state.status)}
-          tryProcess={(files) => tryProcess(files)}
-          dismiss={() => dismiss()}
+          status={activeFsmState.kind}
+          chosenFiles={chosenFiles}
+          setChosenFiles={setChosenFiles}
+          tryProcess={settle.submit}
+          dismiss={settle.cancel}
         />
       );
-    case "showing-failures":
-      return (
-        <FileProcessingFailures
-          titleText="Problem uploading project zipfiles"
-          introText="Sorry, there was a problem uploading the projects:"
-          failures={state.failures}
-          dismiss={() => dismiss()}
-        />
-      );
-    default:
-      assertNever(state);
-      return null;
+    }
+    case "succeeded":
+      // TODO: Something better here.
+      return <GenericWorkingModal />;
   }
+  });
 };
