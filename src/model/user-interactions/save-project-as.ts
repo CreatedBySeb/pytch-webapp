@@ -1,74 +1,73 @@
-import { action, Action, thunk, Thunk } from "easy-peasy";
-import { IModalUserInteraction, modalUserInteraction } from ".";
+import { Action } from "easy-peasy";
 import { ProjectId } from "../project-core";
-import { ICopyProjectDescriptor } from "../projects";
 import { IPytchAppModel, PytchAppModelActions } from "..";
+import {
+  asyncUserFlowSlice,
+  AsyncUserFlowSlice,
+  setRunStateProp,
+} from "./async-user-flow";
+import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
-type ICopyProjectBase = IModalUserInteraction<ICopyProjectDescriptor>;
-
-interface ICopyProjectSpecific {
+type SaveProjectAsRunArgs = {
   sourceProjectId: ProjectId;
-  setSourceProjectId: Action<ICopyProjectSpecific, ProjectId>;
-  nameOfCopy: string;
-  setNameOfCopy: Action<ICopyProjectSpecific, string>;
-  refreshInputsReady: Thunk<ICopyProjectBase & ICopyProjectSpecific>;
+  sourceName: string;
+};
 
-  // Slight fudge to use ICopyProjectDescriptor as the payload type
-  // for launch(), but its properties are of the correct type.
-  launch: Thunk<
-    ICopyProjectBase & ICopyProjectSpecific,
-    ICopyProjectDescriptor,
-    void,
-    IPytchAppModel
-  >;
+type SaveProjectAsRunState = {
+  sourceProjectId: ProjectId;
+  nameOfCopy: string;
+};
+
+type SaveProjectAsBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  SaveProjectAsRunArgs,
+  SaveProjectAsRunState
+>;
+
+type SAction<ArgT> = Action<SaveProjectAsBase, ArgT>;
+
+type SaveProjectAsActions = {
+  setNameOfCopy: SAction<string>;
+};
+
+export type SaveProjectAsFlow = SaveProjectAsBase & SaveProjectAsActions;
+
+async function prepare(
+  args: SaveProjectAsRunArgs,
+  actions: PytchAppModelActions
+): Promise<SaveProjectAsRunState> {
+  await actions.activeProject.requestSyncToStorage();
+  return {
+    sourceProjectId: args.sourceProjectId,
+    nameOfCopy: `Copy of ${args.sourceName}`,
+  };
 }
 
-const attemptSaveCopy = async (
-  actions: PytchAppModelActions,
-  descriptor: ICopyProjectDescriptor
-) => {
-  const requestCopyProjectThenResync =
-    actions.projectCollection.requestCopyProjectThenResync;
+function isSubmittable(runState: SaveProjectAsRunState) {
+  return runState.nameOfCopy !== "";
+}
 
-  const newId = await requestCopyProjectThenResync(descriptor);
+async function attempt(
+  runState: SaveProjectAsRunState,
+  actions: PytchAppModelActions,
+  navGuard: NavigationAbandonmentGuard
+) {
+  const newId = await navGuard.throwIfAbandoned(
+    actions.projectCollection.requestCopyProjectThenResync({
+      sourceProjectId: runState.sourceProjectId,
+      nameOfCopy: runState.nameOfCopy,
+    })
+  );
+
   actions.navigationRequestQueue.enqueue({
     path: `/ide/${newId}`,
     opts: { replace: true },
   });
-};
+}
 
-const copyProjectSpecific: ICopyProjectSpecific = {
-  sourceProjectId: -1,
-  setSourceProjectId: action((state, sourceProjectId) => {
-    state.sourceProjectId = sourceProjectId;
-  }),
-  nameOfCopy: "",
-  setNameOfCopy: action((state, nameOfCopy) => {
-    state.nameOfCopy = nameOfCopy;
-  }),
-
-  refreshInputsReady: thunk((actions, _payload, helpers) => {
-    const state = helpers.getState();
-    actions.setInputsReady(state.nameOfCopy !== "");
-  }),
-
-  launch: thunk(async (actions, payload, helpers) => {
-    // Save project before making copy.
-    await helpers.getStoreActions().activeProject.requestSyncToStorage();
-
-    // We use the payload's "nameOfCopy" property not quite as its name
-    // suggests; we use it to mean "the name of the source project".
-    actions.superLaunch();
-    actions.setSourceProjectId(payload.sourceProjectId);
-    const suggestedCopyName = `Copy of ${payload.nameOfCopy}`;
-    actions.setNameOfCopy(suggestedCopyName);
-    actions.setInputsReady(true);
-  }),
-};
-
-export type ICopyProjectInteraction = ICopyProjectBase & ICopyProjectSpecific;
-
-export const copyProjectInteraction = modalUserInteraction(
-  attemptSaveCopy,
-  copyProjectSpecific
-);
+export let saveProjectAsFlow: SaveProjectAsFlow = (() => {
+  const specificSlice: SaveProjectAsActions = {
+    setNameOfCopy: setRunStateProp("nameOfCopy"),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();
