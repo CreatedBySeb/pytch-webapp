@@ -347,3 +347,20 @@ export function setRunStateProp<RunStateT, PropNameT extends keyof RunStateT>(
     fsmState.runState[propName] = val;
   });
 }
+
+////////////////////////////////////////////////////////////////////////
+// Helpers for very simple flows
+
+export async function idPrepare<ArgsAndStateT>(
+  args: ArgsAndStateT
+): Promise<ArgsAndStateT> {
+  return args;
+}
+
+export function alwaysSubmittable(): boolean {
+  return true;
+}
+
+export async function emptyAttempt(): Promise<void> {
+  return;
+}
