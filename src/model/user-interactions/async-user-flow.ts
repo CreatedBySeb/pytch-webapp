@@ -1,6 +1,7 @@
 import {
   Actions,
   Action,
+  action,
   Thunk,
   Computed,
   computed,
@@ -90,6 +91,12 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
       return (
         fsmState.kind === "interacting" && isSubmittable(fsmState.runState)
       );
+    }),
+
+    // Did not get to the bottom of what's going on with the typing
+    // such that I can't use propSetterAction() here.
+    setFsmState: action((s, val) => {
+      s.fsmState = val;
     }),
   };
 }
