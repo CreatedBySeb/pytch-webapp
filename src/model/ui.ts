@@ -32,8 +32,8 @@ import {
   copyProjectInteraction,
 } from "./user-interactions/save-project-as";
 import {
-  ICodeDiffHelpInteraction,
-  codeDiffHelpInteraction,
+  CodeDiffHelpFlow,
+  codeDiffHelpFlow,
 } from "./user-interactions/code-diff-help";
 import {
   ICropScaleImageInteraction,
@@ -414,13 +414,13 @@ export interface IUserConfirmations {
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   copyProjectInteraction: ICopyProjectInteraction;
   uploadZipfilesInteraction: IProcessFilesInteraction;
-  codeDiffHelpInteraction: ICodeDiffHelpInteraction;
   cropScaleImageInteraction: ICropScaleImageInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
   viewCodeDiff: ViewCodeDiff;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
+  codeDiffHelpFlow: CodeDiffHelpFlow;
 }
 
 // TODO: Better name than 'confirmations'.
@@ -526,13 +526,13 @@ export const userConfirmations: IUserConfirmations = {
   downloadZipfileInteraction,
   copyProjectInteraction,
   uploadZipfilesInteraction,
-  codeDiffHelpInteraction,
   cropScaleImageInteraction,
   shareTutorialInteraction,
 
   viewCodeDiff,
   addAssetsFlow,
   addClipArtFlow,
+  codeDiffHelpFlow,
 };
 
 export interface IPlainTextPane {
