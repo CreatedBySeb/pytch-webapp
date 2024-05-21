@@ -1,18 +1,20 @@
-import { Action, Thunk, thunk } from "easy-peasy";
-import { propSetterAction, simpleReadArrayBuffer } from "../../utils";
+import { Action } from "easy-peasy";
+import { simpleReadArrayBuffer } from "../../utils";
 import { addAssetToProject } from "../../database/indexed-db";
-import {
-  FileProcessingFailure,
-  IProcessFilesInteraction,
-  processFilesBase,
-} from "./process-files";
-import { IPytchAppModel } from "..";
+import { FileProcessingFailure, FileFailureError } from "./process-files";
+import { IPytchAppModel, PytchAppModelActions } from "..";
 import {
   AssetOperationContext,
   AssetOperationContextKey,
   assetOperationContextFromKey,
-  unknownAssetOperationContext,
 } from "../asset";
+import {
+  AsyncUserFlowSlice,
+  asyncUserFlowSlice,
+  setRunStateProp,
+} from "./async-user-flow";
+import { ProjectId } from "../project-core";
+import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
 export function addAssetErrorMessageFromError(
   operationContext: AssetOperationContext,
@@ -30,106 +32,92 @@ export function addAssetErrorMessageFromError(
   }
 }
 
-type AddAssetsLaunchArgs = {
+type AddAssetsRunArgs = {
+  projectId: ProjectId;
   operationContextKey: AssetOperationContextKey;
   assetNamePrefix: string;
 };
 
-type MessageFromErrorArgs = {
-  error: Error;
-  fileBasename: string;
-};
-
-export type AddAssetsInteractionSpecific = {
-  assetNamePrefix: string;
-  setAssetNamePrefix: Action<AddAssetsInteraction, string>;
+type AddAssetsRunState = {
+  projectId: ProjectId;
   operationContext: AssetOperationContext;
-  setOperationContext: Action<AddAssetsInteraction, AssetOperationContext>;
-
-  launchAdd: Thunk<AddAssetsInteraction, AddAssetsLaunchArgs>;
-
-  _messageFromError: Thunk<
-    AddAssetsInteraction,
-    MessageFromErrorArgs,
-    void,
-    IPytchAppModel,
-    string
-  >;
+  assetNamePrefix: string;
+  chosenFiles: FileList | null;
 };
 
-export type AddAssetsInteraction =
-  IProcessFilesInteraction<AddAssetsInteractionSpecific>;
+type AddAssetsBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  AddAssetsRunArgs,
+  AddAssetsRunState
+>;
 
-export const addAssetsInteraction: AddAssetsInteraction = {
-  ...processFilesBase(),
+type SAction<ArgT> = Action<AddAssetsBase, ArgT>;
 
-  assetNamePrefix: "",
-  setAssetNamePrefix: propSetterAction("assetNamePrefix"),
+type AddAssetsActions = {
+  setChosenFiles: SAction<FileList>;
+};
 
-  operationContext: unknownAssetOperationContext,
-  setOperationContext: propSetterAction("operationContext"),
+export type AddAssetsFlow = AddAssetsBase & AddAssetsActions;
 
-  launchAdd: thunk((actions, args) => {
-    actions.setAssetNamePrefix(args.assetNamePrefix);
+async function prepare(args: AddAssetsRunArgs): Promise<AddAssetsRunState> {
+  const operationContext = assetOperationContextFromKey(
+    args.operationContextKey
+  );
+  return {
+    projectId: args.projectId,
+    operationContext,
+    assetNamePrefix: args.assetNamePrefix,
+    chosenFiles: null,
+  };
+}
 
-    const opContext = assetOperationContextFromKey(args.operationContextKey);
-    actions.setOperationContext(opContext);
+function isSubmittable(runState: AddAssetsRunState) {
+  return runState.chosenFiles != null && runState.chosenFiles.length > 0;
+}
 
-    actions.launch();
-  }),
+async function attempt(
+  runState: AddAssetsRunState,
+  actions: PytchAppModelActions,
+  navigationGuard: NavigationAbandonmentGuard
+): Promise<void> {
+  const { projectId, assetNamePrefix, operationContext } = runState;
+  let failures: Array<FileProcessingFailure> = [];
 
-  _messageFromError: thunk((_actions, { error, fileBasename }, helpers) => {
-    const opContext = helpers.getState().operationContext;
-    return addAssetErrorMessageFromError(opContext, fileBasename, error);
-  }),
-
-  tryProcess: thunk(async (actions, files, helpers) => {
-    // It's possible this will change while we're working, e.g., if the
-    // user hits "back" and then opens a different project.  Make sure
-    // we add all assets to the project which was live when the thunk
-    // was launched.
-    const projectId = helpers.getStoreState().activeProject.project.id;
-
-    const assetNamePrefix = helpers.getState().assetNamePrefix;
-
-    actions.setScalar("trying-to-process");
-
-    let failedAdds: Array<FileProcessingFailure> = [];
-
-    for (const file of files) {
-      try {
-        const fileBuffer = await simpleReadArrayBuffer(file);
-        const assetPath = `${assetNamePrefix}${file.name}`;
-        await addAssetToProject(projectId, assetPath, file.type, fileBuffer);
-      } catch (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        e: any
-      ) {
-        console.error("addAssetsInteraction.tryProcess():", e);
-        const reason = actions._messageFromError({
-          error: e,
-          fileBasename: file.name,
-        });
-        failedAdds.push({ fileName: file.name, reason });
-      }
-    }
-
-    // Check the active project now is the same one we worked with.
-    const liveProjectId = helpers.getStoreState().activeProject.project.id;
-    if (liveProjectId !== projectId) {
-      console.log(
-        `assets added to project ${projectId}` +
-          ` but now active is project ${liveProjectId}; bailing`
+  for (const file of runState.chosenFiles ?? []) {
+    try {
+      const fileBuffer = await simpleReadArrayBuffer(file);
+      const assetPath = `${assetNamePrefix}${file.name}`;
+      await navigationGuard.throwIfAbandoned(
+        addAssetToProject(projectId, assetPath, file.type, fileBuffer)
       );
-      return;
-    }
+    } catch (error) {
+      console.error("add-assets::attempt():", error);
 
-    await helpers.getStoreActions().activeProject.syncAssetsFromStorage();
+      if (navigationGuard.wasAbandoned(error)) {
+        throw error;
+      }
 
-    if (failedAdds.length > 0) {
-      actions.setFailed(failedAdds);
-    } else {
-      actions.setScalar("idle");
+      const reason = addAssetErrorMessageFromError(
+        operationContext,
+        file.name,
+        error as Error
+      );
+      failures.push({ fileName: file.name, reason });
     }
-  }),
-};
+  }
+
+  await navigationGuard.throwIfAbandoned(
+    actions.activeProject.syncAssetsFromStorage()
+  );
+
+  if (failures.length > 0) {
+    throw new FileFailureError(failures);
+  }
+}
+
+export let addAssetsFlow: AddAssetsFlow = (() => {
+  const specificSlice: AddAssetsActions = {
+    setChosenFiles: setRunStateProp("chosenFiles"),
+  };
+  return asyncUserFlowSlice(specificSlice, prepare, isSubmittable, attempt);
+})();

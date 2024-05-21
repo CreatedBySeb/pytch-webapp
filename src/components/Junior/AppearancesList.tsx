@@ -15,6 +15,7 @@ import classNames from "classnames";
 import { NoContentHelp } from "./NoContentHelp";
 import { useJrEditState, useMappedProgram } from "./hooks";
 import { useStoreActions, useStoreState } from "../../store";
+import { useFlowActions } from "../../model";
 
 type AppearancesContentProps = {
   actorKind: ActorKind;
@@ -59,6 +60,7 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
 };
 
 export const AppearancesList = () => {
+  const projectId = useStoreState((state) => state.activeProject.project.id);
   const assets = useStoreState((state) => state.activeProject.project.assets);
   const focusedActorId = useJrEditState((s) => s.focusedActor);
 
@@ -84,13 +86,11 @@ export const AppearancesList = () => {
     );
   })();
 
-  const showAddModal = useStoreActions(
-    (actions) => actions.userConfirmations.addAssetsInteraction.launchAdd
-  );
+  const showAddModal = useFlowActions((f) => f.addAssetsFlow.run);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActorKind}/image` as const;
   const addFromDevice = () =>
-    showAddModal({ operationContextKey, assetNamePrefix });
+    showAddModal({ projectId, operationContextKey, assetNamePrefix });
 
   const launchAddFromMediaLibraryAction = useStoreActions(
     (actions) => actions.userConfirmations.addClipArtItemsInteraction.launch

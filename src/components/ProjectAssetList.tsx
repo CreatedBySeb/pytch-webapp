@@ -8,6 +8,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { failIfNull } from "../utils";
 import { AssetThumbnail } from "./AssetThumbnail";
+import { useFlowActions } from "../model";
 
 type AssetCardProps = {
   asset: AssetPresentation;
@@ -110,6 +111,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 };
 
 const ProjectAssetList = () => {
+  const projectId = useStoreState((state) => state.activeProject.project.id);
   const loadState = useStoreState(
     (state) => state.activeProject.syncState.loadState
   );
@@ -117,12 +119,10 @@ const ProjectAssetList = () => {
     (state) => state.activeProject.project?.assets
   );
 
-  const launchAdd = useStoreActions(
-    (actions) => actions.userConfirmations.addAssetsInteraction.launchAdd
-  );
+  const launchAdd = useFlowActions((f) => f.addAssetsFlow.run);
   const operationContextKey = "flat/any" as const;
   const launchUploadModal = () =>
-    launchAdd({ operationContextKey, assetNamePrefix: "" });
+    launchAdd({ projectId, operationContextKey, assetNamePrefix: "" });
 
   const showClipArtModal = useStoreActions(
     (actions) => actions.userConfirmations.addClipArtItemsInteraction.launch

@@ -6,10 +6,7 @@ import {
   createProjectInteraction,
 } from "./user-interactions/create-project";
 import { IProcessFilesInteraction } from "./user-interactions/process-files";
-import {
-  AddAssetsInteraction,
-  addAssetsInteraction,
-} from "./user-interactions/add-assets";
+import { AddAssetsFlow, addAssetsFlow } from "./user-interactions/add-assets";
 import {
   IAddClipArtItemsInteraction,
   addClipArtItemsInteraction,
@@ -411,7 +408,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
   createProjectInteraction: ICreateProjectInteraction;
-  addAssetsInteraction: AddAssetsInteraction;
   addClipArtItemsInteraction: IAddClipArtItemsInteraction;
   renameAssetInteraction: IRenameAssetInteraction;
   renameProjectInteraction: IRenameProjectInteraction;
@@ -424,6 +420,7 @@ export interface IUserConfirmations {
   shareTutorialInteraction: IShareTutorialInteraction;
 
   viewCodeDiff: ViewCodeDiff;
+  addAssetsFlow: AddAssetsFlow;
 }
 
 // TODO: Better name than 'confirmations'.
@@ -523,7 +520,6 @@ export const userConfirmations: IUserConfirmations = {
   }),
 
   createProjectInteraction,
-  addAssetsInteraction,
   addClipArtItemsInteraction,
   renameAssetInteraction,
   renameProjectInteraction,
@@ -536,6 +532,7 @@ export const userConfirmations: IUserConfirmations = {
   shareTutorialInteraction,
 
   viewCodeDiff,
+  addAssetsFlow,
 };
 
 export interface IPlainTextPane {

@@ -1,6 +1,6 @@
 import React from "react";
 import { AssetPresentation } from "../../model/asset";
-import { useStoreActions, useStoreState } from "../../store";
+import { useStoreState } from "../../store";
 import { useJrEditState, useMappedProgram } from "./hooks";
 
 import { AddSomethingSingleButton } from "./AddSomethingButton";
@@ -11,6 +11,7 @@ import {
 import { AssetCard } from "./AssetCard";
 import classNames from "classnames";
 import { NoContentHelp } from "./NoContentHelp";
+import { useFlowActions } from "../../model";
 
 type SoundsContentProps = {
   actorKind: ActorKind;
@@ -43,6 +44,7 @@ const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
 };
 
 export const SoundsList = () => {
+  const projectId = useStoreState((state) => state.activeProject.project.id);
   const assets = useStoreState((state) => state.activeProject.project.assets);
   const focusedActorId = useJrEditState((s) => s.focusedActor);
 
@@ -60,12 +62,11 @@ export const SoundsList = () => {
     return <SoundsContent actorKind={focusedActor.kind} sounds={actorAssets} />;
   })();
 
-  const showAddModal = useStoreActions(
-    (actions) => actions.userConfirmations.addAssetsInteraction.launchAdd
-  );
+  const showAddModal = useFlowActions((f) => f.addAssetsFlow.run);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActor.kind}/sound` as const;
-  const addSound = () => showAddModal({ operationContextKey, assetNamePrefix });
+  const addSound = () =>
+    showAddModal({ projectId, operationContextKey, assetNamePrefix });
 
   const classes = classNames(
     "Junior-AssetsList",

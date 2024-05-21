@@ -1,57 +1,56 @@
-import React, { useState } from "react";
-import { useStoreActions, useStoreState } from "../store";
-import { assertNever } from "../utils";
-import { ChooseFiles, tmpStatusFromOld } from "./ChooseFiles";
+import React from "react";
+import { ChooseFiles } from "./ChooseFiles";
 import { FileProcessingFailures } from "./FileProcessingFailures";
+import { asyncFlowModal } from "./async-flow-modals/utils";
+import { settleFunctions } from "../model/user-interactions/async-user-flow";
+import { FileFailureError } from "../model/user-interactions/process-files";
+import { GenericWorkingModal } from "./async-flow-modals/GenericWorkingModal";
+import { useFlowActions, useFlowState } from "../model";
 
 export const AddAssetsModal = () => {
-  const state = useStoreState(
-    (state) => state.userConfirmations.addAssetsInteraction.state
-  );
-  const { tryProcess, dismiss } = useStoreActions(
-    (actions) => actions.userConfirmations.addAssetsInteraction
-  );
-  const assetPlural = useStoreState(
-    (state) =>
-      state.userConfirmations.addAssetsInteraction.operationContext.assetPlural
-  );
-  const [chosenFiles, setChosenFiles] = useState<FileList | null>(null);
+  const { fsmState, isSubmittable } = useFlowState((f) => f.addAssetsFlow);
+  const setChosenFiles = useFlowActions((f) => f.addAssetsFlow.setChosenFiles);
 
-  switch (state.status) {
-    case "idle":
-      // Ensure state has been reset ready for next time:
-      if (chosenFiles != null) setChosenFiles(null);
-      return null;
-    case "awaiting-user-choice":
-    case "trying-to-process": {
-      const titleText = `Add ${assetPlural}`;
-      const introText = `Choose ${assetPlural} to add to your project.`;
+  return asyncFlowModal(fsmState, (activeState) => {
+    const { operationContext, chosenFiles } = activeState.runState;
+    const settle = settleFunctions(isSubmittable, activeState);
+    const assetPlural = operationContext.assetPlural;
 
-      return (
-        <ChooseFiles
-          {...{ chosenFiles, setChosenFiles }}
-          titleText={titleText}
-          introText={introText}
-          actionButtonText="Add to project"
-          status={tmpStatusFromOld(state.status)}
-          tryProcess={(files) => tryProcess(files)}
-          dismiss={() => dismiss()}
-        />
-      );
-    }
-    case "showing-failures": {
+    if (
+      activeState.kind === "interacting" &&
+      activeState.maybeLastFailure != null
+    ) {
+      const error = activeState.maybeLastFailure as FileFailureError;
       const titleText = `Problem adding ${assetPlural}`;
       return (
         <FileProcessingFailures
           titleText={titleText}
           introText="Sorry, there was a problem adding files to your project:"
-          failures={state.failures}
-          dismiss={() => dismiss()}
+          failures={error.fileFailures}
+          dismiss={settle.cancel}
         />
       );
     }
-    default:
-      assertNever(state);
-      return null;
-  }
+
+    switch (activeState.kind) {
+      case "interacting":
+      case "attempting": {
+        return (
+          <ChooseFiles
+            titleText={`Add ${assetPlural}`}
+            introText={`Choose ${assetPlural} to add to your project.`}
+            actionButtonText="Add to project"
+            status={activeState.kind}
+            chosenFiles={chosenFiles}
+            setChosenFiles={setChosenFiles}
+            tryProcess={settle.submit}
+            dismiss={settle.cancel}
+          />
+        );
+      }
+      case "succeeded":
+        // TODO: Something better here?
+        return <GenericWorkingModal />;
+    }
+  });
 };
