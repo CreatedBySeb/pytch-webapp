@@ -124,7 +124,9 @@ export const StageControls: React.FC<EmptyProps> = () => {
   const linkedContentLoadingState = useStoreState(
     (state) => state.activeProject.linkedContentLoadingState
   );
-  const { codeStateVsStorage } = useStoreState((state) => state.activeProject);
+  const { project, codeStateVsStorage } = useStoreState(
+    (state) => state.activeProject
+  );
   const { requestSyncToStorage } = useStoreActions(
     (actions) => actions.activeProject
   );
@@ -152,17 +154,9 @@ export const StageControls: React.FC<EmptyProps> = () => {
   );
   const onShowTooltips = () => initiateButtonTour();
 
-  const { id: projectId, name: projectName } = useStoreState(
-    (state) => state.activeProject.project
-  );
-  const launchCopyProject = useStoreActions(
-    (actions) => actions.userConfirmations.copyProjectInteraction.launch
-  );
-  const onCreateCopy = () =>
-    launchCopyProject({
-      sourceProjectId: projectId,
-      nameOfCopy: projectName,
-    });
+  const launchCopyProject = useFlowActions((f) => f.saveProjectAsFlow.run);
+  const copyArgs = { sourceProjectId: project.id, sourceName: project.name };
+  const onCreateCopy = () => launchCopyProject(copyArgs);
 
   const mFullScreenButton = programKind === "per-method" && (
     <Button className="full-screen" onClick={() => setIsFullScreen(true)}>
