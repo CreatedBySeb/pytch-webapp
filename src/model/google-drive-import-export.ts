@@ -211,6 +211,11 @@ export type GoogleDriveIntegration = {
   importProjects: Thunk<GoogleDriveIntegration, void, void, IPytchAppModel>;
 };
 
+type SuccessfulFileImport = {
+  filename: string;
+  projectId: ProjectId;
+};
+
 export let googleDriveIntegration: GoogleDriveIntegration = {
   apiBootStatus: { kind: "not-yet-started" },
   setApiBootStatus: propSetterAction("apiBootStatus"),
