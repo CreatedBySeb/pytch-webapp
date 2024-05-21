@@ -6,7 +6,7 @@ import {
   wrappedError,
   zipfileDataFromProject,
 } from "../storage/zipfile";
-import { ValueCell, assertNever, propSetterAction } from "../utils";
+import { ValueCell, assertNever, propSetterAction, valueCell } from "../utils";
 import { LinkedContentLoadingState, StoredProjectContent } from "./project";
 import { ProjectId } from "./project-core";
 import { FileProcessingFailure } from "./user-interactions/process-files";
@@ -384,33 +384,16 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       let failures: Array<FileProcessingFailure> = [];
 
       for (const file of files) {
-        let fileName = "<file with unknown name>";
+        let fileName = valueCell<string>("<file with unknown name>");
         try {
-          // Either of the following might throw an error:
-          fileName = await file.name();
-          const zipData = await file.data();
-          const projectInfo = await projectDescriptor(fileName, zipData);
-
-          // This clunky nested try/catch ensures consistency in how we
-          // present error messages to the user in case of errors
-          // occurring during project or asset creation.
-          try {
-            // The types overlap so can use projectInfo as creationOptions:
-            const project = await createNewProject(
-              projectInfo.name,
-              projectInfo
-            );
-            const projectId = project.id;
-            successfulImports.push({ filename: fileName, projectId });
-          } catch (err) {
-            throw wrappedError(err as Error);
-          }
+          const importResult = await tryImportAsyncFile(fileName, file);
+          successfulImports.push(importResult);
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           e: any
         ) {
           console.error("importProjects():", fileName, e);
-          failures.push({ fileName, reason: e.message });
+          failures.push({ fileName: fileName.get(), reason: e.message });
         }
       }
 
