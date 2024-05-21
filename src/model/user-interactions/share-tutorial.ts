@@ -1,12 +1,13 @@
-import { Action, Thunk, thunk } from "easy-peasy";
-import { IModalUserInteraction, modalUserInteraction, doNothing } from ".";
 import { urlWithinApp } from "../../env-utils";
 import { PytchProgramKind } from "../pytch-program";
-import { propSetterAction } from "../../utils";
-
-// It's a bit sledgehammer/nut to use this machinery for the simple
-// "share tutorial" modal, since there is no action to attempt, but
-// doing so keeps the approach consistent.
+import {
+  AsyncUserFlowSlice,
+  alwaysSubmittable,
+  asyncUserFlowSlice,
+  emptyAttempt,
+  idPrepare,
+} from "./async-user-flow";
+import { IPytchAppModel } from "..";
 
 export function sharingUrlFromSlug(slug: string): string {
   const baseUrl = "/suggested-tutorial";
@@ -22,33 +23,24 @@ function sharingUrlFromUrlComponents(baseUrl: string, slug: string) {
   return urlWithinApp(`${baseUrl}/${slug}`);
 }
 
-type IShareTutorialBase = IModalUserInteraction<void>;
-
-type TutorialShareInfo = {
+type ShareTutorialRunArgs = {
   slug: string;
   displayName: string;
   programKind: PytchProgramKind;
 };
 
-interface IShareTutorialSpecific {
-  info: TutorialShareInfo;
-  setInfo: Action<IShareTutorialSpecific, TutorialShareInfo>;
-  launch: Thunk<IShareTutorialBase & IShareTutorialSpecific, TutorialShareInfo>;
-}
+type ShareTutorialRunState = ShareTutorialRunArgs;
 
-const shareTutorialSpecific: IShareTutorialSpecific = {
-  info: { slug: "", displayName: "", programKind: "flat" },
-  setInfo: propSetterAction("info"),
-  launch: thunk((actions, info) => {
-    actions.setInfo(info);
-    actions.superLaunch();
-  }),
-};
+type ShareTutorialBase = AsyncUserFlowSlice<
+  IPytchAppModel,
+  ShareTutorialRunArgs,
+  ShareTutorialRunState
+>;
 
-export type IShareTutorialInteraction = IShareTutorialBase &
-  IShareTutorialSpecific;
+type ShareTutorialActions = object;
 
-export const shareTutorialInteraction = modalUserInteraction<
-  void,
-  IShareTutorialSpecific
->(doNothing, shareTutorialSpecific);
+export type ShareTutorialFlow = ShareTutorialBase & ShareTutorialActions;
+
+export let shareTutorialFlow: ShareTutorialFlow = (() => {
+  return asyncUserFlowSlice({}, idPrepare, alwaysSubmittable, emptyAttempt);
+})();
