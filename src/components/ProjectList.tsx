@@ -152,9 +152,7 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
     (state) => state.versionOptIn.activeUiVersion
   );
   const launchCreate = useFlowActions((f) => f.createProjectFlow.run);
-  const launchUpload = useStoreActions(
-    (actions) => actions.userConfirmations.uploadZipfilesInteraction.launch
-  );
+  const launchUpload = useFlowActions((f) => f.uploadZipfilesFlow.run);
   const clearAllSelected = useStoreActions(
     (actions) => actions.projectCollection.clearAllSelected
   );
