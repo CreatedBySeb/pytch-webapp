@@ -2,8 +2,8 @@ import { Action, action, computed, Computed, Thunk, thunk } from "easy-peasy";
 import { ProjectId } from "./project-core";
 import { assertNever, propSetterAction } from "../utils";
 import {
-  ICreateProjectInteraction,
-  createProjectInteraction,
+  CreateProjectFlow,
+  createProjectFlow,
 } from "./user-interactions/create-project";
 import { IProcessFilesInteraction } from "./user-interactions/process-files";
 import { AddAssetsFlow, addAssetsFlow } from "./user-interactions/add-assets";
@@ -410,7 +410,6 @@ export interface IUserConfirmations {
   launchDeleteJuniorSprite: DangerousActionThunk<DeleteJuniorSpriteDescriptor>;
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
 
-  createProjectInteraction: ICreateProjectInteraction;
   renameAssetInteraction: IRenameAssetInteraction;
   renameProjectInteraction: IRenameProjectInteraction;
   displayScreenshotInteraction: IDisplayScreenshotInteraction;
@@ -420,6 +419,7 @@ export interface IUserConfirmations {
   cropScaleImageInteraction: ICropScaleImageInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
+  createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
@@ -522,7 +522,6 @@ export const userConfirmations: IUserConfirmations = {
     });
   }),
 
-  createProjectInteraction,
   renameAssetInteraction,
   renameProjectInteraction,
   displayScreenshotInteraction,
@@ -532,6 +531,7 @@ export const userConfirmations: IUserConfirmations = {
   cropScaleImageInteraction,
   shareTutorialInteraction,
 
+  createProjectFlow,
   addAssetsFlow,
   addClipArtFlow,
   codeDiffHelpFlow,
