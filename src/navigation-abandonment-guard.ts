@@ -15,4 +15,20 @@ export class NavigationAbandonmentGuard {
     window.addEventListener("popstate", resolve);
     this.exit = () => window.removeEventListener("popstate", resolve);
   }
+
+  async throwIfAbandoned<ResultT>(
+    resultPromise: Promise<ResultT>
+  ): Promise<ResultT> {
+    const sentinel = new Object();
+    const outcome = await Promise.race([
+      this.abandoned.then(() => sentinel),
+      resultPromise,
+    ]);
+    if (Object.is(outcome, sentinel)) {
+      throw kAbandonedError;
+    } else {
+      // The passed-in resultPromise must have won the race.
+      return outcome as ResultT;
+    }
+  }
 }
