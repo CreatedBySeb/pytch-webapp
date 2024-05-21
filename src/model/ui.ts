@@ -5,7 +5,6 @@ import {
   CreateProjectFlow,
   createProjectFlow,
 } from "./user-interactions/create-project";
-import { IProcessFilesInteraction } from "./user-interactions/process-files";
 import { AddAssetsFlow, addAssetsFlow } from "./user-interactions/add-assets";
 import {
   AddClipArtFlow,
@@ -48,7 +47,10 @@ import {
   viewCodeDiffFlow,
 } from "./user-interactions/view-code-diff";
 
-import { uploadZipfilesInteraction } from "./user-interactions/upload-zipfiles";
+import {
+  UploadZipfilesFlow,
+  uploadZipfilesFlow,
+} from "./user-interactions/upload-zipfiles";
 import { IHelpSidebar, helpSidebar } from "./help-sidebar";
 
 import {
@@ -413,7 +415,6 @@ export interface IUserConfirmations {
   renameAssetInteraction: IRenameAssetInteraction;
   downloadZipfileInteraction: IDownloadZipfileInteraction;
   copyProjectInteraction: ICopyProjectInteraction;
-  uploadZipfilesInteraction: IProcessFilesInteraction;
   shareTutorialInteraction: IShareTutorialInteraction;
 
   createProjectFlow: CreateProjectFlow;
@@ -421,6 +422,7 @@ export interface IUserConfirmations {
   addClipArtFlow: AddClipArtFlow;
   renameProjectFlow: RenameProjectFlow;
   displayScreenshotFlow: DisplayScreenshotFlow;
+  uploadZipfilesFlow: UploadZipfilesFlow;
   codeDiffHelpFlow: CodeDiffHelpFlow;
   cropScaleImageFlow: CropScaleImageFlow;
   viewCodeDiffFlow: ViewCodeDiffFlow;
@@ -525,7 +527,6 @@ export const userConfirmations: IUserConfirmations = {
   renameAssetInteraction,
   downloadZipfileInteraction,
   copyProjectInteraction,
-  uploadZipfilesInteraction,
   shareTutorialInteraction,
 
   createProjectFlow,
@@ -533,6 +534,7 @@ export const userConfirmations: IUserConfirmations = {
   addClipArtFlow,
   renameProjectFlow,
   displayScreenshotFlow,
+  uploadZipfilesFlow,
   codeDiffHelpFlow,
   cropScaleImageFlow,
   viewCodeDiffFlow,
