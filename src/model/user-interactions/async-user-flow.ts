@@ -196,3 +196,29 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
     }),
   };
 }
+
+export function asyncUserFlowSlice<
+  AppModelT extends object,
+  SpecificSliceT,
+  RunArgsT,
+  RunStateT,
+>(
+  specificSlice: SpecificSliceT,
+  prepare: AsyncFlowPrepareFun<RunArgsT, AppModelT, RunStateT>,
+  isSubmittable: (runState: RunStateT) => boolean,
+  attempt: AsyncFlowAttemptFun<RunStateT, AppModelT>,
+  options: Partial<AsyncUserFlowOptions> = kDefaultAsyncUserFlowOptions
+): SpecificSliceT & AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT> {
+  const effectiveOptions: AsyncUserFlowOptions = Object.assign(
+    {},
+    kDefaultAsyncUserFlowOptions,
+    options
+  );
+  const asyncFlowModelSlice = baseAsyncUserFlowSlice(
+    prepare,
+    isSubmittable,
+    attempt,
+    effectiveOptions
+  );
+  return Object.assign({}, specificSlice, asyncFlowModelSlice);
+}
