@@ -8,6 +8,8 @@ import {
   unionAllTags,
   populateUrlOfItems,
   nSelectedItemsInEntries,
+  ClipArtGalleryEntry,
+  selectedEntries,
 } from "./clipart-gallery-core";
 
 export type ClipArtGalleryState =
@@ -27,6 +29,26 @@ export const nSelectedItemsInGallery = (
       return 0;
     case "ready":
       return nSelectedItemsInEntries(galleryState.entries, selectedIds);
+    default:
+      return assertNever(galleryState);
+  }
+};
+
+const selectedEntriesInGallery = (
+  galleryState: ClipArtGalleryState,
+  selectedIds: Array<number>
+): Array<ClipArtGalleryEntry> => {
+  switch (galleryState.status) {
+    case "fetch-failed":
+    case "fetch-not-started":
+    case "fetch-pending":
+      // This function should never be called unless we're "ready".
+      console.warn(`unexpected gallery state ${galleryState.status}`);
+      return [];
+    case "ready": {
+      const allEntries = galleryState.entries;
+      return selectedEntries(allEntries, selectedIds);
+    }
     default:
       return assertNever(galleryState);
   }
