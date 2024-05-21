@@ -36,7 +36,7 @@ import {
   projectFromSpecimenFlow,
   ProjectFromSpecimenFlow,
 } from "./project-from-specimen";
-import { Actions } from "easy-peasy";
+import { Actions, State } from "easy-peasy";
 
 import {
   GoogleDriveIntegration,
@@ -47,6 +47,7 @@ import {
   StandalonePlayDemoState,
   standalonePlayDemoState,
 } from "./standalone-play-demo";
+import { useStoreActions, useStoreState } from "../store";
 
 export interface IPytchAppModel {
   versionOptIn: VersionOptIn;
@@ -95,3 +96,15 @@ export const pytchAppModel: IPytchAppModel = {
   googleDriveImportExport: googleDriveIntegration,
   standalonePlayDemoState,
 };
+
+export function useFlowState<ResultT>(
+  flowMapper: (flows: State<IUserConfirmations>) => ResultT
+) {
+  return useStoreState((state) => flowMapper(state.userConfirmations));
+}
+
+export function useFlowActions<ResultT>(
+  flowMapper: (flows: Actions<IUserConfirmations>) => ResultT
+) {
+  return useStoreActions((actions) => flowMapper(actions.userConfirmations));
+}
