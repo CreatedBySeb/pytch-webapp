@@ -124,14 +124,13 @@ context("Management of project list", () => {
     },
   ].forEach((spec) => {
     it(`can save and re-open projects (via ${spec.label})`, () => {
-      createProject("Pac-Person", "without-example", "button");
-      cy.pytchOpenProject("Pac-Person");
+      cy.pytchTryUploadZipfiles(["Apples-bare.zip"]);
       // Erase the skeleton project text before typing our marker.
       cy.get("#pytch-ace-editor").type(
         "{selectall}{backspace}import pytch\n\n# HELLO PAC-PERSON{enter}"
       );
       spec.action();
-      cy.pytchSwitchProject("Pac-Person");
+      cy.pytchSwitchProject("Apples");
       cy.pytchCodeTextShouldContain("HELLO PAC-PERSON");
 
       cy.pytchSwitchProject("Test seed");
@@ -139,7 +138,7 @@ context("Management of project list", () => {
       cy.get("#pytch-ace-editor").type("# HELLO SEED PROJECT{enter}");
       spec.action();
 
-      cy.pytchSwitchProject("Pac-Person");
+      cy.pytchSwitchProject("Apples");
       cy.pytchCodeTextShouldContain("HELLO PAC-PERSON");
 
       cy.pytchSwitchProject("Test seed");
@@ -177,12 +176,16 @@ context("Management of project list", () => {
   });
 
   it("can rename project", () => {
-    createProject("Bananas", "without-example", "button");
-    cy.pytchProjectNamesShouldDeepEqual(["Bananas", "Test seed project"]);
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    let expProjectNames = ["Bananas", "Apples", "Test seed project"];
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames.slice());
+
     launchDropdownAction("Bananas", "Rename");
     cy.get("input").as("textField").clear().type("Oranges{enter}");
     cy.get("@textField").should("not.exist");
-    cy.pytchProjectNamesShouldDeepEqual(["Oranges", "Test seed project"]);
+
+    expProjectNames[0] = "Oranges";
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
   });
 
   const launchDeletion = (projectName: string) => {
@@ -190,42 +193,29 @@ context("Management of project list", () => {
   };
 
   it("can delete a project", () => {
-    createProject("Apples", "without-example", "enter");
-    createProject("Bananas", "without-example", "button");
-    cy.pytchProjectNamesShouldDeepEqual([
-      "Bananas",
-      "Apples",
-      "Test seed project",
-    ]);
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    const expProjectNames = ["Bananas", "Apples", "Test seed project"];
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
+
     launchDeletion("Apples");
     cy.contains("Are you sure");
     cy.get("button").contains("DELETE").click();
     cy.pytchProjectNamesShouldDeepEqual(["Bananas", "Test seed project"]);
   });
 
-  [
-    {
-      label: "escape key",
-      invoke: () => cy.contains("Are you sure").type("{esc}"),
-    },
-    {
-      label: "cancel button",
-      invoke: () => cy.get("button").contains("Cancel").click(),
-    },
-  ].forEach((cancelMethod) => {
-    it(`can cancel project deletion (via ${cancelMethod.label})`, () => {
-      createProject("Apples", "without-example", "button");
-      createProject("Bananas", "without-example", "enter");
+  it("can cancel project deletion", () => {
+    cy.pytchTryUploadZipfiles(["Apples-bare.zip", "Bananas-bare.zip"]);
+    const expProjectNames = ["Bananas", "Apples", "Test seed project"];
 
-      launchDeletion("Apples");
-      cancelMethod.invoke();
-      cy.contains("Are you sure").should("not.exist");
-      cy.pytchProjectNamesShouldDeepEqual([
-        "Bananas",
-        "Apples",
-        "Test seed project",
-      ]);
-    });
+    launchDeletion("Apples");
+    cy.contains("Are you sure").type("{esc}");
+    cy.contains("Are you sure").should("not.exist");
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
+
+    launchDeletion("Apples");
+    cy.get("button").contains("Cancel").click();
+    cy.contains("Are you sure").should("not.exist");
+    cy.pytchProjectNamesShouldDeepEqual(expProjectNames);
   });
 });
 

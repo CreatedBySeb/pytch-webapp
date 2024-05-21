@@ -131,6 +131,10 @@ context("Create/modify/delete event handlers", () => {
     typeIntoScriptEditor(1, 'print("got x"){enter}');
 
     cy.pytchGreenFlag();
+
+    // The stage should get focus, but it's racy:
+    cy.pytchClickStage(0, 0);
+
     cy.pytchSendKeysToApp("xx");
     cy.pytchStdoutShouldEqual("got x\ngot x\n");
   });

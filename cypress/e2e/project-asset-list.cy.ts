@@ -190,6 +190,7 @@ context("Management of project assets", () => {
 
   it("can rename assets", () => {
     cy.pytchClickAssetDropdownItem("rectangle", "Rename");
+    cy.get(".alert.alert-danger").should("not.exist");
     cy.get("input[type=text]").clear().type("vermillion-rectangle");
     cy.get("button").contains("Rename").click();
     cy.get(".modal-content").should("not.exist");
