@@ -73,6 +73,13 @@ export async function copyTextToClipboard(text: string) {
   PYTCH_CYPRESS()["latestTextCopied"] = text;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function discardReturnValue<T extends any[], R>(
+  f: (...args: T) => R
+): (...args: T) => void {
+  return (...args: T) => void f(...args);
+}
+
 export const failIfNull = function <T>(
   maybeX: T | null | undefined,
   errorIfNull: string
@@ -172,7 +179,12 @@ export const dateAsLocalISO8601 = (date: Date) => {
 
 ////////////////////////////////////////////////////////////////////////
 
-export function valueCell<ValueT>(initialValue: ValueT) {
+export type ValueCell<ValueT> = {
+  get: () => ValueT;
+  set: (value: ValueT) => void;
+};
+
+export function valueCell<ValueT>(initialValue: ValueT): ValueCell<ValueT> {
   let _value: ValueT = initialValue;
   return {
     get() {
@@ -182,6 +194,21 @@ export function valueCell<ValueT>(initialValue: ValueT) {
       _value = value;
     },
   };
+}
+
+////////////////////////////////////////////////////////////////////////
+
+type PromiseAndResolve = {
+  promise: Promise<void>;
+  resolve: () => void;
+};
+
+export function promiseAndResolve(): PromiseAndResolve {
+  let resolve: () => void = () => void 0;
+  const promise = new Promise<void>((innerResolve) => {
+    resolve = innerResolve;
+  });
+  return { promise, resolve };
 }
 
 ////////////////////////////////////////////////////////////////////////
