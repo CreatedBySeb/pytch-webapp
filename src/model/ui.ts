@@ -1,5 +1,4 @@
 import { Action, action, computed, Computed, Thunk, thunk } from "easy-peasy";
-import { ProjectId } from "./project-core";
 import { assertNever, propSetterAction } from "../utils";
 import {
   CreateProjectFlow,
@@ -61,8 +60,6 @@ import {
   stageHalfHeight,
 } from "../constants";
 import { coordsChooser, CoordsChooser } from "./coordinates-chooser";
-import { IPytchAppModel } from ".";
-import { Uuid } from "./junior/structured-program";
 import {
   deleteAssetFlow,
   DeleteAssetFlow,
@@ -329,100 +326,7 @@ export const ideLayout: IIDELayout = {
   helpSidebar,
 };
 
-/** General modal dialog support. */
-
-type IsShowingByName = Map<string, boolean>;
-
-export interface IModals {
-  isShowing: IsShowingByName;
-  show: Action<IModals, string>;
-  hide: Action<IModals, string>;
-}
-
-/** What stage are we at in performing a "dangerous" action (one
- * requiring confirmation by the user before actually doing it)? */
-export enum DangerousActionProgress {
-  AwaitingUserChoice,
-  AwaitingActionCompletion,
-}
-
-/** Description of the "delete project" dangerous action. */
-export type DeleteProjectDescriptor = {
-  kind: "delete-project";
-  projectName: string;
-  projectId: ProjectId;
-};
-
-export type DeleteManyProjectsDescriptor = {
-  kind: "delete-many-projects";
-  projectIds: Array<ProjectId>;
-};
-
-export type DeleteAssetFromProjectDescriptor = {
-  kind: "delete-project-asset";
-  assetKindDisplayName: string;
-  assetName: string;
-  assetDisplayName: string;
-};
-
-export type DeleteJuniorSpriteDescriptor = {
-  kind: "delete-junior-sprite";
-  spriteDisplayName: string;
-  actorId: Uuid;
-};
-
-export type DeleteJuniorHandlerDescriptor = {
-  kind: "delete-junior-handler";
-  actorId: Uuid;
-  handlerId: Uuid;
-};
-
-export type DangerousActionDescriptor =
-  | DeleteProjectDescriptor
-  | DeleteManyProjectsDescriptor
-  | DeleteAssetFromProjectDescriptor
-  | DeleteJuniorSpriteDescriptor
-  | DeleteJuniorHandlerDescriptor;
-
-/** What dangerous action are we asking the user to confirm? */
-export interface IDangerousActionConfirmation {
-  progress: DangerousActionProgress;
-  descriptor: DangerousActionDescriptor;
-}
-
-type DangerousActionLaunchArgs = {
-  actionDescriptor: DangerousActionDescriptor;
-  perform(): Promise<void>;
-};
-
-// TODO: Does this need a "failed" state?
-type DangerousActionState =
-  | { kind: "idle" }
-  | ({ kind: "awaiting-user-confirmation" } & DangerousActionLaunchArgs)
-  | {
-      kind: "performing-action";
-      actionDescriptor: DangerousActionDescriptor;
-    };
-
-type DangerousActionThunk<Descriptor extends DangerousActionDescriptor> = Thunk<
-  IUserConfirmations,
-  Omit<Descriptor, "kind">,
-  void,
-  IPytchAppModel
->;
-
 export interface IUserConfirmations {
-  dangerousActionState: DangerousActionState;
-  setDangerousActionState: Action<IUserConfirmations, DangerousActionState>;
-  launchDangerousAction: Thunk<IUserConfirmations, DangerousActionLaunchArgs>;
-  dismissDangerousAction: Thunk<IUserConfirmations>;
-  invokeDangerousAction: Thunk<IUserConfirmations>;
-
-  launchDeleteAsset: DangerousActionThunk<DeleteAssetFromProjectDescriptor>;
-  launchDeleteProject: DangerousActionThunk<DeleteProjectDescriptor>;
-  launchDeleteManyProjects: DangerousActionThunk<DeleteManyProjectsDescriptor>;
-  launchDeleteJuniorSprite: DangerousActionThunk<DeleteJuniorSpriteDescriptor>;
-  launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
   deleteAssetFlow: DeleteAssetFlow;
   deleteProjectFlow: DeleteProjectFlow;
   deleteManyProjectsFlow: DeleteManyProjectsFlow;
@@ -447,98 +351,6 @@ export interface IUserConfirmations {
 // TODO: Better name than 'confirmations'.
 //
 export const userConfirmations: IUserConfirmations = {
-  dangerousActionState: { kind: "idle" },
-  setDangerousActionState: propSetterAction("dangerousActionState"),
-  launchDangerousAction: thunk((actions, args, helpers) => {
-    const state = helpers.getState().dangerousActionState;
-    if (state.kind !== "idle")
-      throw new Error(
-        "cannot launch dangerous action " +
-          JSON.stringify(args) +
-          " from state " +
-          JSON.stringify(state)
-      );
-
-    actions.setDangerousActionState({
-      kind: "awaiting-user-confirmation",
-      ...args,
-    });
-  }),
-  dismissDangerousAction: thunk((actions, _voidPayload, helpers) => {
-    const state = helpers.getState().dangerousActionState;
-    if (state.kind !== "awaiting-user-confirmation")
-      throw new Error(
-        "cannot cancel dangerous action from state " + JSON.stringify(state)
-      );
-
-    actions.setDangerousActionState({ kind: "idle" });
-  }),
-  invokeDangerousAction: thunk(async (actions, _voidPayload, helpers) => {
-    const state = helpers.getState().dangerousActionState;
-    if (state.kind !== "awaiting-user-confirmation")
-      throw new Error(
-        "cannot perform dangerous action from state " + JSON.stringify(state)
-      );
-
-    actions.setDangerousActionState({
-      kind: "performing-action",
-      actionDescriptor: state.actionDescriptor,
-    });
-
-    // TODO: What if this throws an error?
-    await state.perform();
-
-    actions.setDangerousActionState({ kind: "idle" });
-  }),
-
-  launchDeleteAsset: thunk((actions, actionDescriptor, helpers) => {
-    const deleteAssetAndSync =
-      helpers.getStoreActions().activeProject.deleteAssetAndSync;
-
-    actions.launchDangerousAction({
-      actionDescriptor: { kind: "delete-project-asset", ...actionDescriptor },
-      perform: () => deleteAssetAndSync({ name: actionDescriptor.assetName }),
-    });
-  }),
-
-  launchDeleteProject: thunk((actions, actionDescriptor, helpers) => {
-    const deleteManyProjects =
-      helpers.getStoreActions().projectCollection
-        .requestDeleteManyProjectsThenResync;
-
-    actions.launchDangerousAction({
-      actionDescriptor: { kind: "delete-project", ...actionDescriptor },
-      perform: () => deleteManyProjects([actionDescriptor.projectId]),
-    });
-  }),
-
-  launchDeleteManyProjects: thunk((actions, actionDescriptor, helpers) => {
-    const deleteManyProjects =
-      helpers.getStoreActions().projectCollection
-        .requestDeleteManyProjectsThenResync;
-
-    actions.launchDangerousAction({
-      actionDescriptor: { kind: "delete-many-projects", ...actionDescriptor },
-      perform: () => deleteManyProjects(actionDescriptor.projectIds),
-    });
-  }),
-  launchDeleteJuniorSprite: thunk((actions, actionDescriptor, helpers) => {
-    const deleteSprite =
-      helpers.getStoreActions().jrEditState.deleteFocusedActor;
-
-    actions.launchDangerousAction({
-      actionDescriptor: { kind: "delete-junior-sprite", ...actionDescriptor },
-      perform: () => Promise.resolve(deleteSprite(actionDescriptor.actorId)),
-    });
-  }),
-  launchDeleteJuniorHandler: thunk((actions, actionDescriptor, helpers) => {
-    const deleteHandler = helpers.getStoreActions().activeProject.deleteHandler;
-
-    actions.launchDangerousAction({
-      actionDescriptor: { kind: "delete-junior-handler", ...actionDescriptor },
-      perform: () => Promise.resolve(deleteHandler(actionDescriptor)),
-    });
-  }),
   deleteAssetFlow,
   deleteProjectFlow,
   deleteManyProjectsFlow,
