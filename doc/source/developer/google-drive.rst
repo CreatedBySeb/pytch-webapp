@@ -65,13 +65,17 @@ console.
 API keys and other identifiers: the ``.env`` file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Various identifiers are needed when communicating with Google.
+Various identifiers are needed when communicating with Google.  These
+are stored in environment variables:
 
-* Client ID (env.var ``REACT_APP_GOOGLE_CLIENT_ID``)
-* App ID (env.var ``REACT_APP_GOOGLE_APP_ID``)
-* API key (env.var ``REACT_APP_GOOGLE_API_KEY``)
+* Client ID (env.var ``VITE_GOOGLE_CLIENT_ID``)
+* App ID (env.var ``VITE_GOOGLE_APP_ID``)
+* API key (env.var ``VITE_GOOGLE_API_KEY``)
 
-These are stored in a ``.env`` file which is not part of the repo.
+There is also an env.var indicating whether to use the real Google
+API, or a mock for testing — see below.
+
+These are all stored in a ``.env`` file which is not part of the repo.
 
 
 Testing
@@ -82,6 +86,20 @@ to behave in certain ways so that Cypress can test the UI flow under
 different conditions.
 
 
+Flows
+-----
+
+There are two main flows: import and export.  Each one needs the
+authentication flow to have been completed first.
+
+Each flow is wrapped in ``doTask()``, with the following state
+diagram:
+
+.. figure:: google-drive-states.svg
+
+   State-machine for Google Drive flows.
+
+
 Choice of real vs mock APIs
 ---------------------------
 
@@ -89,7 +107,7 @@ The real Google API objects are used for production builds and also
 for the development server when a particular React environment
 variable is set:
 
-* ``REACT_APP_USE_REAL_GOOGLE_DRIVE=yes``
+* ``VITE_USE_REAL_GOOGLE_DRIVE=yes``
 
 Otherwise, the mock API objects are used, to allow Cypress testing.
 This does mean that you must stop and re-start the development server
