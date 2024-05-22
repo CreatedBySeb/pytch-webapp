@@ -9,6 +9,7 @@ import { assertNever, propSetterAction } from "../../utils";
 import { upsertSpriteFlow, UpsertSpriteFlow } from "./upsert-sprite";
 import { UpsertHatBlockFlow, upsertHatBlockFlow } from "./upsert-hat-block";
 import { LinkedContentKind } from "../linked-content";
+import { DeleteSpriteFlow, deleteSpriteFlow } from "./user-flows/delete-sprite";
 import {
   deleteHandlerFlow,
   DeleteHandlerFlow,
@@ -101,6 +102,7 @@ export type EditState = {
 
   upsertSpriteFlow: UpsertSpriteFlow;
   upsertHatBlockFlow: UpsertHatBlockFlow;
+  deleteSpriteFlow: DeleteSpriteFlow;
   deleteHandlerFlow: DeleteHandlerFlow;
 };
 
@@ -215,5 +217,6 @@ export const editState: EditState = {
 
   upsertSpriteFlow,
   upsertHatBlockFlow,
+  deleteSpriteFlow,
   deleteHandlerFlow,
 };

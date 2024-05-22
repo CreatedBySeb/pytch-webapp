@@ -7,7 +7,7 @@ import {
   Uuid,
   ActorKindOps,
 } from "../../model/junior/structured-program";
-import { useStoreActions, useStoreState } from "../../store";
+import { useStoreState } from "../../store";
 import { AssetImageThumbnail } from "../AssetImageThumbnail";
 import { AddSomethingSingleButton } from "./AddSomethingButton";
 import {
@@ -91,9 +91,7 @@ const ActorCardDropdown: React.FC<ActorCardDropdownProps> = ({
   name,
   id,
 }) => {
-  const deleteActorThunk = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteJuniorSprite
-  );
+  const runDeleteActor = useJrEditActions((a) => a.deleteSpriteFlow.run);
   const activateTab = useJrEditActions((a) => a.setActorPropertiesActiveTab);
 
   // You can only rename/delete sprites, not the stage.
@@ -106,7 +104,7 @@ const ActorCardDropdown: React.FC<ActorCardDropdownProps> = ({
       return;
     }
 
-    deleteActorThunk({ spriteDisplayName: name, actorId: id });
+    runDeleteActor({ spriteDisplayName: name, actorId: id });
   };
 
   const appearancesName = ActorKindOps.names(kind).appearancesDisplay;
