@@ -6,7 +6,13 @@ import {
   wrappedError,
   zipfileDataFromProject,
 } from "../storage/zipfile";
-import { ValueCell, assertNever, propSetterAction, valueCell } from "../utils";
+import {
+  ValueCell,
+  assertNever,
+  promiseAndResolve,
+  propSetterAction,
+  valueCell,
+} from "../utils";
 import { LinkedContentLoadingState, StoredProjectContent } from "./project";
 import { ProjectId } from "./project-core";
 import { FileProcessingFailure } from "./user-interactions/process-files";
@@ -58,6 +64,7 @@ type TaskState =
       user: GoogleUserInfo;
       summary: string;
       outcome: TaskOutcome;
+      dismissNotification: () => void;
     };
 
 type GoogleDriveTask = (
@@ -310,11 +317,20 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     const api = actions.requireBooted();
     const summary = task.summary;
 
+    const { promise: notificationDismissal, resolve: dismissNotification } =
+      promiseAndResolve();
+
     try {
       const { tokenInfo, user } = await actions.ensureAuthenticated();
       actions.setTaskState({ kind: "pending", user, summary });
       const outcome = await task.run(api, tokenInfo);
-      actions.setTaskState({ kind: "done", user, summary, outcome });
+      actions.setTaskState({
+        kind: "done",
+        user,
+        summary,
+        outcome,
+        dismissNotification,
+      });
     } catch (err) {
       console.log("doTask(): caught", err);
       const errMessage = (err as Error).message;
@@ -327,8 +343,17 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       const outcome = { successes: [], failures: [errMessage] };
       const user = unknownGoogleUserInfo;
-      actions.setTaskState({ kind: "done", user, summary, outcome });
+      actions.setTaskState({
+        kind: "done",
+        user,
+        summary,
+        outcome,
+        dismissNotification,
+      });
     }
+
+    await notificationDismissal;
+    actions.setTaskState({ kind: "idle" });
   }),
 
   exportProject: thunk(async (actions, descriptor) => {
