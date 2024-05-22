@@ -9,6 +9,10 @@ import { assertNever, propSetterAction } from "../../utils";
 import { upsertSpriteFlow, UpsertSpriteFlow } from "./upsert-sprite";
 import { UpsertHatBlockFlow, upsertHatBlockFlow } from "./upsert-hat-block";
 import { LinkedContentKind } from "../linked-content";
+import {
+  deleteHandlerFlow,
+  DeleteHandlerFlow,
+} from "./user-flows/delete-handler";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
 export type InfoPanelTabKey = "output" | "errors";
@@ -97,6 +101,7 @@ export type EditState = {
 
   upsertSpriteFlow: UpsertSpriteFlow;
   upsertHatBlockFlow: UpsertHatBlockFlow;
+  deleteHandlerFlow: DeleteHandlerFlow;
 };
 
 export const editState: EditState = {
@@ -210,4 +215,5 @@ export const editState: EditState = {
 
   upsertSpriteFlow,
   upsertHatBlockFlow,
+  deleteHandlerFlow,
 };
