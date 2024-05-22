@@ -63,6 +63,10 @@ import {
 import { coordsChooser, CoordsChooser } from "./coordinates-chooser";
 import { IPytchAppModel } from ".";
 import { Uuid } from "./junior/structured-program";
+import {
+  deleteAssetFlow,
+  DeleteAssetFlow,
+} from "./user-interactions/delete-asset";
 
 /** Choices the user has made about how the IDE should be laid out.
  * Currently this is just a choice between two layouts, but in due
@@ -411,6 +415,7 @@ export interface IUserConfirmations {
   launchDeleteManyProjects: DangerousActionThunk<DeleteManyProjectsDescriptor>;
   launchDeleteJuniorSprite: DangerousActionThunk<DeleteJuniorSpriteDescriptor>;
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
+  deleteAssetFlow: DeleteAssetFlow;
 
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
@@ -524,6 +529,7 @@ export const userConfirmations: IUserConfirmations = {
       perform: () => Promise.resolve(deleteHandler(actionDescriptor)),
     });
   }),
+  deleteAssetFlow,
 
   createProjectFlow,
   addAssetsFlow,
