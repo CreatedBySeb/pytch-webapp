@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useStoreActions, useStoreState } from "../store";
 import { assertNever } from "../utils";
-import { ChooseFiles } from "./ChooseFiles";
+import { ChooseFiles, tmpStatusFromOld } from "./ChooseFiles";
 import { FileProcessingFailures } from "./FileProcessingFailures";
 
 export const AddAssetsModal = () => {
@@ -33,7 +33,7 @@ export const AddAssetsModal = () => {
           titleText={titleText}
           introText={introText}
           actionButtonText="Add to project"
-          status={state.status}
+          status={tmpStatusFromOld(state.status)}
           tryProcess={(files) => tryProcess(files)}
           dismiss={() => dismiss()}
         />
