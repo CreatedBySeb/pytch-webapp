@@ -29,6 +29,7 @@ import {
   applyFormatSpecifier,
   uniqueUserInputFragment,
 } from "./compound-text-input";
+import { NavigationAbandonmentGuard } from "../navigation-abandonment-guard";
 
 type ExportProjectDescriptor = {
   project: StoredProjectContent;
@@ -242,8 +243,8 @@ async function tryImportAsyncFile(
     const project = await createNewProject(projectInfo.name, projectInfo);
     const projectId = project.id;
     return { filename, projectId };
-  } catch (err) {
-    throw wrappedError(err as Error);
+  } catch (error) {
+    throw wrappedError(error as Error);
   }
 }
 
@@ -269,9 +270,9 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       actions.setApiBootStatus({ kind: "pending" });
       const api = await bootApi().boot();
       actions.setApiBootStatus({ kind: "succeeded", api });
-    } catch (err) {
+    } catch (error) {
       // TODO: Any useful way to report this to user?
-      console.error("GoogleDriveIntegration.maybeBoot(): boot failed", err);
+      console.error("GoogleDriveIntegration.maybeBoot(): boot failed", error);
       actions.setApiBootStatus({ kind: "failed" });
     }
   }),
@@ -301,29 +302,56 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         return assertNever(authState);
     }
 
-    const abortController = new AbortController();
-    actions.setAuthState({ kind: "pending", abortController });
-    const signal = abortController.signal;
-    const tokenInfoPromise = api.acquireToken({ signal });
-    const tokenInfo = await tokenInfoPromise;
-    const userInfoPromise = api.getUserInfo(tokenInfo);
-    const user = await userInfoPromise;
-    const authInfo = { tokenInfo, user };
-    actions.setAuthState({ kind: "succeeded", info: authInfo });
-    return authInfo;
+    const navGuard = new NavigationAbandonmentGuard();
+    try {
+      const abortController = new AbortController();
+      actions.setAuthState({ kind: "pending", abortController });
+
+      // TODO: Could the abort-controller mechanism be replaced with a
+      // Promise.race() of the acquireToken() promise and a "user
+      // cancelled" promise which the "pending"-state dialog can
+      // resolve/reject?
+
+      const signal = abortController.signal;
+      const tokenInfoPromise = api.acquireToken({ signal });
+      const tokenInfo = await navGuard.throwIfAbandoned(tokenInfoPromise);
+      const userInfoPromise = api.getUserInfo(tokenInfo);
+      const user = await navGuard.throwIfAbandoned(userInfoPromise);
+      const authInfo = { tokenInfo, user };
+      actions.setAuthState({ kind: "succeeded", info: authInfo });
+      return authInfo;
+    } catch (error) {
+      if (navGuard.wasAbandoned(error)) {
+        actions.setAuthState({ kind: "idle" });
+      }
+      throw error;
+    } finally {
+      navGuard.exit();
+    }
   }),
 
   doTask: thunk(async (actions, task) => {
     const api = actions.requireBooted();
     const summary = task.summary;
 
+    const navGuard = new NavigationAbandonmentGuard();
+
     const { promise: notificationDismissal, resolve: dismissNotification } =
       promiseAndResolve();
 
     try {
+      // ensureAuthenticated() has its own navigation-guard logic; it
+      // can succeed, throw an "abandoned by navigation" error, or throw
+      // a business-logic error.
       const { tokenInfo, user } = await actions.ensureAuthenticated();
+
       actions.setTaskState({ kind: "pending", user, summary });
+
+      // run() also has its own navigation-guard logic; it can succeed,
+      // throw an "abandoned by navigation" error, or throw a
+      // business-logic error.
       const outcome = await task.run(api, tokenInfo);
+
       actions.setTaskState({
         kind: "done",
         user,
@@ -331,67 +359,90 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         outcome,
         dismissNotification,
       });
-    } catch (err) {
-      console.log("doTask(): caught", err);
-      const errMessage = (err as Error).message;
+    } catch (error) {
+      console.log("doTask(): caught", error);
+      const errMessage = (error as Error).message;
 
-      // It might not be the case that auth failed.  But one likely
-      // reason for error is that auth has become invalid, so it might
-      // be useful to throw away token and hope it works next time.
-      // TODO: Is this reasonable?
-      actions.setAuthState({ kind: "idle" });
+      if (navGuard.wasAbandoned(error)) {
+        actions.setTaskState({ kind: "idle" });
+      } else {
+        // It might not be the case that auth failed.  But one likely
+        // reason for error is that auth has become invalid, so it might
+        // be useful to throw away token and hope it works next time.
+        // TODO: Is this reasonable?
+        //
+        // This also covers the case that the user cancels our modal
+        // dialog for the authentication flow, in which case returning to
+        // "idle" is correct.
+        //
+        actions.setAuthState({ kind: "idle" });
 
-      const outcome = { successes: [], failures: [errMessage] };
-      const user = unknownGoogleUserInfo;
-      actions.setTaskState({
-        kind: "done",
-        user,
-        summary,
-        outcome,
-        dismissNotification,
-      });
+        const outcome = { successes: [], failures: [errMessage] };
+        const user = unknownGoogleUserInfo;
+        actions.setTaskState({
+          kind: "done",
+          user,
+          summary,
+          outcome,
+          dismissNotification,
+        });
+      }
     }
 
-    await notificationDismissal;
-    actions.setTaskState({ kind: "idle" });
+    try {
+      await navGuard.throwIfAbandoned(notificationDismissal);
+    } catch (error) {
+      // Ignore "abandoned" errors but re-throw others (although there
+      // shouldn't be any others).
+      if (!navGuard.wasAbandoned(error)) {
+        throw error;
+      }
+    } finally {
+      actions.setTaskState({ kind: "idle" });
+    }
   }),
 
   exportProject: thunk(async (actions, descriptor) => {
     // Any errors thrown from run() will be caught by doTask().
     const run: GoogleDriveTask = async (api, tokenInfo) => {
+      const navGuard = new NavigationAbandonmentGuard();
       const formatSpecifier = filenameFormatSpecifier(
         descriptor.linkedContentLoadingState
       );
-      const chooseFilenameOutcome = await actions.chooseFilenameFlow.outcome(
-        formatSpecifier
-      );
 
-      if (chooseFilenameOutcome.kind === "cancelled") {
-        const cancelledOutcome: TaskOutcome = {
-          successes: [],
-          failures: ["User cancelled export"],
+      try {
+        const chooseFilenameOutcome = await navGuard.throwIfAbandoned(
+          actions.chooseFilenameFlow.outcome(formatSpecifier)
+        );
+        if (chooseFilenameOutcome.kind === "cancelled") {
+          const cancelledOutcome: TaskOutcome = {
+            successes: [],
+            failures: ["User cancelled export"],
+          };
+          return cancelledOutcome;
+        }
+
+        const rawFilename = chooseFilenameOutcome.filename;
+        const filename = rawFilename.endsWith(".zip")
+          ? rawFilename
+          : `${rawFilename}.zip`;
+
+        const file: AsyncFile = {
+          name: () => Promise.resolve(filename),
+          mimeType: () => Promise.resolve("application/zip"),
+          data: () => zipfileDataFromProject(descriptor.project),
         };
-        return cancelledOutcome;
+
+        await navGuard.throwIfAbandoned(api.exportFile(tokenInfo, file));
+
+        const successOutcome: TaskOutcome = {
+          successes: [`Project exported to "${filename}"`],
+          failures: [],
+        };
+        return successOutcome;
+      } finally {
+        navGuard.exit();
       }
-
-      const rawFilename = chooseFilenameOutcome.filename;
-      const filename = rawFilename.endsWith(".zip")
-        ? rawFilename
-        : `${rawFilename}.zip`;
-
-      const file: AsyncFile = {
-        name: () => Promise.resolve(filename),
-        mimeType: () => Promise.resolve("application/zip"),
-        data: () => zipfileDataFromProject(descriptor.project),
-      };
-
-      await api.exportFile(tokenInfo, file);
-
-      const successOutcome: TaskOutcome = {
-        successes: [`Project exported to "${filename}"`],
-        failures: [],
-      };
-      return successOutcome;
     };
 
     actions.doTask({ summary: "Export to Google Drive", run });
@@ -405,61 +456,82 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       api,
       tokenInfo
     ): Promise<TaskOutcome> => {
-      const pendingTaskState = helpers.getState().taskState;
-      actions.setTaskState({ kind: "pending-already-modal" });
+      const navGuard = new NavigationAbandonmentGuard();
 
-      const { files: filesPromise } = api.importFiles(tokenInfo);
+      // Will be overwritten when launching importFiles():
+      let cancelImport: () => void = () => void 0;
 
-      const files = await filesPromise;
+      try {
+        const pendingTaskState = helpers.getState().taskState;
+        actions.setTaskState({ kind: "pending-already-modal" });
 
-      actions.setTaskState(pendingTaskState);
+        const { cancel: cancelImport_, files: filesPromise } =
+          api.importFiles(tokenInfo);
+        cancelImport = cancelImport_;
 
-      let successes: Array<SuccessfulFileImport> = [];
-      let failures: Array<FileProcessingFailure> = [];
+        const files = await navGuard.throwIfAbandoned(filesPromise);
 
-      for (const file of files) {
-        let filename = valueCell<string>("<file with unknown name>");
-        try {
-          const importResult = await tryImportAsyncFile(filename, file);
-          successes.push(importResult);
-        } catch (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          e: any
-        ) {
-          console.error("importProjects():", filename, e);
-          failures.push({ filename: filename.get(), reason: e.message });
+        actions.setTaskState(pendingTaskState);
+
+        let successes: Array<SuccessfulFileImport> = [];
+        let failures: Array<FileProcessingFailure> = [];
+
+        for (const file of files) {
+          let filename = valueCell<string>("<file with unknown name>");
+          try {
+            const importResult = await navGuard.throwIfAbandoned(
+              tryImportAsyncFile(filename, file)
+            );
+            successes.push(importResult);
+          } catch (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            error: any
+          ) {
+            console.error("importProjects():", filename, error);
+            if (navGuard.wasAbandoned(error)) {
+              throw error;
+            }
+            failures.push({ filename: filename.get(), reason: error.message });
+          }
         }
+
+        const message = files.length === 0 ? "No files selected." : undefined;
+        const taskSuccesses = successes.map(
+          (success) => `Imported "${success.filename}"`
+        );
+        const taskFailures = failures.map(
+          (failure) => `"${failure.filename}" — ${failure.reason}`
+        );
+        const outcome: TaskOutcome = {
+          message,
+          successes: taskSuccesses,
+          failures: taskFailures,
+        };
+
+        const nSuccesses = taskSuccesses.length;
+        const nFailures = taskFailures.length;
+
+        if (nSuccesses > 0) {
+          allActions.projectCollection.noteDatabaseChange();
+        }
+
+        if (nFailures === 0 && nSuccesses === 1) {
+          const soleProjectId = successes[0].projectId;
+          allActions.navigationRequestQueue.enqueue({
+            path: `/ide/${soleProjectId}`,
+          });
+        }
+
+        console.log("importProjects(): returning", outcome);
+        return outcome;
+      } catch (error) {
+        if (navGuard.wasAbandoned(error)) {
+          cancelImport();
+        }
+        throw error;
+      } finally {
+        navGuard.exit();
       }
-
-      const message = files.length === 0 ? "No files selected." : undefined;
-      const taskSuccesses = successes.map(
-        (success) => `Imported "${success.filename}"`
-      );
-      const taskFailures = failures.map(
-        (failure) => `"${failure.filename}" — ${failure.reason}`
-      );
-      const outcome: TaskOutcome = {
-        message,
-        successes: taskSuccesses,
-        failures: taskFailures,
-      };
-
-      const nSuccesses = taskSuccesses.length;
-      const nFailures = taskFailures.length;
-
-      if (nSuccesses > 0) {
-        allActions.projectCollection.noteDatabaseChange();
-      }
-
-      if (nFailures === 0 && nSuccesses === 1) {
-        const soleProjectId = successes[0].projectId;
-        allActions.navigationRequestQueue.enqueue({
-          path: `/ide/${soleProjectId}`,
-        });
-      }
-
-      console.log("importProjects(): returning", outcome);
-      return outcome;
     };
 
     actions.doTask({ summary: "Import from Google Drive", run });
