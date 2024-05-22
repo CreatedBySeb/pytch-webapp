@@ -350,7 +350,9 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       const savedTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
-      const files = await api.importFiles(tokenInfo);
+      const { files: filesPromise } = api.importFiles(tokenInfo);
+
+      const files = await filesPromise;
 
       actions.setTaskState(savedTaskState);
 

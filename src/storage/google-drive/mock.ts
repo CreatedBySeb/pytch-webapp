@@ -1,5 +1,5 @@
 import { AsyncFile, GoogleDriveApi, GoogleDriveBootApi } from "./shared";
-import { assertNever, delaySeconds } from "../../utils";
+import { ValueCell, assertNever, delaySeconds } from "../../utils";
 
 type CallBehaviour = {
   boot: "ok" | "fail" | "stall";
@@ -8,7 +8,8 @@ type CallBehaviour = {
   exportFile: "ok" | "fail";
   importFiles:
     | { kind: "fail"; message: string }
-    | { kind: "ok"; files: Array<AsyncFile> };
+    | { kind: "wait"; wasCancelled: ValueCell<boolean> }
+    | { kind: "ok"; files: Array<AsyncFile>; wasCancelled: ValueCell<boolean> };
 };
 
 export type MockApiBehaviour = {
@@ -76,13 +77,23 @@ function mockApi(spec: MockApiBehaviour): GoogleDriveApi {
     }
   };
 
-  const importFiles: GoogleDriveApi["importFiles"] = async (/* tokInfo */) => {
+  const importFiles: GoogleDriveApi["importFiles"] = (/* tokInfo */) => {
     const behaviour = shiftBehaviourOrFail(spec, "importFiles");
     switch (behaviour.kind) {
       case "fail":
         throw new Error(behaviour.message);
+      case "wait":
+        return {
+          cancel: () => behaviour.wasCancelled.set(true),
+          files: new Promise<Array<AsyncFile>>((/* resolve, reject */) => {
+            // Never do anything.
+          }),
+        };
       case "ok":
-        return behaviour.files;
+        return {
+          cancel: () => behaviour.wasCancelled.set(true),
+          files: Promise.resolve(behaviour.files),
+        };
       default:
         return assertNever(behaviour);
     }

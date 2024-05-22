@@ -23,6 +23,11 @@ export type AcquireTokenOptions = {
   signal: AbortSignal;
 };
 
+export type ImportFilesFlow = {
+  cancel: () => void;
+  files: Promise<Array<AsyncFile>>;
+};
+
 export interface GoogleDriveApi {
   /** Acquire an access token for use with future API calls.  To allow
    * external cancellation, the acquisition process listens for the
@@ -38,7 +43,7 @@ export interface GoogleDriveApi {
    * the given `tokenInfo` to authorise.  The returned Promise can
    * reject, for example if the user cancels the operation or if an
    * error occurs. */
-  importFiles(tokenInfo: TokenInfo): Promise<Array<AsyncFile>>;
+  importFiles(tokenInfo: TokenInfo): ImportFilesFlow;
 
   /** Export the data in the given `file`, using the given `tokenInfo`
    * to authorise. */

@@ -2,6 +2,7 @@
 
 import { AsyncFile } from "../../src/storage/google-drive";
 import { MockApiBehaviour } from "../../src/storage/google-drive/mock";
+import { valueCell } from "../../src/utils";
 type MatchContent = Parameters<Cypress.Chainable["contains"]>[1];
 
 context("Google Drive import and export", () => {
@@ -318,7 +319,9 @@ context("Google Drive import and export", () => {
             acquireToken: ["ok"],
             getUserInfo: ["ok"],
             exportFile: [],
-            importFiles: [{ kind: "ok", files: [goodFile] }],
+            importFiles: [
+              { kind: "ok", files: [goodFile], wasCancelled: valueCell(false) },
+            ],
           });
 
           cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
@@ -344,7 +347,9 @@ context("Google Drive import and export", () => {
         acquireToken: ["ok"],
         getUserInfo: ["ok"],
         exportFile: [],
-        importFiles: [{ kind: "ok", files: [] }],
+        importFiles: [
+          { kind: "ok", files: [], wasCancelled: valueCell(false) },
+        ],
       });
 
       cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
@@ -374,7 +379,13 @@ context("Google Drive import and export", () => {
                 acquireToken: ["ok"],
                 getUserInfo: ["ok"],
                 exportFile: [],
-                importFiles: [{ kind: "ok", files: [goodFile, badFile] }],
+                importFiles: [
+                  {
+                    kind: "ok",
+                    files: [goodFile, badFile],
+                    wasCancelled: valueCell(false),
+                  },
+                ],
               });
 
               cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
