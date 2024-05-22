@@ -20,6 +20,7 @@ import { ShareTutorialModal } from "./ShareTutorialModal";
 import { ViewCodeDiffModal } from "./ViewCodeDiffModal";
 import { VersionOptInOperationModal } from "./VersionOptInOperationModal";
 
+import { DeleteAssetModal } from "./async-flow-modals/DeleteAssetModal";
 export const AllModals = () => {
   return (
     <>
@@ -41,6 +42,7 @@ export const AllModals = () => {
       <GoogleGetFilenameFromUserModal />
       <ShareTutorialModal />
       <ViewCodeDiffModal />
+      <DeleteAssetModal />
     </>
   );
 };
