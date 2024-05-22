@@ -386,14 +386,14 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       actions.setTaskState(pendingTaskState);
 
-      let successfulImports: Array<SuccessfulFileImport> = [];
+      let successes: Array<SuccessfulFileImport> = [];
       let failures: Array<FileProcessingFailure> = [];
 
       for (const file of files) {
         let filename = valueCell<string>("<file with unknown name>");
         try {
           const importResult = await tryImportAsyncFile(filename, file);
-          successfulImports.push(importResult);
+          successes.push(importResult);
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           e: any
@@ -404,7 +404,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       }
 
       const message = files.length === 0 ? "No files selected." : undefined;
-      const taskSuccesses = successfulImports.map(
+      const taskSuccesses = successes.map(
         (success) => `Imported "${success.filename}"`
       );
       const taskFailures = failures.map(
@@ -424,7 +424,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       }
 
       if (nFailures === 0 && nSuccesses === 1) {
-        const soleProjectId = successfulImports[0].projectId;
+        const soleProjectId = successes[0].projectId;
         allActions.navigationRequestQueue.enqueue({
           path: `/ide/${soleProjectId}`,
         });
