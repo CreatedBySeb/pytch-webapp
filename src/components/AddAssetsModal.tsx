@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useStoreActions, useStoreState } from "../store";
 import { assertNever } from "../utils";
-import { ChooseFiles } from "./ChooseFiles";
+import { ChooseFiles, tmpStatusFromOld } from "./ChooseFiles";
 import { FileProcessingFailures } from "./FileProcessingFailures";
 
 export const AddAssetsModal = () => {
@@ -15,9 +15,12 @@ export const AddAssetsModal = () => {
     (state) =>
       state.userConfirmations.addAssetsInteraction.operationContext.assetPlural
   );
+  const [chosenFiles, setChosenFiles] = useState<FileList | null>(null);
 
   switch (state.status) {
     case "idle":
+      // Ensure state has been reset ready for next time:
+      if (chosenFiles != null) setChosenFiles(null);
       return null;
     case "awaiting-user-choice":
     case "trying-to-process": {
@@ -26,10 +29,11 @@ export const AddAssetsModal = () => {
 
       return (
         <ChooseFiles
+          {...{ chosenFiles, setChosenFiles }}
           titleText={titleText}
           introText={introText}
           actionButtonText="Add to project"
-          status={state.status}
+          status={tmpStatusFromOld(state.status)}
           tryProcess={(files) => tryProcess(files)}
           dismiss={() => dismiss()}
         />
