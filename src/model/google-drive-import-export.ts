@@ -29,6 +29,7 @@ import {
   applyFormatSpecifier,
   uniqueUserInputFragment,
 } from "./compound-text-input";
+import { NavigationAbandonmentGuard } from "../navigation-abandonment-guard";
 
 type ExportProjectDescriptor = {
   project: StoredProjectContent;
@@ -301,16 +302,26 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         return assertNever(authState);
     }
 
+    const navGuard = new NavigationAbandonmentGuard();
+    try {
     const abortController = new AbortController();
     actions.setAuthState({ kind: "pending", abortController });
     const signal = abortController.signal;
     const tokenInfoPromise = api.acquireToken({ signal });
-    const tokenInfo = await tokenInfoPromise;
+    const tokenInfo = await navGuard.throwIfAbandoned(tokenInfoPromise);
     const userInfoPromise = api.getUserInfo(tokenInfo);
-    const user = await userInfoPromise;
+    const user = await navGuard.throwIfAbandoned(userInfoPromise);
     const authInfo = { tokenInfo, user };
     actions.setAuthState({ kind: "succeeded", info: authInfo });
     return authInfo;
+    } catch (error) {
+      if (navGuard.wasAbandoned(error)) {
+        actions.setAuthState({ kind: "idle" });
+      }
+      throw error;
+    } finally {
+      navGuard.exit();
+    }
   }),
 
   doTask: thunk(async (actions, task) => {
