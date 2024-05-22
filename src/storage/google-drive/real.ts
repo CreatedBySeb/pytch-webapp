@@ -24,6 +24,7 @@ import {
   GoogleUserInfo,
   TokenInfo,
   AcquireTokenOptions,
+  ImportFilesFlow,
 } from "./shared";
 
 const loadGapiClient = (gapi: any, libraries: string): Promise<void> =>
@@ -106,7 +107,7 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
     return { name, mimeType, data };
   };
 
-  function importFiles(tokenInfo: TokenInfo): Promise<Array<AsyncFile>> {
+  function importFiles(tokenInfo: TokenInfo): ImportFilesFlow {
     const builder = new google.picker.PickerBuilder()
       .enableFeature(google.picker.Feature.NAV_HIDDEN)
       .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
@@ -158,7 +159,12 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
     const picker = builder.build();
     picker.setVisible(true);
 
-    return files;
+    function cancel() {
+      picker.setVisible(false);
+      picker.dispose();
+    }
+
+    return { cancel, files };
   }
 
   const exportFile = async (
