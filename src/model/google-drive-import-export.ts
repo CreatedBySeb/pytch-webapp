@@ -288,7 +288,12 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         throw new Error(`ensureAuthenticated(): bad state "pending"`);
       case "succeeded":
         return authState.info;
-      case "idle": {
+      case "idle":
+        break; // Real-work case handled in main body below.
+      default:
+        return assertNever(authState);
+    }
+
         const abortController = new AbortController();
         actions.setAuthState({ kind: "pending", abortController });
         const signal = abortController.signal;
@@ -297,10 +302,6 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         const authInfo = { tokenInfo, user };
         actions.setAuthState({ kind: "succeeded", info: authInfo });
         return authInfo;
-      }
-      default:
-        return assertNever(authState);
-    }
   }),
 
   doTask: thunk(async (actions, task) => {
