@@ -107,9 +107,22 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
   };
 
   function importFiles(tokenInfo: TokenInfo): Promise<Array<AsyncFile>> {
-    const token = tokenInfo.token;
+    const builder = new google.picker.PickerBuilder()
+      .enableFeature(google.picker.Feature.NAV_HIDDEN)
+      .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+      .setDeveloperKey(kApiKey())
+      .setAppId(kAppId());
 
-    return new Promise((resolve, reject) => {
+    const token = tokenInfo.token;
+    builder.setOAuthToken(token);
+
+    // The standard mime-type for zip files is "application/zip", but
+    // it seems Windows uses "application/x-zip-compressed".
+    let docsView = new google.picker.View(google.picker.ViewId.DOCS);
+    docsView.setMimeTypes("application/zip,application/x-zip-compressed");
+    builder.addView(docsView);
+
+    const files = new Promise<Array<AsyncFile>>((resolve, reject) => {
       const callback = async (data: any) => {
         switch (data.action) {
           case google.picker.Action.PICKED: {
@@ -139,23 +152,13 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
         }
       };
 
-      let docsView = new google.picker.View(google.picker.ViewId.DOCS);
-      // The standard mime-type for zip files is "application/zip", but
-      // it seems Windows uses "application/x-zip-compressed".
-      docsView.setMimeTypes("application/zip,application/x-zip-compressed");
-
-      const builder = new google.picker.PickerBuilder()
-        .enableFeature(google.picker.Feature.NAV_HIDDEN)
-        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-        .setDeveloperKey(kApiKey())
-        .setAppId(kAppId())
-        .setOAuthToken(token)
-        .addView(docsView)
-        .setCallback(callback);
-
-      const picker = builder.build();
-      picker.setVisible(true);
+      builder.setCallback(callback);
     });
+
+    const picker = builder.build();
+    picker.setVisible(true);
+
+    return files;
   }
 
   const exportFile = async (
