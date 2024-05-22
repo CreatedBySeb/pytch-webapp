@@ -8,7 +8,7 @@ import {
   ActorKind,
   AssetMetaDataOps,
 } from "../../model/junior/structured-program";
-import { useStoreActions, useStoreState } from "../../store";
+import { useStoreState } from "../../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { AssetThumbnail } from "../AssetThumbnail";
 import { useAssetCardDrag, useAssetCardDrop } from "./hooks";
@@ -56,9 +56,7 @@ const DeleteDropdownItem: React.FC<DeleteDropdownItemProps> = ({
   displayName,
   isAllowed,
 }) => {
-  const launchDeleteAction = useStoreActions(
-    (actions) => actions.userConfirmations.launchDeleteAsset
-  );
+  const launchDeleteAction = useFlowActions((f) => f.deleteAssetFlow.run);
 
   const onDelete = async () => {
     if (!isAllowed) {
@@ -69,9 +67,9 @@ const DeleteDropdownItem: React.FC<DeleteDropdownItemProps> = ({
     // Slight hack: We're relying on the internal assetKind name to be
     // suitable for display use.
     launchDeleteAction({
-      assetKindDisplayName: assetKind,
-      assetName: fullPathname,
-      assetDisplayName: displayName,
+      kindDisplayName: assetKind,
+      name: fullPathname,
+      displayName,
     });
   };
 
