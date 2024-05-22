@@ -436,12 +436,20 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       api,
       tokenInfo
     ): Promise<TaskOutcome> => {
+      const navGuard = new NavigationAbandonmentGuard();
+
+      // Will be overwritten when launching importFiles():
+      let abandonImport: () => void = () => void 0;
+
+      try {
       const pendingTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
-      const { files: filesPromise } = api.importFiles(tokenInfo);
+      const { cancel: cancelImportFiles, files: filesPromise } =
+        api.importFiles(tokenInfo);
+      abandonImport = cancelImportFiles;
 
-      const files = await filesPromise;
+      const files = await navGuard.throwIfAbandoned(filesPromise);
 
       actions.setTaskState(pendingTaskState);
 
@@ -451,13 +459,18 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       for (const file of files) {
         let filename = valueCell<string>("<file with unknown name>");
         try {
-          const importResult = await tryImportAsyncFile(filename, file);
+          const importResult = await navGuard.throwIfAbandoned(
+            tryImportAsyncFile(filename, file)
+          );
           successes.push(importResult);
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           e: any
         ) {
           console.error("importProjects():", filename, e);
+          if (navGuard.wasAbandoned(e)) {
+            throw e;
+          }
           failures.push({ filename: filename.get(), reason: e.message });
         }
       }
@@ -491,6 +504,14 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       console.log("importProjects(): returning", outcome);
       return outcome;
+      } catch (error) {
+        if (navGuard.wasAbandoned(error)) {
+          abandonImport();
+        }
+        throw error;
+      } finally {
+        navGuard.exit();
+      }
     };
 
     actions.doTask({ summary: "Import from Google Drive", run });
