@@ -5,6 +5,12 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import { failIfNull } from "../utils";
 
+export function tmpStatusFromOld(
+  oldStatus: "awaiting-user-choice" | "trying-to-process"
+): "interacting" | "attempting" {
+  return oldStatus === "awaiting-user-choice" ? "interacting" : "attempting";
+}
+
 export const ChooseFiles: React.FC<{
   titleText: string;
   introText: string;
