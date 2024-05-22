@@ -328,6 +328,8 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     const api = actions.requireBooted();
     const summary = task.summary;
 
+    const navGuard = new NavigationAbandonmentGuard();
+
     const { promise: notificationDismissal, resolve: dismissNotification } =
       promiseAndResolve();
 
@@ -346,6 +348,9 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       console.log("doTask(): caught", err);
       const errMessage = (err as Error).message;
 
+      if (navGuard.wasAbandoned(err)) {
+        actions.setTaskState({ kind: "idle" });
+      } else {
       // It might not be the case that auth failed.  But one likely
       // reason for error is that auth has become invalid, so it might
       // be useful to throw away token and hope it works next time.
@@ -361,10 +366,20 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         outcome,
         dismissNotification,
       });
+      }
     }
 
-    await notificationDismissal;
+    try {
+    await navGuard.throwIfAbandoned(notificationDismissal);
+    } catch (error) {
+      // Ignore "abandoned" errors but re-throw others (although there
+      // shouldn't be any others).
+      if (!navGuard.wasAbandoned(error)) {
+        throw error;
+      }
+    } finally {
     actions.setTaskState({ kind: "idle" });
+    }
   }),
 
   exportProject: thunk(async (actions, descriptor) => {
