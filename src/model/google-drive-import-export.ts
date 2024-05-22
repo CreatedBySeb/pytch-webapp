@@ -294,14 +294,14 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         return assertNever(authState);
     }
 
-        const abortController = new AbortController();
-        actions.setAuthState({ kind: "pending", abortController });
-        const signal = abortController.signal;
-        const tokenInfo = await api.acquireToken({ signal });
-        const user = await api.getUserInfo(tokenInfo);
-        const authInfo = { tokenInfo, user };
-        actions.setAuthState({ kind: "succeeded", info: authInfo });
-        return authInfo;
+    const abortController = new AbortController();
+    actions.setAuthState({ kind: "pending", abortController });
+    const signal = abortController.signal;
+    const tokenInfo = await api.acquireToken({ signal });
+    const user = await api.getUserInfo(tokenInfo);
+    const authInfo = { tokenInfo, user };
+    actions.setAuthState({ kind: "succeeded", info: authInfo });
+    return authInfo;
   }),
 
   doTask: thunk(async (actions, task) => {
