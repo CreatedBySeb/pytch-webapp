@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useStoreActions, useStoreState } from "../store";
 import { assertNever } from "../utils";
-import { ChooseFiles } from "./ChooseFiles";
+import { ChooseFiles, tmpStatusFromOld } from "./ChooseFiles";
 import { FileProcessingFailures } from "./FileProcessingFailures";
 
 export const UploadZipfilesModal = () => {
@@ -26,7 +26,7 @@ export const UploadZipfilesModal = () => {
           titleText="Upload project zipfiles"
           introText="Choose zipfiles to upload as new projects."
           actionButtonText="Upload"
-          status={state.status}
+          status={tmpStatusFromOld(state.status)}
           tryProcess={(files) => tryProcess(files)}
           dismiss={() => dismiss()}
         />
