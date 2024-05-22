@@ -71,6 +71,10 @@ import {
   deleteProjectFlow,
   DeleteProjectFlow,
 } from "./user-interactions/delete-project";
+import {
+  DeleteManyProjectsFlow,
+  deleteManyProjectsFlow,
+} from "./user-interactions/delete-many-projects";
 
 /** Choices the user has made about how the IDE should be laid out.
  * Currently this is just a choice between two layouts, but in due
@@ -421,6 +425,7 @@ export interface IUserConfirmations {
   launchDeleteJuniorHandler: DangerousActionThunk<DeleteJuniorHandlerDescriptor>;
   deleteAssetFlow: DeleteAssetFlow;
   deleteProjectFlow: DeleteProjectFlow;
+  deleteManyProjectsFlow: DeleteManyProjectsFlow;
 
   createProjectFlow: CreateProjectFlow;
   addAssetsFlow: AddAssetsFlow;
@@ -536,6 +541,7 @@ export const userConfirmations: IUserConfirmations = {
   }),
   deleteAssetFlow,
   deleteProjectFlow,
+  deleteManyProjectsFlow,
 
   createProjectFlow,
   addAssetsFlow,
