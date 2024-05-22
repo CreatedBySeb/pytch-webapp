@@ -1,20 +1,20 @@
-import React from "react";
+import React, { ChangeEventHandler } from "react";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { useState } from "react";
 import Spinner from "react-bootstrap/Spinner";
+import { failIfNull } from "../utils";
 
 export const ChooseFiles: React.FC<{
   titleText: string;
   introText: string;
   actionButtonText: string;
   status: "awaiting-user-choice" | "trying-to-process";
+  chosenFiles: FileList | null;
+  setChosenFiles: (files: FileList) => void;
   tryProcess: (files: FileList) => void;
   dismiss: () => void;
 }> = (props) => {
-  const [atLeastOneFileChosen, setAtLeastOneFileChosen] = useState(false);
-
   const isAwaiting = props.status === "awaiting-user-choice";
   const isTrying = props.status === "trying-to-process";
 
@@ -23,21 +23,24 @@ export const ChooseFiles: React.FC<{
 
   const fileInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
-  const handleFileSelection = () => {
-    const files = fileInputRef.current?.files;
-    if (files != null) {
-      setAtLeastOneFileChosen(files.length > 0);
-    }
+  const handleFileSelection: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const files = failIfNull(e.target.files, 'no "files" in element');
+    props.setChosenFiles(files);
   };
 
   const handleAdd = () => {
-    const files = fileInputRef.current?.files;
+    const files = props.chosenFiles;
+    // As far as flow analysis is concerned, the "atLeastOneFileChosen"
+    // value computed below might be stale, so re-check:
     if (files == null || files.length === 0) {
       console.warn("trying to process missing/empty list of files");
       return;
     }
     props.tryProcess(files);
   };
+
+  const atLeastOneFileChosen =
+    props.chosenFiles != null && props.chosenFiles.length > 0;
 
   const modalContent = (
     <>
