@@ -13,7 +13,7 @@ export const ChooseFiles: React.FC<{
   tryProcess: (files: FileList) => void;
   dismiss: () => void;
 }> = (props) => {
-  const [filesChosen, setFilesChosen] = useState(false);
+  const [atLeastOneFileChosen, setAtLeastOneFileChosen] = useState(false);
 
   const isAwaiting = props.status === "awaiting-user-choice";
   const isTrying = props.status === "trying-to-process";
@@ -26,7 +26,7 @@ export const ChooseFiles: React.FC<{
   const handleFileSelection = () => {
     const files = fileInputRef.current?.files;
     if (files != null) {
-      setFilesChosen(files.length > 0);
+      setAtLeastOneFileChosen(files.length > 0);
     }
   };
 
@@ -56,7 +56,11 @@ export const ChooseFiles: React.FC<{
         <Button variant="secondary" onClick={() => props.dismiss()}>
           Cancel
         </Button>
-        <Button disabled={!filesChosen} variant="primary" onClick={handleAdd}>
+        <Button
+          disabled={!atLeastOneFileChosen}
+          variant="primary"
+          onClick={handleAdd}
+        >
           {props.actionButtonText}
         </Button>
       </Modal.Footer>
