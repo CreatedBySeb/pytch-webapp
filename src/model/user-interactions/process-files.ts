@@ -1,5 +1,5 @@
 export type FileProcessingFailure = {
-  fileName: string;
+  filename: string;
   reason: string;
 };
 

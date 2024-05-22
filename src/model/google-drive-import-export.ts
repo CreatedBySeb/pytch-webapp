@@ -6,7 +6,7 @@ import {
   wrappedError,
   zipfileDataFromProject,
 } from "../storage/zipfile";
-import { assertNever, propSetterAction } from "../utils";
+import { ValueCell, assertNever, propSetterAction, valueCell } from "../utils";
 import { LinkedContentLoadingState, StoredProjectContent } from "./project";
 import { ProjectId } from "./project-core";
 import { FileProcessingFailure } from "./user-interactions/process-files";
@@ -130,13 +130,13 @@ let chooseFilenameFlow: ChooseFilenameFlow = {
 
   _resolve: thunk((actions, outcome, helpers) => {
     const state = helpers.getState();
-    ensureFlowState("submit", state, "active");
+    ensureFlowState("_resolve", state, "active");
     state.state.resolve(outcome);
     actions.setIdle();
   }),
 
   setUserInput: action((state, userInput) => {
-    ensureFlowState("setCurrentFilename", state, "active");
+    ensureFlowState("setUserInput", state, "active");
     state.state.userInput = userInput;
   }),
 
@@ -157,12 +157,12 @@ let chooseFilenameFlow: ChooseFilenameFlow = {
 
   cancel: thunk((actions, _voidPayload, helpers) => {
     const state = helpers.getState();
-    ensureFlowState("submit", state, "active");
+    ensureFlowState("cancel", state, "active");
     actions._resolve({ kind: "cancelled" });
   }),
 
   outcome: thunk((actions, formatSpecifier, helpers) => {
-    ensureFlowState("chosenFilename", helpers.getState(), "idle");
+    ensureFlowState("outcome", helpers.getState(), "idle");
     const userInput = uniqueUserInputFragment(formatSpecifier).initialValue;
     return new Promise<ChooseFilenameOutcome>((resolve) => {
       actions.setState({
@@ -210,6 +210,35 @@ export type GoogleDriveIntegration = {
   exportProject: Thunk<GoogleDriveIntegration, ExportProjectDescriptor>;
   importProjects: Thunk<GoogleDriveIntegration, void, void, IPytchAppModel>;
 };
+
+type SuccessfulFileImport = {
+  filename: string;
+  projectId: ProjectId;
+};
+
+async function tryImportAsyncFile(
+  filenameCell: ValueCell<string>,
+  file: AsyncFile
+): Promise<SuccessfulFileImport> {
+  // Any of the following might throw an error:
+  const filename = await file.name();
+  filenameCell.set(filename);
+
+  const zipData = await file.data();
+  const projectInfo = await projectDescriptor(filename, zipData);
+
+  // This clunky try/catch ensures consistency in how we
+  // present error messages to the user in case of errors
+  // occurring during project or asset creation.
+  try {
+    // The types overlap so can use projectInfo as creationOptions:
+    const project = await createNewProject(projectInfo.name, projectInfo);
+    const projectId = project.id;
+    return { filename, projectId };
+  } catch (err) {
+    throw wrappedError(err as Error);
+  }
+}
 
 export let googleDriveIntegration: GoogleDriveIntegration = {
   apiBootStatus: { kind: "not-yet-started" },
@@ -259,19 +288,22 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         throw new Error(`ensureAuthenticated(): bad state "pending"`);
       case "succeeded":
         return authState.info;
-      case "idle": {
-        const abortController = new AbortController();
-        actions.setAuthState({ kind: "pending", abortController });
-        const signal = abortController.signal;
-        const tokenInfo = await api.acquireToken({ signal });
-        const user = await api.getUserInfo(tokenInfo);
-        const authInfo = { tokenInfo, user };
-        actions.setAuthState({ kind: "succeeded", info: authInfo });
-        return authInfo;
-      }
+      case "idle":
+        break; // Real-work case handled in main body below.
       default:
         return assertNever(authState);
     }
+
+    const abortController = new AbortController();
+    actions.setAuthState({ kind: "pending", abortController });
+    const signal = abortController.signal;
+    const tokenInfoPromise = api.acquireToken({ signal });
+    const tokenInfo = await tokenInfoPromise;
+    const userInfoPromise = api.getUserInfo(tokenInfo);
+    const user = await userInfoPromise;
+    const authInfo = { tokenInfo, user };
+    actions.setAuthState({ kind: "succeeded", info: authInfo });
+    return authInfo;
   }),
 
   doTask: thunk(async (actions, task) => {
@@ -309,11 +341,13 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         formatSpecifier
       );
 
-      if (chooseFilenameOutcome.kind === "cancelled")
-        return {
+      if (chooseFilenameOutcome.kind === "cancelled") {
+        const cancelledOutcome: TaskOutcome = {
           successes: [],
           failures: ["User cancelled export"],
         };
+        return cancelledOutcome;
+      }
 
       const rawFilename = chooseFilenameOutcome.filename;
       const filename = rawFilename.endsWith(".zip")
@@ -328,10 +362,11 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
 
       await api.exportFile(tokenInfo, file);
 
-      return {
+      const successOutcome: TaskOutcome = {
         successes: [`Project exported to "${filename}"`],
         failures: [],
       };
+      return successOutcome;
     };
 
     actions.doTask({ summary: "Export to Google Drive", run });
@@ -341,61 +376,42 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     const allActions = helpers.getStoreActions();
 
     // Any errors thrown from run() will be caught by doTask().
-    const run: GoogleDriveTask = async (api, tokenInfo) => {
-      type SuccessfulImport = {
-        filename: string;
-        projectId: ProjectId;
-      };
-
-      const savedTaskState = helpers.getState().taskState;
+    const run: GoogleDriveTask = async (
+      api,
+      tokenInfo
+    ): Promise<TaskOutcome> => {
+      const pendingTaskState = helpers.getState().taskState;
       actions.setTaskState({ kind: "pending-already-modal" });
 
       const { files: filesPromise } = api.importFiles(tokenInfo);
 
       const files = await filesPromise;
 
-      actions.setTaskState(savedTaskState);
+      actions.setTaskState(pendingTaskState);
 
-      let successfulImports: Array<SuccessfulImport> = [];
+      let successes: Array<SuccessfulFileImport> = [];
       let failures: Array<FileProcessingFailure> = [];
 
       for (const file of files) {
-        let fileName = "<file with unknown name>";
+        let filename = valueCell<string>("<file with unknown name>");
         try {
-          // Either of the following might throw an error:
-          fileName = await file.name();
-          const zipData = await file.data();
-          const projectInfo = await projectDescriptor(fileName, zipData);
-
-          // This clunky nested try/catch ensures consistency in how we
-          // present error messages to the user in case of errors
-          // occurring during project or asset creation.
-          try {
-            // The types overlap so can use projectInfo as creationOptions:
-            const project = await createNewProject(
-              projectInfo.name,
-              projectInfo
-            );
-            const projectId = project.id;
-            successfulImports.push({ filename: fileName, projectId });
-          } catch (err) {
-            throw wrappedError(err as Error);
-          }
+          const importResult = await tryImportAsyncFile(filename, file);
+          successes.push(importResult);
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           e: any
         ) {
-          console.error("importProjects():", fileName, e);
-          failures.push({ fileName, reason: e.message });
+          console.error("importProjects():", filename, e);
+          failures.push({ filename: filename.get(), reason: e.message });
         }
       }
 
       const message = files.length === 0 ? "No files selected." : undefined;
-      const taskSuccesses = successfulImports.map(
+      const taskSuccesses = successes.map(
         (success) => `Imported "${success.filename}"`
       );
       const taskFailures = failures.map(
-        (failure) => `"${failure.fileName}" — ${failure.reason}`
+        (failure) => `"${failure.filename}" — ${failure.reason}`
       );
       const outcome: TaskOutcome = {
         message,
@@ -403,15 +419,15 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         failures: taskFailures,
       };
 
-      const nSuccesses = successfulImports.length;
-      const nFailures = failures.length;
+      const nSuccesses = taskSuccesses.length;
+      const nFailures = taskFailures.length;
 
       if (nSuccesses > 0) {
         allActions.projectCollection.noteDatabaseChange();
       }
 
       if (nFailures === 0 && nSuccesses === 1) {
-        const soleProjectId = successfulImports[0].projectId;
+        const soleProjectId = successes[0].projectId;
         allActions.navigationRequestQueue.enqueue({
           path: `/ide/${soleProjectId}`,
         });

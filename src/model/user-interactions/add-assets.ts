@@ -102,7 +102,7 @@ async function attempt(
         file.name,
         error as Error
       );
-      failures.push({ fileName: file.name, reason });
+      failures.push({ filename: file.name, reason });
     }
   }
 

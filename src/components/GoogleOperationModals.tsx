@@ -1,7 +1,7 @@
 import { Button, Modal, Spinner } from "react-bootstrap";
 import { useStoreState, useStoreActions } from "../store";
 import React, { useEffect } from "react";
-import { assertNever } from "../utils";
+import { assertNever, discardReturnValue } from "../utils";
 import { GoogleUserInfo } from "../storage/google-drive/shared";
 import { CompoundTextInput } from "./CompoundTextInput";
 
@@ -90,13 +90,11 @@ export const GoogleAuthenticationStatusModal = () => {
   const authState = useStoreState(
     (state) => state.googleDriveImportExport.authState
   );
-  const maybeBoot = useStoreActions(
-    (actions) => actions.googleDriveImportExport.maybeBoot
+  const maybeBoot = useStoreActions((actions) =>
+    discardReturnValue(actions.googleDriveImportExport.maybeBoot)
   );
 
-  useEffect(() => {
-    maybeBoot();
-  });
+  useEffect(maybeBoot);
 
   switch (authState.kind) {
     case "succeeded":
