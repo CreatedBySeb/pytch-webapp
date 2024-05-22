@@ -30,12 +30,14 @@ export const ChooseFiles: React.FC<{
 
   const handleAdd = () => {
     const files = props.chosenFiles;
+
     // As far as flow analysis is concerned, the "atLeastOneFileChosen"
     // value computed below might be stale, so re-check:
     if (files == null || files.length === 0) {
       console.warn("trying to process missing/empty list of files");
       return;
     }
+
     props.tryProcess(files);
   };
 
