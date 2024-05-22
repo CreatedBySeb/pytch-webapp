@@ -217,15 +217,15 @@ type SuccessfulFileImport = {
 };
 
 async function tryImportAsyncFile(
-  fileNameCell: ValueCell<string>,
+  filenameCell: ValueCell<string>,
   file: AsyncFile
 ): Promise<SuccessfulFileImport> {
   // Any of the following might throw an error:
-  const fileName = await file.name();
-  fileNameCell.set(fileName);
+  const filename = await file.name();
+  filenameCell.set(filename);
 
   const zipData = await file.data();
-  const projectInfo = await projectDescriptor(fileName, zipData);
+  const projectInfo = await projectDescriptor(filename, zipData);
 
   // This clunky try/catch ensures consistency in how we
   // present error messages to the user in case of errors
@@ -234,7 +234,7 @@ async function tryImportAsyncFile(
     // The types overlap so can use projectInfo as creationOptions:
     const project = await createNewProject(projectInfo.name, projectInfo);
     const projectId = project.id;
-    return { filename: fileName, projectId };
+    return { filename, projectId };
   } catch (err) {
     throw wrappedError(err as Error);
   }
@@ -390,16 +390,16 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       let failures: Array<FileProcessingFailure> = [];
 
       for (const file of files) {
-        let fileName = valueCell<string>("<file with unknown name>");
+        let filename = valueCell<string>("<file with unknown name>");
         try {
-          const importResult = await tryImportAsyncFile(fileName, file);
+          const importResult = await tryImportAsyncFile(filename, file);
           successfulImports.push(importResult);
         } catch (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           e: any
         ) {
-          console.error("importProjects():", fileName, e);
-          failures.push({ fileName: fileName.get(), reason: e.message });
+          console.error("importProjects():", filename, e);
+          failures.push({ fileName: filename.get(), reason: e.message });
         }
       }
 
