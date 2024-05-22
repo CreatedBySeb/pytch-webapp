@@ -306,6 +306,12 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     try {
       const abortController = new AbortController();
       actions.setAuthState({ kind: "pending", abortController });
+
+      // TODO: Could the abort-controller mechanism be replaced with a
+      // Promise.race() of the acquireToken() promise and a "user
+      // cancelled" promise which the "pending"-state dialog can
+      // resolve/reject?
+
       const signal = abortController.signal;
       const tokenInfoPromise = api.acquireToken({ signal });
       const tokenInfo = await navGuard.throwIfAbandoned(tokenInfoPromise);
@@ -334,9 +340,18 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       promiseAndResolve();
 
     try {
+      // ensureAuthenticated() has its own navigation-guard logic; it
+      // can succeed, throw an "abandoned by navigation" error, or throw
+      // a business-logic error.
       const { tokenInfo, user } = await actions.ensureAuthenticated();
+
       actions.setTaskState({ kind: "pending", user, summary });
+
+      // run() also has its own navigation-guard logic; it can succeed,
+      // throw an "abandoned by navigation" error, or throw a
+      // business-logic error.
       const outcome = await task.run(api, tokenInfo);
+
       actions.setTaskState({
         kind: "done",
         user,
@@ -355,6 +370,11 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         // reason for error is that auth has become invalid, so it might
         // be useful to throw away token and hope it works next time.
         // TODO: Is this reasonable?
+        //
+        // This also covers the case that the user cancels our modal
+        // dialog for the authentication flow, in which case returning to
+        // "idle" is correct.
+        //
         actions.setAuthState({ kind: "idle" });
 
         const outcome = { successes: [], failures: [errMessage] };
