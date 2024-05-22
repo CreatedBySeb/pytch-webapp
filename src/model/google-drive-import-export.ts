@@ -297,8 +297,10 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
     const abortController = new AbortController();
     actions.setAuthState({ kind: "pending", abortController });
     const signal = abortController.signal;
-    const tokenInfo = await api.acquireToken({ signal });
-    const user = await api.getUserInfo(tokenInfo);
+    const tokenInfoPromise = api.acquireToken({ signal });
+    const tokenInfo = await tokenInfoPromise;
+    const userInfoPromise = api.getUserInfo(tokenInfo);
+    const user = await userInfoPromise;
     const authInfo = { tokenInfo, user };
     actions.setAuthState({ kind: "succeeded", info: authInfo });
     return authInfo;
