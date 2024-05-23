@@ -7,7 +7,7 @@ import { DisplayScreenshotModal } from "./DisplayScreenshotModal";
 import { DownloadZipfileModal } from "./DownloadZipfileModal";
 import { UploadZipfilesModal } from "./UploadZipfilesModal";
 import { CodeDiffHelpModal } from "./async-flow-modals/CodeDiffHelpModal";
-import { CopyProjectModal } from "./CopyProjectModal";
+import { CopyProjectModal } from "./async-flow-modals/CopyProjectModal";
 import { CropScaleImageModal } from "./CropScaleImageModal";
 import { AddClipArtModal } from "./async-flow-modals/AddClipArtModal";
 import {
