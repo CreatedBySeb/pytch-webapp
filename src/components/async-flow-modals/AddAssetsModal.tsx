@@ -1,11 +1,11 @@
 import React from "react";
-import { ChooseFiles } from "./ChooseFiles";
-import { FileProcessingFailures } from "./FileProcessingFailures";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { settleFunctions } from "../model/user-interactions/async-user-flow";
-import { FileFailureError } from "../model/user-interactions/process-files";
-import { GenericWorkingModal } from "./async-flow-modals/GenericWorkingModal";
-import { useFlowActions, useFlowState } from "../model";
+import { asyncFlowModal } from "./utils";
+import { useFlowActions, useFlowState } from "../../model";
+import { ChooseFiles } from "../ChooseFiles";
+import { FileProcessingFailures } from "../FileProcessingFailures";
+import { settleFunctions } from "../../model/user-interactions/async-user-flow";
+import { FileFailureError } from "../../model/user-interactions/process-files";
+import { GenericWorkingModal } from "./GenericWorkingModal";
 
 export const AddAssetsModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.addAssetsFlow);
