@@ -8,7 +8,7 @@ import { DownloadZipfileModal } from "./DownloadZipfileModal";
 import { UploadZipfilesModal } from "./UploadZipfilesModal";
 import { CodeDiffHelpModal } from "./async-flow-modals/CodeDiffHelpModal";
 import { CopyProjectModal } from "./async-flow-modals/CopyProjectModal";
-import { CropScaleImageModal } from "./CropScaleImageModal";
+import { CropScaleImageModal } from "./async-flow-modals/CropScaleImageModal";
 import { AddClipArtModal } from "./async-flow-modals/AddClipArtModal";
 import {
   GoogleAuthenticationStatusModal,

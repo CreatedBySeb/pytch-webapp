@@ -4,24 +4,24 @@ import ReactCrop from "react-image-crop";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
+import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
 
 import { Crop as ReactCropSpec } from "react-image-crop";
-import { ImageCropSourceDescriptor, ImageDimensions } from "../model/asset";
+import { ImageCropSourceDescriptor, ImageDimensions } from "../../model/asset";
 import {
   effectiveCropFromDisplayedCrop,
   zeroCrop,
-} from "../model/user-interactions/crop-scale-image";
+} from "../../model/user-interactions/crop-scale-image";
 
 import "react-image-crop/dist/ReactCrop.css";
-import { asyncFlowModal } from "./async-flow-modals/utils";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 import {
   isInteractable,
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { useFlowActions, useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../../model";
 
 // The react-image-crop interface works in percentages but the model
 // state and the transformation functions work in proportions.  And the
