@@ -1,6 +1,6 @@
-import { useJrEditState } from "../Junior/hooks";
-import { GenericConfirmActionModal } from "./GenericConfirmActionModal";
-import { asyncFlowModal } from "./utils";
+import { useJrEditState } from "../../Junior/hooks";
+import { GenericConfirmActionModal } from "../../async-flow-modals/GenericConfirmActionModal";
+import { asyncFlowModal } from "../../async-flow-modals/utils";
 
 export const DeleteSpriteModal = () => {
   const { fsmState } = useJrEditState((a) => a.deleteSpriteFlow);
