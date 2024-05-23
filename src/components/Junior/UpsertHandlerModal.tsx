@@ -10,7 +10,7 @@ import {
   StructuredProgramOps,
 } from "../../model/junior/structured-program";
 import { submitOnEnterKeyFun } from "../../utils";
-import { KeyChoiceModal } from "./KeyChoiceModal";
+import { KeyChoiceModal } from "./async-flow-modals/KeyChoiceModal";
 import { useJrEditActions, useJrEditState, useMappedProgram } from "./hooks";
 import classNames from "classnames";
 import {

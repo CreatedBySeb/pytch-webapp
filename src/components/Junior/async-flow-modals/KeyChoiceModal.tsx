@@ -5,7 +5,7 @@ import classNames from "classnames";
 import {
   KeyDescriptor,
   keyboardLayout,
-} from "../../model/junior/keyboard-layout";
+} from "../../../model/junior/keyboard-layout";
 
 type KeyOptionProps = {
   descriptor: KeyDescriptor;
