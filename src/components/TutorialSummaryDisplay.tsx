@@ -9,7 +9,7 @@ import Button from "react-bootstrap/Button";
 import LoadingOverlay from "./LoadingOverlay";
 import { PytchProgramKind } from "../model/pytch-program";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 interface TutorialSummaryDisplayProps {
   tutorial: ITutorialSummary;
@@ -27,7 +27,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
     (actions) => actions.tutorialCollection.createDemoFromTutorial
   );
 
-  const shareTutorial = useFlowActions((f) => f.shareTutorialFlow.run);
+  const runShareTutorial = useRunFlow((f) => f.shareTutorialFlow);
 
   const alertRef: React.RefObject<HTMLDivElement> = createRef();
   const buttonsRef: React.RefObject<HTMLDivElement> = createRef();
@@ -67,7 +67,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
 
   const launchShare = () => {
     const shareInfo = { slug: tutorial.slug, displayName, programKind };
-    shareTutorial(shareInfo);
+    runShareTutorial(shareInfo);
   };
 
   const showDemoButton =

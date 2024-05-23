@@ -13,7 +13,7 @@ import { makeScratchSVG } from "../model/scratchblocks-render";
 
 import "../pytch-tutorial.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 type NavigationDirection = "prev" | "next";
 
@@ -284,7 +284,7 @@ const diffSamples = (tables: Array<HTMLTableElement>): DiffHelpSamples => {
 };
 
 const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
-  const showHelp = useFlowActions((f) => f.codeDiffHelpFlow.run);
+  const runCodeDiffHelp = useRunFlow((f) => f.codeDiffHelpFlow);
 
   let divCopy = div.cloneNode(true) as HTMLDivElement;
 
@@ -337,7 +337,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
     <div className="patch-container" onCopy={convertDotsToSpaces}>
       <div className="header">
         <h1 className="decoration">Change the code like this:</h1>
-        <Button onClick={() => showHelp({ samples })}>
+        <Button onClick={() => runCodeDiffHelp({ samples })}>
           <FontAwesomeIcon icon="question-circle" />
         </Button>
       </div>

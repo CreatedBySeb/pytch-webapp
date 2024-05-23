@@ -9,7 +9,7 @@ import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -138,21 +138,21 @@ export const StageControls: React.FC<EmptyProps> = () => {
 
   const handleSave = () => requestSyncToStorage();
 
-  const launchScreenshot = useFlowActions((f) => f.displayScreenshotFlow.run);
-  const onScreenshot = () => launchScreenshot();
+  const runDisplayScreenshot = useRunFlow((f) => f.displayScreenshotFlow);
+  const onScreenshot = () => runDisplayScreenshot();
 
-  const launchDownloadZip = useFlowActions((f) => f.downloadZipfileFlow.run);
+  const runDownloadZipfiles = useRunFlow((f) => f.downloadZipfileFlow);
   const formatSpecifier = filenameFormatSpecifier(linkedContentLoadingState);
-  const onDownload = () => launchDownloadZip({ project, formatSpecifier });
+  const onDownload = () => runDownloadZipfiles({ project, formatSpecifier });
 
   const initiateButtonTour = useStoreActions(
     (actions) => actions.ideLayout.initiateButtonTour
   );
   const onShowTooltips = () => initiateButtonTour();
 
-  const launchCopyProject = useFlowActions((f) => f.saveProjectAsFlow.run);
+  const runSaveProjectAs = useRunFlow((f) => f.saveProjectAsFlow);
   const copyArgs = { sourceProjectId: project.id, sourceName: project.name };
-  const onCreateCopy = () => launchCopyProject(copyArgs);
+  const onCreateCopy = () => runSaveProjectAs(copyArgs);
 
   const mFullScreenButton = programKind === "per-method" && (
     <Button className="full-screen" onClick={() => setIsFullScreen(true)}>

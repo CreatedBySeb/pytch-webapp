@@ -4,7 +4,7 @@ import { useStoreState } from "../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { codeTextEnsuringFlat, useFlatCodeText } from "./hooks/code-text";
 import { LessonDescriptor } from "../model/linked-content";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 // Not sure about this mixture of props and useStoreState() but it lets
 // us work directly with the LessonDescriptor.
@@ -13,7 +13,7 @@ const LinkedSpecimenContent: React.FC<LinkedSpecimenContentProps> = ({
   lesson,
 }) => {
   const currentCodeText = useFlatCodeText("LinkedSpecimenContent");
-  const runFlow = useFlowActions((f) => f.viewCodeDiffFlow.run);
+  const runFlow = useRunFlow((f) => f.viewCodeDiffFlow);
 
   const originalCodeText = codeTextEnsuringFlat(
     "LinkedSpecimenContent",

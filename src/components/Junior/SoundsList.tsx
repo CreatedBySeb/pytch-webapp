@@ -11,7 +11,7 @@ import {
 import { AssetCard } from "./AssetCard";
 import classNames from "classnames";
 import { NoContentHelp } from "./NoContentHelp";
-import { useFlowActions } from "../../model";
+import { useRunFlow } from "../../model";
 
 type SoundsContentProps = {
   actorKind: ActorKind;
@@ -62,11 +62,11 @@ export const SoundsList = () => {
     return <SoundsContent actorKind={focusedActor.kind} sounds={actorAssets} />;
   })();
 
-  const showAddModal = useFlowActions((f) => f.addAssetsFlow.run);
+  const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActor.kind}/sound` as const;
   const addSound = () =>
-    showAddModal({ projectId, operationContextKey, assetNamePrefix });
+    runAddAssets({ projectId, operationContextKey, assetNamePrefix });
 
   const classes = classNames(
     "Junior-AssetsList",
