@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { CompoundTextInput } from "./CompoundTextInput";
-import { FormatSpecifier } from "../model/compound-text-input";
+import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { CompoundTextInput } from "../CompoundTextInput";
+import { FormatSpecifier } from "../../model/compound-text-input";
 import {
   flowFocusOrBlurFun,
   isInteractable,
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { useFlowActions, useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "./utils";
+import { useFlowActions, useFlowState } from "../../model";
 
 export const RenameAssetModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.renameAssetFlow);
