@@ -437,3 +437,12 @@ export const addFromMediaLib = (matches: Array<string>) => {
   const expButtonMatch = `Add ${matches.length}`;
   settleModalDialog(expButtonMatch);
 };
+
+/** Assuming that we are in the per-method IDE, with the Appearances
+ * (i.e., Backdrops or Costumes) tab active, launch the Delete modal for
+ * the appearance at the given `idx`. */
+export const launchDeleteAssetByIndex = (idx: number) => {
+  cy.get(".AssetCard").eq(idx).find("button").click();
+  cy.get(".dropdown-item").contains("DELETE").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Delete image");
+};

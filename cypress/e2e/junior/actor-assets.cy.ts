@@ -8,6 +8,7 @@ import {
   clickHeaderCloseButton,
   clickUniqueButton,
   initiateAddFromMediaLib,
+  launchDeleteAssetByIndex,
   selectActorAspect,
   selectSprite,
   selectStage,
@@ -41,12 +42,6 @@ context("Working with assets of an actor", () => {
   const addFromFixture = (fixtureBasename: string) => {
     initiateAddFromFixture(fixtureBasename);
     settleModalDialog("Add to project");
-  };
-
-  const launchDeleteAssetByIndex = (idx: number) => {
-    cy.get(".AssetCard").eq(idx).find("button").click();
-    cy.get(".dropdown-item").contains("DELETE").click();
-    cy.get(".modal-header").contains("Delete image");
   };
 
   it("can add and delete Costumes from medialib", () => {
