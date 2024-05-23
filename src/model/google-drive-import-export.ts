@@ -243,8 +243,8 @@ async function tryImportAsyncFile(
     const project = await createNewProject(projectInfo.name, projectInfo);
     const projectId = project.id;
     return { filename, projectId };
-  } catch (err) {
-    throw wrappedError(err as Error);
+  } catch (error) {
+    throw wrappedError(error as Error);
   }
 }
 
@@ -270,9 +270,9 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       actions.setApiBootStatus({ kind: "pending" });
       const api = await bootApi().boot();
       actions.setApiBootStatus({ kind: "succeeded", api });
-    } catch (err) {
+    } catch (error) {
       // TODO: Any useful way to report this to user?
-      console.error("GoogleDriveIntegration.maybeBoot(): boot failed", err);
+      console.error("GoogleDriveIntegration.maybeBoot(): boot failed", error);
       actions.setApiBootStatus({ kind: "failed" });
     }
   }),
@@ -359,11 +359,11 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         outcome,
         dismissNotification,
       });
-    } catch (err) {
-      console.log("doTask(): caught", err);
-      const errMessage = (err as Error).message;
+    } catch (error) {
+      console.log("doTask(): caught", error);
+      const errMessage = (error as Error).message;
 
-      if (navGuard.wasAbandoned(err)) {
+      if (navGuard.wasAbandoned(error)) {
         actions.setTaskState({ kind: "idle" });
       } else {
         // It might not be the case that auth failed.  But one likely
@@ -459,15 +459,15 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
       const navGuard = new NavigationAbandonmentGuard();
 
       // Will be overwritten when launching importFiles():
-      let abandonImport: () => void = () => void 0;
+      let cancelImport: () => void = () => void 0;
 
       try {
         const pendingTaskState = helpers.getState().taskState;
         actions.setTaskState({ kind: "pending-already-modal" });
 
-        const { cancel: cancelImportFiles, files: filesPromise } =
+        const { cancel: cancelImport_, files: filesPromise } =
           api.importFiles(tokenInfo);
-        abandonImport = cancelImportFiles;
+        cancelImport = cancelImport_;
 
         const files = await navGuard.throwIfAbandoned(filesPromise);
 
@@ -485,13 +485,13 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
             successes.push(importResult);
           } catch (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            e: any
+            error: any
           ) {
-            console.error("importProjects():", filename, e);
-            if (navGuard.wasAbandoned(e)) {
-              throw e;
+            console.error("importProjects():", filename, error);
+            if (navGuard.wasAbandoned(error)) {
+              throw error;
             }
-            failures.push({ filename: filename.get(), reason: e.message });
+            failures.push({ filename: filename.get(), reason: error.message });
           }
         }
 
@@ -526,7 +526,7 @@ export let googleDriveIntegration: GoogleDriveIntegration = {
         return outcome;
       } catch (error) {
         if (navGuard.wasAbandoned(error)) {
-          abandonImport();
+          cancelImport();
         }
         throw error;
       } finally {
