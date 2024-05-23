@@ -1,26 +1,26 @@
 import React, { CSSProperties, MouseEventHandler, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button } from "react-bootstrap";
-import { useStoreState, useStoreActions } from "../store";
+import { useStoreState, useStoreActions } from "../../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { nSelectedItemsInGallery } from "../model/clipart-gallery";
+import { nSelectedItemsInGallery } from "../../model/clipart-gallery";
 import {
   ClipArtGalleryData,
   ClipArtGalleryEntryId,
   ClipArtGalleryEntry,
   entryMatchesTags,
-} from "../model/clipart-gallery-core";
+} from "../../model/clipart-gallery-core";
 
-import { assertNever, discardReturnValue } from "../utils";
-import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { asyncFlowModal } from "./async-flow-modals/utils";
+import { assertNever, discardReturnValue } from "../../utils";
+import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 import {
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { OnTagClickFun } from "../model/user-interactions/clipart-gallery-select";
-import { useFlowActions, useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { OnTagClickFun } from "../../model/user-interactions/clipart-gallery-select";
+import { useFlowActions, useFlowState } from "../../model";
 
 const kMaxImageWidthOrHeight = 100;
 

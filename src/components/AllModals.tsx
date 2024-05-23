@@ -9,7 +9,7 @@ import { UploadZipfilesModal } from "./UploadZipfilesModal";
 import { CodeDiffHelpModal } from "./CodeDiffHelpModal";
 import { CopyProjectModal } from "./CopyProjectModal";
 import { CropScaleImageModal } from "./CropScaleImageModal";
-import { AddClipartModal } from "./AddClipartModal";
+import { AddClipartModal } from "./async-flow-modals/AddClipartModal";
 import {
   GoogleAuthenticationStatusModal,
   GoogleGetFilenameFromUserModal,
