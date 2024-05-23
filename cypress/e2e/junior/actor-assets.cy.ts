@@ -9,6 +9,7 @@ import {
   clickUniqueButton,
   initiateAddFromMediaLib,
   launchDeleteAssetByIndex,
+  launchRenameAssetByIndex,
   selectActorAspect,
   selectSprite,
   selectStage,
@@ -202,12 +203,6 @@ context("Working with assets of an actor", () => {
     selectStage();
     assertErrorCorrect("stage", "to the stage");
   });
-
-  const launchRenameAssetByIndex = (idx: number) => {
-    cy.get("div.tab-pane.active .AssetCard").eq(idx).find("button").click();
-    cy.get(".dropdown-item").contains("Rename").click();
-    cy.get(".modal-header").should("have.length", 1).contains("Rename");
-  };
 
   const addSampleSounds = () => {
     selectActorAspect("Sounds");

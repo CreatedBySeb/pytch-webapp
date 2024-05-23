@@ -446,3 +446,12 @@ export const launchDeleteAssetByIndex = (idx: number) => {
   cy.get(".dropdown-item").contains("DELETE").click();
   cy.get(".modal-header").should("have.length", 1).contains("Delete image");
 };
+
+/** Assuming that we are in the per-method IDE, with the Appearances
+ * (i.e., Backdrops or Costumes) tab active, launch the Rename modal for
+ * the appearance at the given `idx`. */
+export const launchRenameAssetByIndex = (idx: number) => {
+  cy.get("div.tab-pane.active .AssetCard").eq(idx).find("button").click();
+  cy.get(".dropdown-item").contains("Rename").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Rename");
+};
