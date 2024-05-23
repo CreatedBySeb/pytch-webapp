@@ -16,7 +16,7 @@ import {
   GoogleTaskStatusModal,
 } from "./GoogleOperationModals";
 import { ShareTutorialModal } from "./async-flow-modals/ShareTutorialModal";
-import { ViewCodeDiffModal } from "./ViewCodeDiffModal";
+import { ViewCodeDiffModal } from "./async-flow-modals/ViewCodeDiffModal";
 import { VersionOptInOperationModal } from "./VersionOptInOperationModal";
 
 import { DeleteAssetModal } from "./async-flow-modals/DeleteAssetModal";

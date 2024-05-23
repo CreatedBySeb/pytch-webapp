@@ -1,10 +1,10 @@
 import React from "react";
-import { EmptyProps } from "../utils";
+import { EmptyProps } from "../../utils";
 import { Button, Modal } from "react-bootstrap";
-import { CodeDiffHunk } from "../model/code-diff";
-import { useFlowState } from "../model";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { settleFunctions } from "../model/user-interactions/async-user-flow";
+import { CodeDiffHunk } from "../../model/code-diff";
+import { useFlowState } from "../../model";
+import { asyncFlowModal } from "./utils";
+import { settleFunctions } from "../../model/user-interactions/async-user-flow";
 
 type PreTableDatumProps = { content: string | undefined };
 const PreTableDatum: React.FC<PreTableDatumProps> = ({ content }) => (
