@@ -2,18 +2,18 @@ import React, { useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
-import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { MaybeErrorOrSuccessReport } from "../../MaybeErrorOrSuccessReport";
 import { Form } from "react-bootstrap";
-import { assertNever, onChangeFun, submitOnEnterKeyFun } from "../../utils";
-import { useJrEditActions, useJrEditState } from "./hooks";
+import { assertNever, onChangeFun, submitOnEnterKeyFun } from "../../../utils";
+import { useJrEditActions, useJrEditState } from "../hooks";
 import {
   flowFocusOrBlurFun,
   isInteractable,
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../../model/user-interactions/async-user-flow";
-import { asyncFlowModal } from "../async-flow-modals/utils";
+} from "../../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../../async-flow-modals/utils";
 
 export const UpsertSpriteModal = () => {
   const { fsmState, isSubmittable } = useJrEditState((s) => s.upsertSpriteFlow);
