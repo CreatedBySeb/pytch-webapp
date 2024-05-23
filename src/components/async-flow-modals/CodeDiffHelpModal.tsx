@@ -1,10 +1,10 @@
 import React from "react";
 import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
-import RawElement from "./RawElement";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { settleFunctions } from "../model/user-interactions/async-user-flow";
-import { useFlowState } from "../model";
+import RawElement from "../RawElement";
+import { asyncFlowModal } from "../async-flow-modals/utils";
+import { settleFunctions } from "../../model/user-interactions/async-user-flow";
+import { useFlowState } from "../../model";
 
 export const CodeDiffHelpModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.codeDiffHelpFlow);

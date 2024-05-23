@@ -3,17 +3,17 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 
-import { useStoreActions, useStoreState } from "../store";
-import { submitOnEnterKeyFun } from "../utils";
-import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { RadioButtonOption } from "./RadioButtonOption";
+import { useStoreActions, useStoreState } from "../../store";
+import { submitOnEnterKeyFun } from "../../utils";
+import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { RadioButtonOption } from "../RadioButtonOption";
 
-import { PytchProgramKind } from "../model/pytch-program";
-import { WhetherExampleTag } from "../model/project-templates";
+import { PytchProgramKind } from "../../model/pytch-program";
+import { WhetherExampleTag } from "../../model/project-templates";
 
-import FlatEditorThumbnail from "../images/flat.png";
-import PerMethodEditorThumbnail from "../images/per-method.png";
-import { asyncFlowModal } from "./async-flow-modals/utils";
+import FlatEditorThumbnail from "../../images/flat.png";
+import PerMethodEditorThumbnail from "../../images/per-method.png";
+import { asyncFlowModal } from "../async-flow-modals/utils";
 import {
   flowFocusOrBlurFun,
   isActive,
@@ -21,8 +21,8 @@ import {
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { useFlowActions, useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../../model";
 
 const WhetherExampleOption = RadioButtonOption<WhetherExampleTag>;
 const EditorKindOption = RadioButtonOption<PytchProgramKind>;

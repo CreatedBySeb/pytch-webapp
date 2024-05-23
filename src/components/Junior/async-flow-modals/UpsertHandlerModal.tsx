@@ -2,16 +2,16 @@ import React, { ChangeEvent, createRef, useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { MaybeErrorOrSuccessReport } from "../../MaybeErrorOrSuccessReport";
 import {
   ActorKindOps,
   EventDescriptorKind,
   EventDescriptorKindOps,
   StructuredProgramOps,
-} from "../../model/junior/structured-program";
-import { submitOnEnterKeyFun } from "../../utils";
+} from "../../../model/junior/structured-program";
+import { submitOnEnterKeyFun } from "../../../utils";
 import { KeyChoiceModal } from "./KeyChoiceModal";
-import { useJrEditActions, useJrEditState, useMappedProgram } from "./hooks";
+import { useJrEditActions, useJrEditState, useMappedProgram } from "../hooks";
 import classNames from "classnames";
 import {
   isActive,
@@ -19,8 +19,8 @@ import {
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../../model/user-interactions/async-user-flow";
-import { asyncFlowModal } from "../async-flow-modals/utils";
+} from "../../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../../async-flow-modals/utils";
 
 // TODO: Is this unduly restrictive?  I think we should end up with a
 // valid Python string literal if we forbid the backslash character, the

@@ -1,11 +1,11 @@
 import React from "react";
-import { ChooseFiles } from "./ChooseFiles";
-import { FileProcessingFailures } from "./FileProcessingFailures";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { settleFunctions } from "../model/user-interactions/async-user-flow";
-import { FileFailureError } from "../model/user-interactions/process-files";
-import { GenericWorkingModal } from "./async-flow-modals/GenericWorkingModal";
-import { useFlowActions, useFlowState } from "../model";
+import { ChooseFiles } from "../ChooseFiles";
+import { FileProcessingFailures } from "../FileProcessingFailures";
+import { asyncFlowModal } from "./utils";
+import { settleFunctions } from "../../model/user-interactions/async-user-flow";
+import { FileFailureError } from "../../model/user-interactions/process-files";
+import { GenericWorkingModal } from "./GenericWorkingModal";
+import { useFlowActions, useFlowState } from "../../model";
 
 export const UploadZipfilesModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.uploadZipfilesFlow);

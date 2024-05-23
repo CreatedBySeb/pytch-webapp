@@ -4,12 +4,12 @@ import Modal from "react-bootstrap/Modal";
 import {
   sharingUrlFromSlug,
   sharingUrlFromSlugForDemo,
-} from "../model/user-interactions/share-tutorial";
+} from "../../model/user-interactions/share-tutorial";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { copyTextToClipboard } from "../utils";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { settleFunctions } from "../model/user-interactions/async-user-flow";
-import { useFlowState } from "../model";
+import { copyTextToClipboard } from "../../utils";
+import { asyncFlowModal } from "./utils";
+import { settleFunctions } from "../../model/user-interactions/async-user-flow";
+import { useFlowState } from "../../model";
 
 export const ShareTutorialModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.shareTutorialFlow);
