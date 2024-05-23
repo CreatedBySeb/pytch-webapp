@@ -199,7 +199,7 @@ const ClipArtGalleryPanel: React.FC<SelectionProps> = (selectionProps) => {
   }
 };
 
-export const AddClipartModal = () => {
+export const AddClipArtModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.addClipArtFlow);
   const { selectItemById, deselectItemById, onTagClick } = useFlowActions(
     (f) => f.addClipArtFlow

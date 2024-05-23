@@ -9,7 +9,7 @@ import { UploadZipfilesModal } from "./UploadZipfilesModal";
 import { CodeDiffHelpModal } from "./CodeDiffHelpModal";
 import { CopyProjectModal } from "./CopyProjectModal";
 import { CropScaleImageModal } from "./CropScaleImageModal";
-import { AddClipartModal } from "./async-flow-modals/AddClipartModal";
+import { AddClipArtModal } from "./async-flow-modals/AddClipArtModal";
 import {
   GoogleAuthenticationStatusModal,
   GoogleGetFilenameFromUserModal,
@@ -37,7 +37,7 @@ export const AllModals = () => {
       <UploadZipfilesModal />
       <CodeDiffHelpModal />
       <CropScaleImageModal />
-      <AddClipartModal />
+      <AddClipArtModal />
       <GoogleAuthenticationStatusModal />
       <GoogleTaskStatusModal />
       <GoogleGetFilenameFromUserModal />
