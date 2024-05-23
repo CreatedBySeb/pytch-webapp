@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { EmptyProps, assertNever } from "../utils";
 import { MtimeDisplay } from "./MtimeDisplay";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 type ProjectCardProps = {
   project: IDisplayedProjectSummary;
@@ -22,8 +22,8 @@ type ProjectCardProps = {
 const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   const navigate = useNavigate();
 
-  const launchDeleteAction = useFlowActions((f) => f.deleteProjectFlow.run);
-  const launchRename = useFlowActions((f) => f.renameProjectFlow.run);
+  const launchDeleteAction = useRunFlow((f) => f.deleteProjectFlow);
+  const launchRename = useRunFlow((f) => f.renameProjectFlow);
   const toggleSelected = useStoreActions(
     (actions) => actions.projectCollection.toggleProjectSelected
   );
@@ -149,9 +149,10 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const activeUiVersion = useStoreState(
     (state) => state.versionOptIn.activeUiVersion
   );
-  const launchCreate = useFlowActions((f) => f.createProjectFlow.run);
-  const launchUpload = useFlowActions((f) => f.uploadZipfilesFlow.run);
-  const runDelete = useFlowActions((f) => f.deleteManyProjectsFlow.run);
+  const launchCreate = useRunFlow((f) => f.createProjectFlow);
+  const launchUpload = useRunFlow((f) => f.uploadZipfilesFlow);
+  const runDelete = useRunFlow((f) => f.deleteManyProjectsFlow);
+
   const clearAllSelected = useStoreActions(
     (actions) => actions.projectCollection.clearAllSelected
   );

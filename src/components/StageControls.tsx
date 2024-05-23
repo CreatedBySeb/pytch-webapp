@@ -9,7 +9,7 @@ import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
-import { useFlowActions } from "../model";
+import { useRunFlow } from "../model";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -138,10 +138,10 @@ export const StageControls: React.FC<EmptyProps> = () => {
 
   const handleSave = () => requestSyncToStorage();
 
-  const launchScreenshot = useFlowActions((f) => f.displayScreenshotFlow.run);
+  const launchScreenshot = useRunFlow((f) => f.displayScreenshotFlow);
   const onScreenshot = () => launchScreenshot();
 
-  const launchDownloadZip = useFlowActions((f) => f.downloadZipfileFlow.run);
+  const launchDownloadZip = useRunFlow((f) => f.downloadZipfileFlow);
   const formatSpecifier = filenameFormatSpecifier(linkedContentLoadingState);
   const onDownload = () => launchDownloadZip({ project, formatSpecifier });
 
@@ -150,7 +150,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
   );
   const onShowTooltips = () => initiateButtonTour();
 
-  const launchCopyProject = useFlowActions((f) => f.saveProjectAsFlow.run);
+  const launchCopyProject = useRunFlow((f) => f.saveProjectAsFlow);
   const copyArgs = { sourceProjectId: project.id, sourceName: project.name };
   const onCreateCopy = () => launchCopyProject(copyArgs);
 

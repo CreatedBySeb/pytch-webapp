@@ -18,7 +18,7 @@ import SoundAssetPreview from "../../images/sound-wave-w96.png";
 import { DragPreviewImage } from "react-dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
-import { useFlowActions } from "../../model";
+import { useRunFlow } from "../../model";
 
 type RenameDropdownItemProps = {
   actorKind: ActorKind;
@@ -30,7 +30,7 @@ const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
   assetKind,
   fullPathname,
 }) => {
-  const launchRenameAction = useFlowActions((f) => f.renameAssetFlow.run);
+  const launchRenameAction = useRunFlow((f) => f.renameAssetFlow);
 
   const operationContextKey = `${actorKind}/${assetKind}` as const;
   const { actorId, basename } = AssetMetaDataOps.pathComponents(fullPathname);
@@ -56,7 +56,7 @@ const DeleteDropdownItem: React.FC<DeleteDropdownItemProps> = ({
   displayName,
   isAllowed,
 }) => {
-  const launchDeleteAction = useFlowActions((f) => f.deleteAssetFlow.run);
+  const launchDeleteAction = useRunFlow((f) => f.deleteAssetFlow);
 
   const onDelete = async () => {
     if (!isAllowed) {
@@ -88,7 +88,7 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
   projectId,
   presentation,
 }) => {
-  const launchCropScale = useFlowActions((f) => f.cropScaleImageFlow.run);
+  const launchCropScale = useRunFlow((f) => f.cropScaleImageFlow);
 
   if (presentation.presentation.kind !== "image") {
     return;

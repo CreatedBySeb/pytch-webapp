@@ -15,7 +15,7 @@ import classNames from "classnames";
 import { NoContentHelp } from "./NoContentHelp";
 import { useJrEditState, useMappedProgram } from "./hooks";
 import { useStoreState } from "../../store";
-import { useFlowActions } from "../../model";
+import { useRunFlow } from "../../model";
 
 type AppearancesContentProps = {
   actorKind: ActorKind;
@@ -86,13 +86,13 @@ export const AppearancesList = () => {
     );
   })();
 
-  const showAddModal = useFlowActions((f) => f.addAssetsFlow.run);
+  const showAddModal = useRunFlow((f) => f.addAssetsFlow);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActorKind}/image` as const;
   const addFromDevice = () =>
     showAddModal({ projectId, operationContextKey, assetNamePrefix });
 
-  const addClipArt = useFlowActions((f) => f.addClipArtFlow.run);
+  const addClipArt = useRunFlow((f) => f.addClipArtFlow);
   const addFromMediaLibrary = () =>
     addClipArt({ projectId, operationContextKey, assetNamePrefix });
 
