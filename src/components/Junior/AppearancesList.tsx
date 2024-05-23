@@ -86,15 +86,15 @@ export const AppearancesList = () => {
     );
   })();
 
-  const showAddModal = useRunFlow((f) => f.addAssetsFlow);
+  const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActorKind}/image` as const;
   const addFromDevice = () =>
-    showAddModal({ projectId, operationContextKey, assetNamePrefix });
+    runAddAssets({ projectId, operationContextKey, assetNamePrefix });
 
-  const addClipArt = useRunFlow((f) => f.addClipArtFlow);
+  const runAddClipArt = useRunFlow((f) => f.addClipArtFlow);
   const addFromMediaLibrary = () =>
-    addClipArt({ projectId, operationContextKey, assetNamePrefix });
+    runAddClipArt({ projectId, operationContextKey, assetNamePrefix });
 
   const classes = classNames(
     "Junior-AssetsList",

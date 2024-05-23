@@ -27,7 +27,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
     (actions) => actions.tutorialCollection.createDemoFromTutorial
   );
 
-  const shareTutorial = useRunFlow((f) => f.shareTutorialFlow);
+  const runShareTutorial = useRunFlow((f) => f.shareTutorialFlow);
 
   const alertRef: React.RefObject<HTMLDivElement> = createRef();
   const buttonsRef: React.RefObject<HTMLDivElement> = createRef();
@@ -67,7 +67,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
 
   const launchShare = () => {
     const shareInfo = { slug: tutorial.slug, displayName, programKind };
-    shareTutorial(shareInfo);
+    runShareTutorial(shareInfo);
   };
 
   const showDemoButton =

@@ -15,15 +15,15 @@ type AssetCardProps = {
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
 
-  const launchDeleteAction = useRunFlow((f) => f.deleteAssetFlow);
-  const launchRename = useRunFlow((f) => f.renameAssetFlow);
-  const launchCropScale = useRunFlow((f) => f.cropScaleImageFlow);
+  const runDeleteAsset = useRunFlow((f) => f.deleteAssetFlow);
+  const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
+  const runCropScaleImage = useRunFlow((f) => f.cropScaleImageFlow);
 
   const presentation = asset.presentation;
   const isImage = presentation.kind === "image";
 
   const onDelete = () =>
-    launchDeleteAction({
+    runDeleteAsset({
       kindDisplayName: presentation.kind,
       name: asset.name,
       displayName: asset.name,
@@ -33,7 +33,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
   const operationContextKey = `flat/${presentation.kind}` as const;
   const onRename = () =>
-    launchRename({
+    runRenameAsset({
       operationContextKey,
       fixedPrefix: "",
       oldNameSuffix: asset.assetInProject.name,
@@ -58,7 +58,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
       height: fullSourceImage.height,
     };
 
-    launchCropScale({
+    runCropScaleImage({
       projectId,
       assetName: asset.name,
       existingCrop,
@@ -108,15 +108,15 @@ const ProjectAssetList = () => {
   );
   const assets = useStoreState((state) => state.activeProject.project.assets);
 
-  const launchAdd = useRunFlow((f) => f.addAssetsFlow);
+  const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const operationContextKey = "flat/any" as const;
   const launchUploadModal = () =>
-    launchAdd({ projectId, operationContextKey, assetNamePrefix: "" });
+    runAddAssets({ projectId, operationContextKey, assetNamePrefix: "" });
 
-  const showClipArtModal = useRunFlow((f) => f.addClipArtFlow);
+  const runAddClipArt = useRunFlow((f) => f.addClipArtFlow);
 
   const launchClipArtModal = () =>
-    showClipArtModal({ projectId, operationContextKey, assetNamePrefix: "" });
+    runAddClipArt({ projectId, operationContextKey, assetNamePrefix: "" });
 
   switch (loadState) {
     case "pending":

@@ -30,12 +30,12 @@ const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
   assetKind,
   fullPathname,
 }) => {
-  const launchRenameAction = useRunFlow((f) => f.renameAssetFlow);
+  const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
 
   const operationContextKey = `${actorKind}/${assetKind}` as const;
   const { actorId, basename } = AssetMetaDataOps.pathComponents(fullPathname);
   const launchRename = () =>
-    launchRenameAction({
+    runRenameAsset({
       operationContextKey,
       fixedPrefix: `${actorId}/`,
       oldNameSuffix: basename,
@@ -56,7 +56,7 @@ const DeleteDropdownItem: React.FC<DeleteDropdownItemProps> = ({
   displayName,
   isAllowed,
 }) => {
-  const launchDeleteAction = useRunFlow((f) => f.deleteAssetFlow);
+  const runDeleteAsset = useRunFlow((f) => f.deleteAssetFlow);
 
   const onDelete = async () => {
     if (!isAllowed) {
@@ -66,7 +66,7 @@ const DeleteDropdownItem: React.FC<DeleteDropdownItemProps> = ({
 
     // Slight hack: We're relying on the internal assetKind name to be
     // suitable for display use.
-    launchDeleteAction({
+    runDeleteAsset({
       kindDisplayName: assetKind,
       name: fullPathname,
       displayName,
@@ -88,7 +88,7 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
   projectId,
   presentation,
 }) => {
-  const launchCropScale = useRunFlow((f) => f.cropScaleImageFlow);
+  const runCropScaleImage = useRunFlow((f) => f.cropScaleImageFlow);
 
   if (presentation.presentation.kind !== "image") {
     return;
@@ -103,7 +103,7 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
   const fullSource = presentation.presentation.fullSourceImage;
 
   const onClick = () => {
-    launchCropScale({
+    runCropScaleImage({
       projectId,
       assetName: presentation.name,
       existingCrop: transform,

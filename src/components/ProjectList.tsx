@@ -22,8 +22,8 @@ type ProjectCardProps = {
 const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   const navigate = useNavigate();
 
-  const launchDeleteAction = useRunFlow((f) => f.deleteProjectFlow);
-  const launchRename = useRunFlow((f) => f.renameProjectFlow);
+  const runDeleteProject = useRunFlow((f) => f.deleteProjectFlow);
+  const runRenameProject = useRunFlow((f) => f.renameProjectFlow);
   const toggleSelected = useStoreActions(
     (actions) => actions.projectCollection.toggleProjectSelected
   );
@@ -39,7 +39,7 @@ const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   const linkTarget = `/ide/${project.summary.id}`;
 
   const onDelete = () => {
-    launchDeleteAction({
+    runDeleteProject({
       id: project.summary.id,
       name: project.summary.name,
     });
@@ -62,7 +62,7 @@ const Project: React.FC<ProjectCardProps> = ({ project, anySelected }) => {
   };
 
   const onRename = () => {
-    launchRename({
+    runRenameProject({
       projectId: project.summary.id,
       oldName: project.summary.name,
     });
@@ -149,9 +149,9 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const activeUiVersion = useStoreState(
     (state) => state.versionOptIn.activeUiVersion
   );
-  const launchCreate = useRunFlow((f) => f.createProjectFlow);
-  const launchUpload = useRunFlow((f) => f.uploadZipfilesFlow);
-  const runDelete = useRunFlow((f) => f.deleteManyProjectsFlow);
+  const runCreateProject = useRunFlow((f) => f.createProjectFlow);
+  const runUploadZipfiles = useRunFlow((f) => f.uploadZipfilesFlow);
+  const runDeleteManyProjects = useRunFlow((f) => f.deleteManyProjectsFlow);
 
   const clearAllSelected = useStoreActions(
     (actions) => actions.projectCollection.clearAllSelected
@@ -162,7 +162,7 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const nSelected = selectedIds.length;
 
   if (nSelected > 0) {
-    const onDelete = () => runDelete({ ids: selectedIds });
+    const onDelete = () => runDeleteManyProjects({ ids: selectedIds });
 
     return (
       <div className="buttons some-selected">
@@ -178,8 +178,8 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
       </div>
     );
   } else {
-    const showCreateModal = () => launchCreate({ activeUiVersion });
-    const showUploadModal = () => launchUpload();
+    const showCreateModal = () => runCreateProject({ activeUiVersion });
+    const showUploadModal = () => runUploadZipfiles();
     return (
       <div className="buttons">
         <Button key="create-new" onClick={showCreateModal}>

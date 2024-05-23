@@ -138,21 +138,21 @@ export const StageControls: React.FC<EmptyProps> = () => {
 
   const handleSave = () => requestSyncToStorage();
 
-  const launchScreenshot = useRunFlow((f) => f.displayScreenshotFlow);
-  const onScreenshot = () => launchScreenshot();
+  const runDisplayScreenshot = useRunFlow((f) => f.displayScreenshotFlow);
+  const onScreenshot = () => runDisplayScreenshot();
 
-  const launchDownloadZip = useRunFlow((f) => f.downloadZipfileFlow);
+  const runDownloadZipfiles = useRunFlow((f) => f.downloadZipfileFlow);
   const formatSpecifier = filenameFormatSpecifier(linkedContentLoadingState);
-  const onDownload = () => launchDownloadZip({ project, formatSpecifier });
+  const onDownload = () => runDownloadZipfiles({ project, formatSpecifier });
 
   const initiateButtonTour = useStoreActions(
     (actions) => actions.ideLayout.initiateButtonTour
   );
   const onShowTooltips = () => initiateButtonTour();
 
-  const launchCopyProject = useRunFlow((f) => f.saveProjectAsFlow);
+  const runSaveProjectAs = useRunFlow((f) => f.saveProjectAsFlow);
   const copyArgs = { sourceProjectId: project.id, sourceName: project.name };
-  const onCreateCopy = () => launchCopyProject(copyArgs);
+  const onCreateCopy = () => runSaveProjectAs(copyArgs);
 
   const mFullScreenButton = programKind === "per-method" && (
     <Button className="full-screen" onClick={() => setIsFullScreen(true)}>

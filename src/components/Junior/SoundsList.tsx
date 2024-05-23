@@ -62,11 +62,11 @@ export const SoundsList = () => {
     return <SoundsContent actorKind={focusedActor.kind} sounds={actorAssets} />;
   })();
 
-  const showAddModal = useRunFlow((f) => f.addAssetsFlow);
+  const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const assetNamePrefix = `${focusedActorId}/`;
   const operationContextKey = `${focusedActor.kind}/sound` as const;
   const addSound = () =>
-    showAddModal({ projectId, operationContextKey, assetNamePrefix });
+    runAddAssets({ projectId, operationContextKey, assetNamePrefix });
 
   const classes = classNames(
     "Junior-AssetsList",
