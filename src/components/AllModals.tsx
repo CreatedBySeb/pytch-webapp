@@ -2,7 +2,7 @@ import React from "react";
 import { CreateProjectModal } from "./async-flow-modals/CreateProjectModal";
 import { AddAssetsModal } from "./async-flow-modals/AddAssetsModal";
 import { RenameAssetModal } from "./async-flow-modals/RenameAssetModal";
-import { RenameProjectModal } from "./RenameProjectModal";
+import { RenameProjectModal } from "./async-flow-modals/RenameProjectModal";
 import { DisplayScreenshotModal } from "./async-flow-modals/DisplayScreenshotModal";
 import { DownloadZipfileModal } from "./async-flow-modals/DownloadZipfileModal";
 import { UploadZipfilesModal } from "./UploadZipfilesModal";

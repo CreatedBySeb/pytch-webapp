@@ -2,17 +2,17 @@ import React, { ChangeEvent, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { MaybeErrorOrSuccessReport } from "./MaybeErrorOrSuccessReport";
-import { submitOnEnterKeyFun } from "../utils";
-import { asyncFlowModal } from "./async-flow-modals/utils";
+import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
+import { submitOnEnterKeyFun } from "../../utils";
+import { asyncFlowModal } from "./utils";
 import {
   flowFocusOrBlurFun,
   isInteractable,
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { useFlowActions, useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { useFlowActions, useFlowState } from "../../model";
 
 export const RenameProjectModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.renameProjectFlow);
