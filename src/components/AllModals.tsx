@@ -1,5 +1,5 @@
 import React from "react";
-import { CreateProjectModal } from "./CreateProjectModal";
+import { CreateProjectModal } from "./async-flow-modals/CreateProjectModal";
 import { AddAssetsModal } from "./async-flow-modals/AddAssetsModal";
 import { RenameAssetModal } from "./RenameAssetModal";
 import { RenameProjectModal } from "./RenameProjectModal";
