@@ -36,7 +36,7 @@ import {
   projectFromSpecimenFlow,
   ProjectFromSpecimenFlow,
 } from "./project-from-specimen";
-import { Actions, State } from "easy-peasy";
+import { ActionCreator, Actions, State, ThunkCreator } from "easy-peasy";
 
 import {
   GoogleDriveIntegration,
@@ -107,4 +107,18 @@ export function useFlowActions<ResultT>(
   flowMapper: (flows: Actions<IUserConfirmations>) => ResultT
 ) {
   return useStoreActions((actions) => flowMapper(actions.userConfirmations));
+}
+
+type HasRunActionOrThunk<RunArgsT> = {
+  run: ActionCreator<RunArgsT> | ThunkCreator<RunArgsT, void>;
+};
+
+export function useRunFlow<RunArgsT>(
+  flowMapper: (
+    flows: Actions<IUserConfirmations>
+  ) => HasRunActionOrThunk<RunArgsT>
+) {
+  return useStoreActions(
+    (actions) => flowMapper(actions.userConfirmations).run
+  );
 }
