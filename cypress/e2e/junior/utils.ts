@@ -465,3 +465,11 @@ export const launchDeleteActorByIndex = (idx: number) => {
   cy.get(".dropdown-item").contains("DELETE").click();
   cy.get(".modal-header").should("have.length", 1).contains("Delete");
 };
+
+/** Assuming that we are in the per-method IDE, with the Code tab
+ * active, launch the "Delete Handler" modal for the script at the given
+ * `idx`. */
+export const launchDeleteHandlerByIndex = (idx: number) => {
+  ScriptOps.chooseHandlerDropdownItem(idx, "DELETE");
+  cy.get(".modal-header").should("have.length", 1).contains("Delete script?");
+};

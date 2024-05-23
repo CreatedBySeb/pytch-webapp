@@ -8,6 +8,7 @@ import {
   soleEventHandlerCodeShouldEqual,
   typeIntoScriptEditor,
   ScriptOps,
+  launchDeleteHandlerByIndex,
 } from "./utils";
 import { saveButton } from "../utils";
 
@@ -140,11 +141,6 @@ context("Create/modify/delete event handlers", () => {
   });
 
   it("can add and delete handlers", () => {
-    const launchDeleteHandlerByIndex = (idx: number) => {
-      ScriptOps.chooseHandlerDropdownItem(idx, "DELETE");
-      cy.get(".modal-header").contains("Delete script?");
-    };
-
     selectSprite("Snake");
 
     saveButton.shouldReactToInteraction(() => {
