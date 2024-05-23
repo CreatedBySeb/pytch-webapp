@@ -3,7 +3,7 @@ import { CreateProjectModal } from "./async-flow-modals/CreateProjectModal";
 import { AddAssetsModal } from "./async-flow-modals/AddAssetsModal";
 import { RenameAssetModal } from "./RenameAssetModal";
 import { RenameProjectModal } from "./RenameProjectModal";
-import { DisplayScreenshotModal } from "./DisplayScreenshotModal";
+import { DisplayScreenshotModal } from "./async-flow-modals/DisplayScreenshotModal";
 import { DownloadZipfileModal } from "./DownloadZipfileModal";
 import { UploadZipfilesModal } from "./UploadZipfilesModal";
 import { CodeDiffHelpModal } from "./async-flow-modals/CodeDiffHelpModal";

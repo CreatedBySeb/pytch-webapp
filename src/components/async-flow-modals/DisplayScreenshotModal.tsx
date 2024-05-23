@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { stageWidth, stageHeight } from "../constants";
-import { failIfNull } from "../utils";
+import { stageWidth, stageHeight } from "../../constants";
+import { failIfNull } from "../../utils";
 import {
   isActive,
   settleFunctions,
-} from "../model/user-interactions/async-user-flow";
-import { asyncFlowModal } from "./async-flow-modals/utils";
-import { useFlowState } from "../model";
+} from "../../model/user-interactions/async-user-flow";
+import { asyncFlowModal } from "../async-flow-modals/utils";
+import { useFlowState } from "../../model";
 
 export const DisplayScreenshotModal = () => {
   const { fsmState, isSubmittable } = useFlowState(
