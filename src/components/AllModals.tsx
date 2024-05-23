@@ -15,7 +15,7 @@ import {
   GoogleGetFilenameFromUserModal,
   GoogleTaskStatusModal,
 } from "./GoogleOperationModals";
-import { ShareTutorialModal } from "./ShareTutorialModal";
+import { ShareTutorialModal } from "./async-flow-modals/ShareTutorialModal";
 import { ViewCodeDiffModal } from "./ViewCodeDiffModal";
 import { VersionOptInOperationModal } from "./VersionOptInOperationModal";
 
