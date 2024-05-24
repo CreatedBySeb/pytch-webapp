@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { selectUniqueProject } from "./utils";
+
 context("Selecting/deselecting projects", () => {
   const extraProjectNames = [
     "Apples",
@@ -84,16 +86,8 @@ context("Selecting/deselecting projects", () => {
   allProjectNames.reverse();
 
   it("can delete multiple projects", () => {
-    const selectProject = (name: string) => {
-      cy.contains(name)
-        .parent()
-        .parent()
-        .find("span.selection-check")
-        .click({ force: true });
-    };
-
-    selectProject("Bananas");
-    selectProject("Strawberries");
+    selectUniqueProject("Bananas");
+    selectUniqueProject("Strawberries");
 
     cy.get(".buttons").contains("DELETE").click();
     cy.contains("want to delete 2 projects?");
