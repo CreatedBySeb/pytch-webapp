@@ -3,7 +3,7 @@
 import { DexieStorage } from "../../src/database/indexed-db";
 import { WhetherExampleTag } from "../../src/model/project-templates";
 import { hexSHA256 } from "../../src/utils";
-import { launchDropdownAction } from "./utils";
+import { launchProjectInListDropdownAction } from "./utils";
 
 function startCreateProject(name: string) {
   cy.get("button").contains("Create new").click();
@@ -178,7 +178,7 @@ context("Management of project list", () => {
     let expProjectNames = ["Bananas", "Apples", "Test seed project"];
     cy.pytchProjectNamesShouldDeepEqual(expProjectNames.slice());
 
-    launchDropdownAction("Bananas", "Rename");
+    launchProjectInListDropdownAction("Bananas", "Rename");
     cy.get("input").as("textField").clear().type("Oranges{enter}");
     cy.get("@textField").should("not.exist");
 
@@ -187,7 +187,7 @@ context("Management of project list", () => {
   });
 
   const launchDeletion = (projectName: string) => {
-    launchDropdownAction(projectName, "DELETE");
+    launchProjectInListDropdownAction(projectName, "DELETE");
   };
 
   it("can delete a project", () => {

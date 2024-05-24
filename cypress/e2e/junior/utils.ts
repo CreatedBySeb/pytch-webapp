@@ -6,7 +6,7 @@ import { deIndent } from "../../common/utils";
 
 import { IconName } from "@fortawesome/fontawesome-common-types";
 import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
-import { launchDropdownAction } from "../utils";
+import { launchProjectInListDropdownAction } from "../utils";
 import { Actions } from "easy-peasy";
 import { IActiveProject } from "../../../src/model/project";
 
@@ -233,7 +233,7 @@ export const getActivityBarTab = (icon: IconName) =>
   cy.get(`.ActivityBarTab .tabkey-icon svg[data-icon="${icon}"]`);
 
 export const renameProject = (currentNameMatch: string, newName: string) => {
-  launchDropdownAction(currentNameMatch, "Rename");
+  launchProjectInListDropdownAction(currentNameMatch, "Rename");
   cy.get("input").type("{selectAll}{del}");
   cy.get("input").type(newName);
   settleModalDialog("Rename");

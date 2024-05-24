@@ -46,17 +46,23 @@ export function interceptDemoZipfile(demoStem: string) {
   });
 }
 
-export const launchDropdownAction = (
+/** Assuming we're on the "My projects" page, open the dropdown menu for
+ * the unique project whose name matches the given `projectName`, and
+ * choose the unique dropdown item whose name matches the given
+ * `actionName`. */
+export const launchProjectInListDropdownAction = (
   projectName: string,
   actionName: string
 ) => {
   cy.get(".project-name")
     .contains(projectName)
+    .should("have.length", 1)
     .parent()
     .parent()
     .parent()
     .within(() => {
       cy.get(".dropdown").click();
-      cy.contains(actionName).click();
+      cy.contains(actionName).should("have.length", 1).click();
     });
+  cy.get(".modal").should("have.length", 1).should("be.visible");
 };
