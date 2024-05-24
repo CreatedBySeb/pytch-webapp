@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { launchShareTutorialModal } from "./utils";
+
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
     cy.visit("/");
@@ -163,11 +165,7 @@ context("Work with suggested tutorials", () => {
 context("Tutorial share feature", () => {
   it("Allows user to copy links", () => {
     cy.visit("/tutorials");
-    cy.contains("Boing")
-      .parent()
-      .within(() => {
-        cy.contains("Share").click();
-      });
+    launchShareTutorialModal("Boing");
     cy.get("button[title*='only']").click();
     cy.waitUntil(() =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
