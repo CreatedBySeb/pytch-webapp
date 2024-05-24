@@ -78,3 +78,15 @@ export const selectUniqueProject = (name: string) => {
     // "force" in case list is long and project is out of viewport:
     .click({ force: true });
 };
+
+/** Assuming we're on the "Tutorials" page, launch the Share modal for
+ * the unique tutorial whose name matches the given `nameMatch`. */
+export const launchShareTutorialModal = (nameMatch: string) => {
+  cy.get("ul.tutorial-list li")
+    .contains(nameMatch)
+    .should("have.length", 1)
+    .parent()
+    .within(() => {
+      cy.get("button").contains("Share").click();
+    });
+};
