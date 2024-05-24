@@ -66,3 +66,15 @@ export const launchProjectInListDropdownAction = (
     });
   cy.get(".modal").should("have.length", 1).should("be.visible");
 };
+
+/** Assuming we're on the "My projects" page, select (for potential
+ * deletion) the unique project matching the given `name`. */
+export const selectUniqueProject = (name: string) => {
+  cy.contains(name)
+    .should("have.length", 1)
+    .parent()
+    .parent()
+    .find("span.selection-check")
+    // "force" in case list is long and project is out of viewport:
+    .click({ force: true });
+};
