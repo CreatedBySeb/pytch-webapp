@@ -5,6 +5,7 @@ import {
   elementIsVisible,
   launchAddSprite,
   launchDeleteActorByIndex,
+  launchRenameActorByIndex,
   selectActorAspect,
   selectSprite,
   settleModalDialog,
@@ -81,12 +82,6 @@ context("Work with list of actors", () => {
       .contains("Rename")
       .should("have.class", "disabled");
   });
-
-  const launchRenameActorByIndex = (idx: number) => {
-    cy.get(".ActorCard").eq(idx).click().find("button").click();
-    cy.get(".dropdown-item").contains("Rename").click();
-    cy.get(".modal-header").contains("Rename");
-  };
 
   [
     { actionName: "rename", launchFun: launchRenameActorByIndex },

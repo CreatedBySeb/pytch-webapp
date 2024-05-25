@@ -456,6 +456,16 @@ export const launchRenameAssetByIndex = (idx: number) => {
   cy.get(".modal-header").should("have.length", 1).contains("Rename");
 };
 
+/** Assuming that we are in the per-method IDE, launch the "rename"
+ * action on the Actor at the given `idx` (which must be non-zero,
+ * because it is impossible to rename the Stage).   */
+export const launchRenameActorByIndex = (idx: number) => {
+  cy.get(".ActorCard").eq(idx).click().find("button").click();
+  cy.get(".dropdown-item.disabled").should("not.exist");
+  cy.get(".dropdown-item").contains("Rename").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Rename");
+};
+
 /** Assuming that we are in the per-method IDE, launch the "delete"
  * action on the Actor at the given `idx` (which must be non-zero,
  * because it is impossible to delete the Stage).   */
