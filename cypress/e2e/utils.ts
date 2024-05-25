@@ -90,3 +90,13 @@ export const launchShareTutorialModal = (nameMatch: string) => {
       cy.get("button").contains("Share").click();
     });
 };
+
+/** Assuming we're on the "My project" page, launch the "Create project"
+ * modal and, if `name` is supplied, type that `name` into the text-box
+ * to provide a name for the to-be-created project. */
+export function launchCreateProjectModal(name?: string) {
+  cy.get("button").contains("Create new").click();
+  if (name != null) {
+    cy.get("input[type=text]").clear().type(name);
+  }
+}

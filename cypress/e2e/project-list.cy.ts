@@ -3,18 +3,16 @@
 import { DexieStorage } from "../../src/database/indexed-db";
 import { WhetherExampleTag } from "../../src/model/project-templates";
 import { hexSHA256 } from "../../src/utils";
-import { launchProjectInListDropdownAction } from "./utils";
-
-function startCreateProject(name: string) {
-  cy.get("button").contains("Create new").click();
-  cy.get("input[type=text]").clear().type(name);
-}
+import {
+  launchCreateProjectModal,
+  launchProjectInListDropdownAction,
+} from "./utils";
 
 context("Default creation of project", () => {
   it('creates "flat" by default', () => {
     cy.pytchResetDatabase({ uiVersion: "v1" });
     cy.contains("My projects").click();
-    startCreateProject("Bananas");
+    launchCreateProjectModal("Bananas");
     cy.get("button").contains("Create project").click();
     cy.contains("Your project’s images and sounds");
   });
@@ -79,7 +77,7 @@ context("Management of project list", () => {
     whetherExample: WhetherExampleTag,
     invocation: "button" | "enter"
   ) => {
-    startCreateProject(name);
+    launchCreateProjectModal(name);
 
     // We get away with using the same data attribute for both
     // components because the two types don't overlap:
