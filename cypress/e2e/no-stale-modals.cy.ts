@@ -12,6 +12,9 @@ import {
   assertCostumeNames,
   assertHatBlockLabels,
   clickUniqueButton,
+  launchAddSprite,
+  launchDeleteActorByIndex,
+  launchRenameActorByIndex,
   selectActorAspect,
   selectSprite,
 } from "./junior/utils";
@@ -320,6 +323,27 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
     runModal: () => cy.pytchClickAssetDropdownItem(kPngAssetName, "Crop/scale"),
     // TODO: Assert image-transform unchanged?
+  });
+
+  itCanAbandon("add sprite", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: launchAddSprite,
+    afterwardsExpect: assertActorNamesUnchanged,
+  });
+
+  itCanAbandon("rename sprite", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      launchRenameActorByIndex(1);
+      cy.get(".modal-dialog input").type(`{selectAll}{del}Apples`);
+    },
+    afterwardsExpect: assertActorNamesUnchanged,
+  });
+
+  itCanAbandon("delete sprite", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => launchDeleteActorByIndex(1),
+    afterwardsExpect: assertActorNamesUnchanged,
   });
 
   // #endregion
