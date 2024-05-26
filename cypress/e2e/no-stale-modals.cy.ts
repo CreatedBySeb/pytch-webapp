@@ -5,6 +5,9 @@ import {
   setInstantDelays,
 } from "./utils";
 import {
+  assertActorNames,
+  assertCostumeNames,
+  assertHatBlockLabels,
   selectActorAspect,
   selectSprite,
 } from "./junior/utils";
@@ -214,6 +217,27 @@ context("Modals are cancelled when navigating away", () => {
       funcs.returnToMyProjects();
     });
   }
+
+  // Common assertions, intended for use as the `afterwardsExpect`
+  // property of a test.
+
+  const assertProjectNamesUnchanged = () =>
+    cy.pytchProjectNamesShouldDeepEqual(kExpAllProjectNames);
+
+  const assertFlatAssetsUnchanged = () =>
+    cy.pytchShouldShowAssets(kExpFlatAssetNames);
+
+  const assertActorNamesUnchanged = () => assertActorNames(["Stage", "Snake"]);
+
+  const assertSnakeCostumesUnchanged = () => {
+    selectSnakeCostumes();
+    assertCostumeNames(["python-logo.png"]);
+  };
+
+  const assertSnakeHatBlocksUnchanged = () => {
+    selectSnakeCode();
+    assertHatBlockLabels(["when green flag clicked"]);
+  };
 
   // #endregion
 });
