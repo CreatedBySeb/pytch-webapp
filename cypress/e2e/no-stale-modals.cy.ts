@@ -190,5 +190,30 @@ context("Modals are cancelled when navigating away", () => {
     },
   };
 
+  // Test-specific information:
+  type ItCanAbandonDescriptor = {
+    only?: boolean;
+    page: PageIdentifier;
+    runModal: () => void;
+    afterwardsExpect?: () => void;
+  };
+
+  // Register a test that navigating back abandons a particular modal.
+  function itCanAbandon(label: string, descr: ItCanAbandonDescriptor) {
+    const createTest = descr.only ?? false ? it.only : it;
+
+    createTest(label, () => {
+      const page = descr.page;
+      const funcs = abandonmentTestFuncsFromKind[page.kind];
+
+      funcs.goToPageUnderTest(page);
+      descr.runModal();
+      navBack();
+      funcs.returnToPageUnderTest(page);
+      descr.afterwardsExpect && descr.afterwardsExpect();
+      funcs.returnToMyProjects();
+    });
+  }
+
   // #endregion
 });
