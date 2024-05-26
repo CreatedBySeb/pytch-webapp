@@ -1,6 +1,9 @@
 /// <reference types="cypress" />
 
-import { launchShareTutorialModal } from "./utils";
+import {
+  createProjectFollowingTutorial,
+  launchShareTutorialModal,
+} from "./utils";
 
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
@@ -93,13 +96,7 @@ context("Demo of a tutorial", () => {
     cy.contains("Click the green flag");
     cy.pytchHomeFromIDE();
     cy.get(".NavBar").contains("Tutorials").click();
-    cy.contains("Boing")
-      .parent()
-      .within(() => {
-        cy.contains("Tutorial").click();
-      });
-    cy.contains("images and sounds");
-    cy.get(".ReadOnlyOverlay").should("not.exist");
+    createProjectFollowingTutorial("Boing");
     cy.get(".pytch-static-tooltip.hidden").should("have.length", 1);
     cy.get(".pytch-static-tooltip.shown").should("not.exist");
   });
