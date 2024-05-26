@@ -427,5 +427,24 @@ context("Modals are cancelled when navigating away", () => {
     afterwardsExpect: assertSnakeCostumesUnchanged,
   });
 
+  // Assume (hopefully that's not hubristic) that we don't have to test
+  // all of the following three modals in both types of IDE.  Just
+  // ensure both are covered.
+
+  itCanAbandon("save project as", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => cy.pytchChooseDropdownEntry("Make a copy"),
+  });
+
+  itCanAbandon("download zipfile", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => cy.pytchChooseDropdownEntry("Download"),
+  });
+
+  itCanAbandon("display screenshot", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => cy.pytchChooseDropdownEntry("Screenshot"),
+  });
+
   // #endregion
 });
