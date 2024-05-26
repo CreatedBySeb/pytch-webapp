@@ -11,9 +11,11 @@ import {
   assertActorNames,
   assertCostumeNames,
   assertHatBlockLabels,
+  clickAddSomething,
   clickUniqueButton,
   launchAddSprite,
   launchDeleteActorByIndex,
+  launchDeleteHandlerByIndex,
   launchRenameActorByIndex,
   selectActorAspect,
   selectSprite,
@@ -344,6 +346,34 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => launchDeleteActorByIndex(1),
     afterwardsExpect: assertActorNamesUnchanged,
+  });
+
+  itCanAbandon("add script", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCode();
+      clickAddSomething("Add script");
+    },
+    afterwardsExpect: assertSnakeHatBlocksUnchanged,
+  });
+
+  itCanAbandon("update script", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCode();
+      cy.get(".HatBlock").contains("green flag clicked").dblclick();
+      cy.contains("when I start as a clone").click();
+    },
+    afterwardsExpect: assertSnakeHatBlocksUnchanged,
+  });
+
+  itCanAbandon("delete script", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCode();
+      launchDeleteHandlerByIndex(0);
+    },
+    afterwardsExpect: assertSnakeHatBlocksUnchanged,
   });
 
   // #endregion
