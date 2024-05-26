@@ -461,5 +461,13 @@ context("Modals are cancelled when navigating away", () => {
     },
   });
 
+  itCanAbandon("view code diff", {
+    page: { kind: "specimen-linked-project" },
+    runModal: () => {
+      cy.get(".LinkedContentBar.linked-content .dropdown button").click();
+      cy.contains("Compare to original").click();
+    },
+  });
+
   // #endregion
 });
