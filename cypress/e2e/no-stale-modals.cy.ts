@@ -32,4 +32,9 @@ context("Modals are cancelled when navigating away", () => {
   beforeEach(initSpecimenIntercepts);
 
   // #endregion
+
+  ////////////////////////////////////////////////////////////////////////
+  // #region Helpers
+
+  // #endregion
 });
