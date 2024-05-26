@@ -61,6 +61,17 @@ export function interceptDemoZipfile(demoStem: string) {
   });
 }
 
+export function createProjectFollowingTutorial(tutorialMatch: string) {
+  cy.contains(tutorialMatch)
+    .parent()
+    .within(() => {
+      cy.get("button").contains("Tutorial").click();
+    });
+
+  cy.contains("images and sounds");
+  cy.get(".ReadOnlyOverlay").should("not.exist");
+}
+
 /** Assuming we're on the "My projects" page, open the dropdown menu for
  * the unique project whose name matches the given `projectName`, and
  * choose the unique dropdown item whose name matches the given
