@@ -115,5 +115,80 @@ context("Modals are cancelled when navigating away", () => {
     selectActorAspect("Costumes");
   };
 
+  // Machinery to describe a "navigating back abandons modal" test:
+
+  // Which page should the test take place on:
+  type PageIdentifier =
+    | { kind: "my-projects" }
+    | { kind: "ide"; projectIdx: number }
+    | { kind: "tutorials" }
+    | { kind: "specimen-linked-project" };
+
+  // Type for bundle of functions to conduct the test, based on which
+  // kind of page the test takes place on.  Declare these as function
+  // properties rather than methods to get stricter type checking.
+  // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html#strict-function-types
+  type AbandonmentTestFuncs = {
+    goToPageUnderTest: (page: PageIdentifier) => void;
+    returnToPageUnderTest: (page: PageIdentifier) => void;
+    returnToMyProjects: () => void;
+  };
+
+  type AbandonmentTestFuncsFromKind = Record<
+    PageIdentifier["kind"],
+    AbandonmentTestFuncs
+  >;
+
+  // Bundles of functions for each page-kind:
+  const abandonmentTestFuncsFromKind: AbandonmentTestFuncsFromKind = {
+    "my-projects": {
+      goToPageUnderTest: () => void 0, // Already on "My projects"
+      returnToPageUnderTest: () => {
+        assertHomePageNoModals();
+        goToMyProjectsAssertNoModals();
+      },
+      returnToMyProjects: () => void 0, // Already on "My projects"
+    },
+    ide: {
+      goToPageUnderTest: (page: PageIdentifier) => {
+        if (page.kind !== "ide") throw new Error("bad page.kind");
+        openProjectByIdx(page.projectIdx);
+      },
+      returnToPageUnderTest: (page: PageIdentifier) => {
+        if (page.kind !== "ide") throw new Error("bad page.kind");
+        assertMyProjectsNoModals();
+        openProjectByIdx(page.projectIdx);
+      },
+      returnToMyProjects: () => {
+        navBack();
+        assertMyProjectsNoModals();
+      },
+    },
+    tutorials: {
+      goToPageUnderTest: () => goToTutorialsAssertNoModals(),
+      returnToPageUnderTest: () => {
+        assertMyProjectsNoModals();
+        goToTutorialsAssertNoModals();
+      },
+      returnToMyProjects: () => {
+        navBack();
+        assertMyProjectsNoModals();
+      },
+    },
+    "specimen-linked-project": {
+      goToPageUnderTest: () => {
+        openProjectByIdx(kSpecimenLinkedProjectIdx);
+      },
+      returnToPageUnderTest: () => {
+        assertMyProjectsNoModals();
+        openProjectByIdx(kSpecimenLinkedProjectIdx);
+      },
+      returnToMyProjects: () => {
+        navBack();
+        assertMyProjectsNoModals();
+      },
+    },
+  };
+
   // #endregion
 });
