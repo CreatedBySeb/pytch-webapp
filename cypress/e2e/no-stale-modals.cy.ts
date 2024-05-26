@@ -80,5 +80,24 @@ context("Modals are cancelled when navigating away", () => {
     assertNoModals();
   }
 
+  // Navigation helpers:
+
+  const navBack = () => cy.go("back");
+
+  const openProjectByIdx = (idx: number): void => {
+    cy.pytchOpenProject(projectName(idx));
+    assertProjectIdeNoModals();
+  };
+
+  const goToMyProjectsAssertNoModals = () => {
+    cy.get(".NavBar li").contains("My projects").click();
+    assertMyProjectsNoModals();
+  };
+
+  const goToTutorialsAssertNoModals = () => {
+    cy.get(".NavBar li").contains("Tutorials").click();
+    assertTutorialsNoModals();
+  };
+
   // #endregion
 });
