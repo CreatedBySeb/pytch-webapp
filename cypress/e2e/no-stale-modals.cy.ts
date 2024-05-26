@@ -56,5 +56,29 @@ context("Modals are cancelled when navigating away", () => {
 
   const projectName = (idx: number): string => kExpAllProjectNames[idx];
 
+  // Assertions that we are at various pages and have no modals:
+
+  const assertNoModals = () => cy.get(".modal").should("not.exist");
+
+  const assertHomePageNoModals = () => {
+    cy.contains("Pytch is a bridge from Scratch to Python");
+    assertNoModals();
+  };
+
+  function assertMyProjectsNoModals() {
+    cy.get(".ProjectList h1").contains("My projects");
+    assertNoModals();
+  }
+
+  function assertTutorialsNoModals() {
+    cy.get(".TutorialList h1").contains("Tutorials");
+    assertNoModals();
+  }
+
+  function assertProjectIdeNoModals() {
+    cy.get("#pytch-stage-layers");
+    assertNoModals();
+  }
+
   // #endregion
 });
