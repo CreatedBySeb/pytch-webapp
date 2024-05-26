@@ -1,19 +1,11 @@
 /// <reference types="cypress" />
-const initIntercepts = () => {
-  cy.intercept("GET", "**/hello-world-lesson.zip", {
-    fixture: "lesson-specimens/hello-world-lesson.zip",
-  });
-  cy.intercept("GET", "**/_by_content_hash_/*f4db652fe09e1663.zip", {
-    fixture: "lesson-specimens/hello-world-lesson.zip",
-  });
-};
+
+import { initSpecimenIntercepts } from "./utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
 
 context("Create project from specimen", () => {
-  beforeEach(() => {
-    initIntercepts();
-  });
+  beforeEach(initSpecimenIntercepts);
 
   it("behaves correctly", () => {
     const saveProject = () => {
@@ -214,9 +206,7 @@ context("Create project from specimen", () => {
 });
 
 context("Compare user code to original", () => {
-  beforeEach(() => {
-    initIntercepts();
-  });
+  beforeEach(initSpecimenIntercepts);
 
   it("can launch and dismiss modal", () => {
     cy.visit(lessonUrl);

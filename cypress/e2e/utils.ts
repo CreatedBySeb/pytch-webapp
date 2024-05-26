@@ -1,3 +1,13 @@
+/** Set up request intercepts for a specimen for use intests. */
+export function initSpecimenIntercepts() {
+  cy.intercept("GET", "**/hello-world-lesson.zip", {
+    fixture: "lesson-specimens/hello-world-lesson.zip",
+  });
+  cy.intercept("GET", "**/_by_content_hash_/*f4db652fe09e1663.zip", {
+    fixture: "lesson-specimens/hello-world-lesson.zip",
+  });
+}
+
 /** Object with function properties to help with testing behaviour of
  * the Save button.  In most cases, tests should be able to use:
  *
