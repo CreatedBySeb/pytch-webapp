@@ -36,5 +36,25 @@ context("Modals are cancelled when navigating away", () => {
   ////////////////////////////////////////////////////////////////////////
   // #region Helpers
 
+  const kMp3AssetName = "sine-1kHz-2s.mp3";
+  const kPngAssetName = "red-rectangle-80-60.png";
+  const kExpFlatAssetNames = [kPngAssetName, kMp3AssetName];
+
+  // In the before() function, we set up the following projects:
+  const kExpAllProjectNames = [
+    "Untitled project",
+    "Per-method test project",
+    'My "catch-apple"',
+    "Hello World Specimen",
+    "Test seed project",
+  ];
+
+  const kPerMethodProjectIdx = 1;
+  const kTutorialFollowingProjectIdx = 2;
+  const kSpecimenLinkedProjectIdx = 3;
+  const kFlatProjectIdx = 4;
+
+  const projectName = (idx: number): string => kExpAllProjectNames[idx];
+
   // #endregion
 });
