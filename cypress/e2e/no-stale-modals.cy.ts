@@ -4,6 +4,10 @@ import {
   initSpecimenIntercepts,
   setInstantDelays,
 } from "./utils";
+import {
+  selectActorAspect,
+  selectSprite,
+} from "./junior/utils";
 
 context("Modals are cancelled when navigating away", () => {
   ////////////////////////////////////////////////////////////////////////
@@ -97,6 +101,18 @@ context("Modals are cancelled when navigating away", () => {
   const goToTutorialsAssertNoModals = () => {
     cy.get(".NavBar li").contains("Tutorials").click();
     assertTutorialsNoModals();
+  };
+
+  // Selection helpers for within the per-method IDE:
+
+  const selectSnakeCode = () => {
+    selectSprite("Snake");
+    selectActorAspect("Code");
+  };
+
+  const selectSnakeCostumes = () => {
+    selectSprite("Snake");
+    selectActorAspect("Costumes");
   };
 
   // #endregion
