@@ -3,11 +3,15 @@ import {
   createProjectFollowingTutorial,
   initSpecimenIntercepts,
   setInstantDelays,
+  launchCreateProjectModal,
+  launchProjectInListDropdownAction,
+  selectUniqueProject,
 } from "./utils";
 import {
   assertActorNames,
   assertCostumeNames,
   assertHatBlockLabels,
+  clickUniqueButton,
   selectActorAspect,
   selectSprite,
 } from "./junior/utils";
@@ -243,6 +247,47 @@ context("Modals are cancelled when navigating away", () => {
 
   ////////////////////////////////////////////////////////////////////////
   // #region Tests
+
+  itCanAbandon("create project", {
+    page: { kind: "my-projects" },
+    runModal: () => launchCreateProjectModal(),
+  });
+
+  itCanAbandon("upload zipfiles", {
+    page: { kind: "my-projects" },
+    runModal: () => cy.get("button").contains("Upload").click(),
+    afterwardsExpect: assertProjectNamesUnchanged,
+  });
+
+  itCanAbandon("rename project", {
+    page: { kind: "my-projects" },
+    runModal: () =>
+      launchProjectInListDropdownAction("Per-method test project", "Rename"),
+    afterwardsExpect: assertProjectNamesUnchanged,
+  });
+
+  itCanAbandon("delete project", {
+    page: { kind: "my-projects" },
+    runModal: () =>
+      launchProjectInListDropdownAction("Per-method test project", "DELETE"),
+    afterwardsExpect: assertProjectNamesUnchanged,
+  });
+
+  itCanAbandon("delete many projects", {
+    page: { kind: "my-projects" },
+    runModal: () => {
+      selectUniqueProject(projectName(0));
+      selectUniqueProject(projectName(1));
+      clickUniqueButton("DELETE");
+    },
+    afterwardsExpect: () => {
+      // Slight abuse of this method to change app state (rather than
+      // just assert some things).  We need to leave things as we found
+      // them, by cancelling the multi-project selection:
+      cy.get(".buttons.some-selected button.btn-primary").click();
+      cy.pytchProjectNamesShouldDeepEqual(kExpAllProjectNames);
+    },
+  });
 
   // #endregion
 });
