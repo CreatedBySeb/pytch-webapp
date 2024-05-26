@@ -289,5 +289,38 @@ context("Modals are cancelled when navigating away", () => {
     },
   });
 
+  itCanAbandon("add assets (flat)", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => cy.contains("Add an image").click(),
+    afterwardsExpect: assertFlatAssetsUnchanged,
+  });
+
+  itCanAbandon("add clip art (flat)", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => {
+      cy.contains("Choose from library").click();
+      cy.get(".clipart-card").contains("blocks").click();
+    },
+    afterwardsExpect: assertFlatAssetsUnchanged,
+  });
+
+  itCanAbandon("delete asset (flat)", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => cy.pytchClickAssetDropdownItem(kMp3AssetName, "DELETE"),
+    afterwardsExpect: assertFlatAssetsUnchanged,
+  });
+
+  itCanAbandon("rename asset (flat)", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => cy.pytchClickAssetDropdownItem(kMp3AssetName, "Rename"),
+    afterwardsExpect: assertFlatAssetsUnchanged,
+  });
+
+  itCanAbandon("crop+scale image (flat)", {
+    page: { kind: "ide", projectIdx: kFlatProjectIdx },
+    runModal: () => cy.pytchClickAssetDropdownItem(kPngAssetName, "Crop/scale"),
+    // TODO: Assert image-transform unchanged?
+  });
+
   // #endregion
 });
