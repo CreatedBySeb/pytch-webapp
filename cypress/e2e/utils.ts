@@ -8,6 +8,11 @@ export function initSpecimenIntercepts() {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function setInstantDelays(window: any) {
+  window.PYTCH_CYPRESS.instantDelays = true;
+}
+
 /** Object with function properties to help with testing behaviour of
  * the Save button.  In most cases, tests should be able to use:
  *
