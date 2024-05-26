@@ -1,5 +1,10 @@
 /// <reference types="cypress" />
 
+import {
+  createProjectFollowingTutorial,
+  launchShareTutorialModal,
+} from "./utils";
+
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
     cy.visit("/");
@@ -91,13 +96,7 @@ context("Demo of a tutorial", () => {
     cy.contains("Click the green flag");
     cy.pytchHomeFromIDE();
     cy.get(".NavBar").contains("Tutorials").click();
-    cy.contains("Boing")
-      .parent()
-      .within(() => {
-        cy.contains("Tutorial").click();
-      });
-    cy.contains("images and sounds");
-    cy.get(".ReadOnlyOverlay").should("not.exist");
+    createProjectFollowingTutorial("Boing");
     cy.get(".pytch-static-tooltip.hidden").should("have.length", 1);
     cy.get(".pytch-static-tooltip.shown").should("not.exist");
   });
@@ -163,11 +162,7 @@ context("Work with suggested tutorials", () => {
 context("Tutorial share feature", () => {
   it("Allows user to copy links", () => {
     cy.visit("/tutorials");
-    cy.contains("Boing")
-      .parent()
-      .within(() => {
-        cy.contains("Share").click();
-      });
+    launchShareTutorialModal("Boing");
     cy.get("button[title*='only']").click();
     cy.waitUntil(() =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

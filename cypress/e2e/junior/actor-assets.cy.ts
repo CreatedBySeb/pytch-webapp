@@ -8,6 +8,8 @@ import {
   clickHeaderCloseButton,
   clickUniqueButton,
   initiateAddFromMediaLib,
+  launchDeleteAssetByIndex,
+  launchRenameAssetByIndex,
   selectActorAspect,
   selectSprite,
   selectStage,
@@ -41,12 +43,6 @@ context("Working with assets of an actor", () => {
   const addFromFixture = (fixtureBasename: string) => {
     initiateAddFromFixture(fixtureBasename);
     settleModalDialog("Add to project");
-  };
-
-  const launchDeleteAssetByIndex = (idx: number) => {
-    cy.get(".AssetCard").eq(idx).find("button").click();
-    cy.get(".dropdown-item").contains("DELETE").click();
-    cy.get(".modal-header").contains("Delete image");
   };
 
   it("can add and delete Costumes from medialib", () => {
@@ -207,12 +203,6 @@ context("Working with assets of an actor", () => {
     selectStage();
     assertErrorCorrect("stage", "to the stage");
   });
-
-  const launchRenameAssetByIndex = (idx: number) => {
-    cy.get("div.tab-pane.active .AssetCard").eq(idx).find("button").click();
-    cy.get(".dropdown-item").contains("Rename").click();
-    cy.get(".modal-header").should("have.length", 1).contains("Rename");
-  };
 
   const addSampleSounds = () => {
     selectActorAspect("Sounds");

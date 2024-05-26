@@ -6,7 +6,7 @@ import { deIndent } from "../../common/utils";
 
 import { IconName } from "@fortawesome/fontawesome-common-types";
 import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
-import { launchDropdownAction } from "../utils";
+import { launchProjectInListDropdownAction } from "../utils";
 import { Actions } from "easy-peasy";
 import { IActiveProject } from "../../../src/model/project";
 
@@ -233,7 +233,7 @@ export const getActivityBarTab = (icon: IconName) =>
   cy.get(`.ActivityBarTab .tabkey-icon svg[data-icon="${icon}"]`);
 
 export const renameProject = (currentNameMatch: string, newName: string) => {
-  launchDropdownAction(currentNameMatch, "Rename");
+  launchProjectInListDropdownAction(currentNameMatch, "Rename");
   cy.get("input").type("{selectAll}{del}");
   cy.get("input").type(newName);
   settleModalDialog("Rename");
@@ -436,4 +436,50 @@ export const addFromMediaLib = (matches: Array<string>) => {
   initiateAddFromMediaLib(matches);
   const expButtonMatch = `Add ${matches.length}`;
   settleModalDialog(expButtonMatch);
+};
+
+/** Assuming that we are in the per-method IDE, with the Appearances
+ * (i.e., Backdrops or Costumes) tab active, launch the Delete modal for
+ * the appearance at the given `idx`. */
+export const launchDeleteAssetByIndex = (idx: number) => {
+  cy.get(".AssetCard").eq(idx).find("button").click();
+  cy.get(".dropdown-item").contains("DELETE").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Delete image");
+};
+
+/** Assuming that we are in the per-method IDE, with the Appearances
+ * (i.e., Backdrops or Costumes) tab active, launch the Rename modal for
+ * the appearance at the given `idx`. */
+export const launchRenameAssetByIndex = (idx: number) => {
+  cy.get("div.tab-pane.active .AssetCard").eq(idx).find("button").click();
+  cy.get(".dropdown-item").contains("Rename").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Rename");
+};
+
+/** Assuming that we are in the per-method IDE, launch the "rename"
+ * action on the Actor at the given `idx` (which must be non-zero,
+ * because it is impossible to rename the Stage).   */
+export const launchRenameActorByIndex = (idx: number) => {
+  cy.get(".ActorCard").eq(idx).click().find("button").click();
+  cy.get(".dropdown-item.disabled").should("not.exist");
+  cy.get(".dropdown-item").contains("Rename").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Rename");
+};
+
+/** Assuming that we are in the per-method IDE, launch the "delete"
+ * action on the Actor at the given `idx` (which must be non-zero,
+ * because it is impossible to delete the Stage).   */
+export const launchDeleteActorByIndex = (idx: number) => {
+  cy.get(".ActorCard").eq(idx).click().find("button").click();
+  cy.get(".dropdown-item.disabled").should("not.exist");
+  cy.get(".dropdown-item").contains("DELETE").click();
+  cy.get(".modal-header").should("have.length", 1).contains("Delete");
+};
+
+/** Assuming that we are in the per-method IDE, with the Code tab
+ * active, launch the "Delete Handler" modal for the script at the given
+ * `idx`. */
+export const launchDeleteHandlerByIndex = (idx: number) => {
+  ScriptOps.chooseHandlerDropdownItem(idx, "DELETE");
+  cy.get(".modal-header").should("have.length", 1).contains("Delete script?");
 };
