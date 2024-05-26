@@ -15,8 +15,10 @@ import {
   clickUniqueButton,
   launchAddSprite,
   launchDeleteActorByIndex,
+  launchDeleteAssetByIndex,
   launchDeleteHandlerByIndex,
   launchRenameActorByIndex,
+  launchRenameAssetByIndex,
   selectActorAspect,
   selectSprite,
 } from "./junior/utils";
@@ -374,6 +376,55 @@ context("Modals are cancelled when navigating away", () => {
       launchDeleteHandlerByIndex(0);
     },
     afterwardsExpect: assertSnakeHatBlocksUnchanged,
+  });
+
+  itCanAbandon("add assets (per-method)", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCostumes();
+      clickAddSomething("from this device");
+    },
+  });
+
+  itCanAbandon("rename asset (per-method)", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCostumes();
+      launchRenameAssetByIndex(0);
+    },
+    afterwardsExpect: () => {
+      selectSnakeCostumes();
+      assertCostumeNames(["python-logo.png"]);
+    },
+  });
+
+  itCanAbandon("delete asset (per-method)", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCostumes();
+      launchDeleteAssetByIndex(0);
+    },
+    afterwardsExpect: assertSnakeCostumesUnchanged,
+  });
+
+  itCanAbandon("crop+scale image (per-method)", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCostumes();
+      cy.get(".AssetCard button.dropdown-toggle").click();
+      cy.get(".dropdown-item").contains("Crop/scale").click();
+    },
+    // TODO: Assert image-transform unchanged?
+  });
+
+  itCanAbandon("add clip art (per-method)", {
+    page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
+    runModal: () => {
+      selectSnakeCostumes();
+      clickAddSomething("Add from media library");
+      cy.get(".clipart-card").contains("blocks").click();
+    },
+    afterwardsExpect: assertSnakeCostumesUnchanged,
   });
 
   // #endregion
