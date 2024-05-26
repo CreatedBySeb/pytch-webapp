@@ -240,4 +240,9 @@ context("Modals are cancelled when navigating away", () => {
   };
 
   // #endregion
+
+  ////////////////////////////////////////////////////////////////////////
+  // #region Tests
+
+  // #endregion
 });
