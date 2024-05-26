@@ -71,6 +71,8 @@ context("Google Drive import and export", () => {
     cy.get("button").contains("Drive unavailable").should("be.disabled");
   });
 
+  ////////////////////////////////////////////////////////////////////////
+
   context("with successful boot", () => {
     const okBootBehaviour = (
       remainingBehaviour: Omit<MockApiBehaviour, "boot">
@@ -102,6 +104,87 @@ context("Google Drive import and export", () => {
       cy.get(".modal-body").contains(/Project exported to.*[.]zip/);
       cy.get("button").contains("OK").click();
     };
+
+    context("can abandon via navigate-back", () => {
+      function startImportFlow(mockBehaviour: MockApiBehaviour): void {
+        cy.pytchResetDatabase(setApiBehaviourOpts(mockBehaviour));
+        cy.contains("My projects").click();
+        cy.contains("Import from Google").click();
+      }
+
+      afterEach(() => {
+        cy.get(".modal").should("not.exist");
+        cy.contains("Pytch is a bridge");
+      });
+
+      it("can navigate back from auth failure", () => {
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["fail"],
+          getUserInfo: [],
+          exportFile: [],
+          importFiles: [],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-title").contains("Import from Google");
+        cy.get(".modal-body .outcome-summary.failures").contains(
+          "something_went_wrong"
+        );
+        cy.go("back");
+      });
+
+      it("can navigate back from auth-pending", () => {
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["wait"],
+          getUserInfo: [],
+          exportFile: [],
+          importFiles: [],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-title").contains("Connecting to Google");
+        cy.go("back");
+      });
+
+      it("can navigate back from picker", () => {
+        let wasCancelled = valueCell(false);
+
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["ok"],
+          getUserInfo: ["ok"],
+          exportFile: [],
+          importFiles: [{ kind: "wait", wasCancelled }],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".GoogleTaskStatusModal-already-modal");
+        cy.go("back");
+        cy.get(".GoogleTaskStatusModal-already-modal")
+          .should("not.exist")
+          .then(() => {
+            expect(wasCancelled.get()).eq(true);
+          });
+      });
+
+      it("can navigate back from summary modal", () => {
+        let wasCancelled = valueCell(false);
+        const mockBehaviour = okBootBehaviour({
+          acquireToken: ["ok"],
+          getUserInfo: ["ok"],
+          exportFile: [],
+          importFiles: [{ kind: "ok", files: [], wasCancelled }],
+        });
+        startImportFlow(mockBehaviour);
+
+        cy.get(".modal-header").contains("Import from Google");
+        cy.go("back");
+        cy.get(".modal-header")
+          .should("not.exist")
+          .then(() => {
+            expect(wasCancelled.get()).eq(false);
+          });
+      });
+    });
 
     it("shows error if no auth then succeeds on retry", () => {
       // The user chooses Cancel in the Google log-in pop-up, thereby
