@@ -5,6 +5,7 @@ import {
   setInstantDelays,
   launchCreateProjectModal,
   launchProjectInListDropdownAction,
+  launchShareTutorialModal,
   selectUniqueProject,
 } from "./utils";
 import {
@@ -444,6 +445,20 @@ context("Modals are cancelled when navigating away", () => {
   itCanAbandon("display screenshot", {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => cy.pytchChooseDropdownEntry("Screenshot"),
+  });
+
+  itCanAbandon("share tutorial", {
+    page: { kind: "tutorials" },
+    runModal: () => launchShareTutorialModal("Shoot the fruit"),
+  });
+
+  itCanAbandon("code diff help", {
+    page: { kind: "ide", projectIdx: kTutorialFollowingProjectIdx },
+    runModal: () => {
+      cy.get("ul.ToC").contains("Start the bowl").click();
+      cy.get(".patch-container .header button").eq(0).click();
+      cy.contains("What changes should I make to my code?");
+    },
   });
 
   // #endregion
