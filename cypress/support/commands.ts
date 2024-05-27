@@ -223,12 +223,12 @@ Cypress.Commands.add(
     cy.get(".AssetCard .card-header code")
       .should("have.length", nExpNames)
       .then(($codes) => {
-      const orderedExpectedNames = [...expectedNames];
-      orderedExpectedNames.sort();
-      const gotNames = $codes.toArray().map((c) => c.innerText);
-      gotNames.sort();
-      expect(gotNames).to.eql(orderedExpectedNames);
-    });
+        const orderedExpectedNames = [...expectedNames];
+        orderedExpectedNames.sort();
+        const gotNames = $codes.toArray().map((c) => c.innerText);
+        gotNames.sort();
+        expect(gotNames).to.eql(orderedExpectedNames);
+      });
   }
 );
 
