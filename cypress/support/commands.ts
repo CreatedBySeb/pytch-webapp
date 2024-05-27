@@ -216,10 +216,13 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "pytchShouldShowAssets",
   (expectedNames: Array<string>) => {
+    const nExpNames = expectedNames.length;
     cy.get(".InfoPanel .nav-link")
       .contains("Images and sounds")
       .should("have.class", "active");
-    cy.get(".AssetCard .card-header code").then(($codes) => {
+    cy.get(".AssetCard .card-header code")
+      .should("have.length", nExpNames)
+      .then(($codes) => {
       const orderedExpectedNames = [...expectedNames];
       orderedExpectedNames.sort();
       const gotNames = $codes.toArray().map((c) => c.innerText);
