@@ -42,7 +42,8 @@ context("Management of project list", () => {
       const db = window.PYTCH_CYPRESS.PYTCH_DB as DexieStorage;
       cy.get("[data-project-id]")
         .invoke("attr", "data-project-id")
-        .then(async (idStr: string) => {
+        .then(async (idStr: string | undefined) => {
+          if (idStr == null) throw new Error('no "data-project-id" attr');
           const projectId = parseInt(idStr);
           const gotHash = await db.projectContentHash(projectId);
 

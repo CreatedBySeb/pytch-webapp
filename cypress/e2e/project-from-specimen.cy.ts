@@ -38,7 +38,8 @@ context("Create project from specimen", () => {
     cy.title().should("eq", "Pytch: Hello World Specimen");
     cy.get("[data-project-id]")
       .invoke("attr", "data-project-id")
-      .then((idStr: string) => {
+      .then((idStr: string | undefined) => {
+        if (idStr == null) throw new Error('no "data-project-id" attr');
         const firstId = parseInt(idStr);
 
         // Second visit to the lesson URL should immediately open the
@@ -84,7 +85,8 @@ context("Create project from specimen", () => {
         saveProject();
         cy.get("[data-project-id]")
           .invoke("attr", "data-project-id")
-          .then((idStr: string) => {
+          .then((idStr: string | undefined) => {
+            if (idStr == null) throw new Error('no "data-project-id" attr');
             const secondId = parseInt(idStr);
             const bothIds = [firstId, secondId];
 
