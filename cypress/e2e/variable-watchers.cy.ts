@@ -18,7 +18,7 @@ context("Watch variables", () => {
     }>;
   };
 
-  [
+  const instanceVarWatcherSpecs: Array<InstanceVarWatcherSpec> = [
     {
       label: "default",
       kwargsCode: "",
@@ -44,7 +44,9 @@ context("Watch variables", () => {
       kwargsCode: ", bottom=-176, right=236",
       expStyle: { right: "4px", bottom: "4px" },
     },
-  ].forEach((spec) => {
+  ];
+
+  instanceVarWatcherSpecs.forEach((spec) => {
     it(`shows a Sprite instance variable (${spec.label})`, () => {
       cy.pytchBuildCode(`
         import pytch
