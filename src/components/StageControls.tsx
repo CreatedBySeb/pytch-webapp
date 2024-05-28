@@ -133,9 +133,8 @@ export const StageControls: React.FC<EmptyProps> = () => {
   const setIsFullScreen = useStoreActions(
     (actions) => actions.ideLayout.setIsFullScreen
   );
-  const programKind = useStoreState(
-    (state) => state.activeProject.project.program.kind
-  );
+
+  const programKind = project.program.kind;
 
   const handleSave = () => requestSyncToStorage();
 
