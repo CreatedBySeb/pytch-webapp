@@ -113,6 +113,8 @@ context("Watch variables", () => {
       cy.get("@bubblesDiv").then(($div) => {
         const stageWd = $div.width();
         const stageHt = $div.height();
+        if (stageWd == null || stageHt == null)
+          throw new Error("missing wd/ht");
         cy.get(".attribute-watcher")
           .should("have.css", "left", `${stageWd / 2}px`)
           .should("have.css", "bottom", `${stageHt / 2}px`);
