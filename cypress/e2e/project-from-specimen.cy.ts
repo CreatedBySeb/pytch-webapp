@@ -13,6 +13,13 @@ context("Create project from specimen", () => {
       cy.get("button.no-changes-since-last-save");
     };
 
+    function projectIdOfElt(elt: HTMLElement): number {
+      const mProjectIdStr = elt.getAttribute("data-project-id");
+      if (mProjectIdStr == null)
+        throw new Error('no "data-project-id" attribute');
+      return parseInt(mProjectIdStr);
+    }
+
     const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
       let gotIds = $li
         .toArray()
