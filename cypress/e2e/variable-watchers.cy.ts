@@ -67,8 +67,12 @@ context("Watch variables", () => {
       cy.pytchSendKeysToProject("s");
 
       cy.get(".attribute-watcher").as("watcher").should("have.length", 1);
-      for (const attr in spec.expStyle) {
-        cy.get("@watcher").should("have.css", attr, spec.expStyle[attr]);
+
+      for (const attr of ["left", "right", "top", "bottom"] as const) {
+        const mExpCssValue = spec.expStyle[attr];
+        if (mExpCssValue != null) {
+          cy.get("@watcher").should("have.css", attr, mExpCssValue);
+        }
       }
 
       cy.pytchSendKeysToProject("h");
