@@ -21,11 +21,7 @@ context("Create project from specimen", () => {
     }
 
     const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
-      let gotIds = $li
-        .toArray()
-        .map((elt: HTMLElement) =>
-          parseInt(elt.getAttribute("data-project-id"))
-        );
+      let gotIds = $li.toArray().map(projectIdOfElt);
       gotIds.sort((a, b) => a - b);
 
       expect(gotIds.length).eq(expIds.length);
