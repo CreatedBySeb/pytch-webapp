@@ -7,6 +7,17 @@ context("Watch variables", () => {
     cy.pytchExactlyOneProject();
   });
 
+  type InstanceVarWatcherSpec = {
+    label: string;
+    kwargsCode: string;
+    expStyle: Partial<{
+      left: string;
+      right: string;
+      top: string;
+      bottom: string;
+    }>;
+  };
+
   [
     {
       label: "default",
