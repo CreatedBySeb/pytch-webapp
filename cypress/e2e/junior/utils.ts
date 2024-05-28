@@ -302,7 +302,9 @@ export const deleteAllCodeOfSoleHandler = () => {
       const controllerMap = aceControllerMapFromWindow(window);
       const editorIds = controllerMap.nonSpecialEditorIds();
       if (editorIds.length !== 1) return false;
-      const soleCode = controllerMap.get(editorIds[0]).value();
+      const mController = controllerMap.get(editorIds[0]);
+      if (mController == null) return false;
+      const soleCode = mController.value();
       return soleCode === "";
     });
   });
