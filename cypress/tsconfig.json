@@ -4,8 +4,11 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "target": "es6",
-    "lib": ["es6", "dom", "dom.iterable"],
-    "types": ["cypress", "node"]
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "types": ["cypress", "node", "vite/client"],
+    "skipLibCheck": true,
+    "allowJs": true,
+    "noEmit": true
   },
   "include": ["**/*.ts"]
 }
