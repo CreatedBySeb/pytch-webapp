@@ -219,10 +219,14 @@ export const aceControllerMapFromWindow = (window: any): AceControllerMap =>
  * and that it has the given `expCode` as its contents. */
 export const soleEventHandlerCodeShouldEqual = (expCode: string): void => {
   cy.window().then((window) => {
+    // This is similar to deleteAllCodeOfSoleHandler() below but
+    // different enough that it's not worth extracting a function.
     const controllerMap = aceControllerMapFromWindow(window);
     const editorIds = controllerMap.nonSpecialEditorIds();
     cy.wrap(editorIds.length).should("equal", 1);
-    const soleCode = controllerMap.get(editorIds[0]).value();
+    const mController = controllerMap.get(editorIds[0]);
+    if (mController == null) throw new Error("no controller");
+    const soleCode = mController.value();
     cy.wrap(soleCode).should("equal", expCode);
   });
 };
@@ -298,7 +302,9 @@ export const deleteAllCodeOfSoleHandler = () => {
       const controllerMap = aceControllerMapFromWindow(window);
       const editorIds = controllerMap.nonSpecialEditorIds();
       if (editorIds.length !== 1) return false;
-      const soleCode = controllerMap.get(editorIds[0]).value();
+      const mController = controllerMap.get(editorIds[0]);
+      if (mController == null) return false;
+      const soleCode = mController.value();
       return soleCode === "";
     });
   });

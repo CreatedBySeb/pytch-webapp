@@ -13,12 +13,15 @@ context("Create project from specimen", () => {
       cy.get("button.no-changes-since-last-save");
     };
 
+    function projectIdOfElt(elt: HTMLElement): number {
+      const mProjectIdStr = elt.getAttribute("data-project-id");
+      if (mProjectIdStr == null)
+        throw new Error('no "data-project-id" attribute');
+      return parseInt(mProjectIdStr);
+    }
+
     const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
-      let gotIds = $li
-        .toArray()
-        .map((elt: HTMLElement) =>
-          parseInt(elt.getAttribute("data-project-id"))
-        );
+      let gotIds = $li.toArray().map(projectIdOfElt);
       gotIds.sort((a, b) => a - b);
 
       expect(gotIds.length).eq(expIds.length);
@@ -35,7 +38,8 @@ context("Create project from specimen", () => {
     cy.title().should("eq", "Pytch: Hello World Specimen");
     cy.get("[data-project-id]")
       .invoke("attr", "data-project-id")
-      .then((idStr: string) => {
+      .then((idStr: string | undefined) => {
+        if (idStr == null) throw new Error('no "data-project-id" attr');
         const firstId = parseInt(idStr);
 
         // Second visit to the lesson URL should immediately open the
@@ -81,7 +85,8 @@ context("Create project from specimen", () => {
         saveProject();
         cy.get("[data-project-id]")
           .invoke("attr", "data-project-id")
-          .then((idStr: string) => {
+          .then((idStr: string | undefined) => {
+            if (idStr == null) throw new Error('no "data-project-id" attr');
             const secondId = parseInt(idStr);
             const bothIds = [firstId, secondId];
 

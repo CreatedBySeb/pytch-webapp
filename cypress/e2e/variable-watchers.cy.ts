@@ -7,7 +7,18 @@ context("Watch variables", () => {
     cy.pytchExactlyOneProject();
   });
 
-  [
+  type InstanceVarWatcherSpec = {
+    label: string;
+    kwargsCode: string;
+    expStyle: Partial<{
+      left: string;
+      right: string;
+      top: string;
+      bottom: string;
+    }>;
+  };
+
+  const instanceVarWatcherSpecs: Array<InstanceVarWatcherSpec> = [
     {
       label: "default",
       kwargsCode: "",
@@ -33,7 +44,9 @@ context("Watch variables", () => {
       kwargsCode: ", bottom=-176, right=236",
       expStyle: { right: "4px", bottom: "4px" },
     },
-  ].forEach((spec) => {
+  ];
+
+  instanceVarWatcherSpecs.forEach((spec) => {
     it(`shows a Sprite instance variable (${spec.label})`, () => {
       cy.pytchBuildCode(`
         import pytch
@@ -54,8 +67,12 @@ context("Watch variables", () => {
       cy.pytchSendKeysToProject("s");
 
       cy.get(".attribute-watcher").as("watcher").should("have.length", 1);
-      for (const attr in spec.expStyle) {
-        cy.get("@watcher").should("have.css", attr, spec.expStyle[attr]);
+
+      for (const attr of ["left", "right", "top", "bottom"] as const) {
+        const mExpCssValue = spec.expStyle[attr];
+        if (mExpCssValue != null) {
+          cy.get("@watcher").should("have.css", attr, mExpCssValue);
+        }
       }
 
       cy.pytchSendKeysToProject("h");
@@ -96,6 +113,8 @@ context("Watch variables", () => {
       cy.get("@bubblesDiv").then(($div) => {
         const stageWd = $div.width();
         const stageHt = $div.height();
+        if (stageWd == null || stageHt == null)
+          throw new Error("missing wd/ht");
         cy.get(".attribute-watcher")
           .should("have.css", "left", `${stageWd / 2}px`)
           .should("have.css", "bottom", `${stageHt / 2}px`);

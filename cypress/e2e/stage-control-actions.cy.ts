@@ -42,7 +42,11 @@ context("Stage control actions", () => {
       cy.window().then((win: any) => {
         const copiedText: string =
           win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
+
         const match = coordsRegExp.exec(copiedText);
+        if (match == null)
+          throw new Error(`bad copied text "${copiedText}" for coords`);
+
         const [gotX, gotY] = [parseInt(match[1]), parseInt(match[2])];
         return Math.abs(gotX - stageX) < 2 && Math.abs(gotY - stageY) < 2;
       })
@@ -104,7 +108,9 @@ context("Stage control actions", () => {
             // when the type file says it return JSZipObject | null.
             const obj = zipFile.file(path);
             expect(obj, `file "${path}" within zip`).not.null;
-            return obj;
+
+            // TypeScript doesn't understand Cypress control flow, so cast:
+            return obj as JSZip.JSZipObject;
           };
 
           const codeJson = await existingFile("code/code.json").async("string");

@@ -10,45 +10,47 @@ const dragDropArgs = {
 
 type CyElementWrapper = Cypress.Chainable<JQuery<HTMLElement>>;
 
-const DragSimulator = {
-  init(
-    sourceWrapper: Cypress.JQueryWithSelector,
+const DragSimulator = () => {
+  let sourceEltWrapper: CyElementWrapper;
+  let targetEltWrapper: CyElementWrapper;
+
+  function init(
+    sourceSelector: Cypress.JQueryWithSelector,
     target: string | CyElementWrapper
   ) {
-    this.source = cy.wrap(sourceWrapper.get(0));
-    const wrappedTarget = typeof target === "string" ? cy.get(target) : target;
-    return wrappedTarget.then((targetWrapper) => {
-      this.target = cy.wrap(targetWrapper.get(0));
+    sourceEltWrapper = cy.wrap(sourceSelector.get(0));
+    const targetSelector = typeof target === "string" ? cy.get(target) : target;
+    return targetSelector.then((targetWrapper) => {
+      targetEltWrapper = cy.wrap(targetWrapper.get(0));
     });
-  },
+  }
 
-  dragstart() {
-    return this.source.trigger("dragstart", dragDropArgs);
-  },
+  function dragstart() {
+    return sourceEltWrapper.trigger("dragstart", dragDropArgs);
+  }
 
-  dragover() {
-    this.target.trigger("dragover", dragDropArgs);
-  },
+  function dragover() {
+    return targetEltWrapper.trigger("dragover", dragDropArgs);
+  }
 
-  drop() {
-    return this.target
+  function drop() {
+    return targetEltWrapper
       .trigger("drop", dragDropArgs)
-      .then(() => this.source.trigger("dragend", dragDropArgs));
-  },
+      .then(() => sourceEltWrapper.trigger("dragend", dragDropArgs));
+  }
 
-  drag(
+  function drag(
     sourceWrapper: Cypress.JQueryWithSelector,
     target: string | CyElementWrapper
   ) {
-    this.init(sourceWrapper, target)
-      .then(() => this.dragstart())
-      .then(() => this.dragover())
-      .then(() => this.drop());
-  },
+    init(sourceWrapper, target).then(dragstart).then(dragover).then(drop);
+  }
+
+  return { drag };
 };
 
 Cypress.Commands.add(
   "drag",
   { prevSubject: "element" },
-  (prevSubject, targetAlias) => DragSimulator.drag(prevSubject, targetAlias)
+  (prevSubject, targetAlias) => DragSimulator().drag(prevSubject, targetAlias)
 );
