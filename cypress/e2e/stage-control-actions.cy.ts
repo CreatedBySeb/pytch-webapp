@@ -108,7 +108,9 @@ context("Stage control actions", () => {
             // when the type file says it return JSZipObject | null.
             const obj = zipFile.file(path);
             expect(obj, `file "${path}" within zip`).not.null;
-            return obj;
+
+            // TypeScript doesn't understand Cypress control flow, so cast:
+            return obj as JSZip.JSZipObject;
           };
 
           const codeJson = await existingFile("code/code.json").async("string");
