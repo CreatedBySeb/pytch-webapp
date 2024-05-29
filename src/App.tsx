@@ -71,6 +71,10 @@ function App() {
   const basepath = envVarOrFail("BASE_URL");
   console.log(`basepath: "${basepath}"`);
 
+  const bootUiVersion = useStoreActions(
+    (actions) => actions.versionOptIn.bootFromQuery
+  );
+
   const router = createBrowserRouter([
     {
       path: basepath,
@@ -125,6 +129,7 @@ function App() {
   ]);
 
   useEffect(() => {
+    bootUiVersion();
     fireAndForgetEvent("render", "");
   });
 
