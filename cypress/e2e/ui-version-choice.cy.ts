@@ -155,3 +155,7 @@ context("Choice of UI version", () => {
     assertFrontPageIsV1();
   });
 });
+
+context("Choose UIv2 with query param", () => {
+  const enableV2Query = "ui-v2";
+});
