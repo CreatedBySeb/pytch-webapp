@@ -3,6 +3,7 @@ name = "editor-style-images"
 version = "0.1.0"
 description = ""
 authors = ["Ben North <ben.north@tcd.ie>"]
+package-mode = false
 packages = []
 
 [tool.poetry.dependencies]
