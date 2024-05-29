@@ -1,5 +1,5 @@
 We use poetry to configure the Python environment for developing the
-docs.  Set up using:
+docs.  We are using Poetry v1.8.3.  Set up using:
 
     poetry install
 
