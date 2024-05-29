@@ -155,3 +155,33 @@ context("Choice of UI version", () => {
     assertFrontPageIsV1();
   });
 });
+
+context("Choose UIv2 with query param", () => {
+  const enableV2Query = "ui-v2";
+
+  type ChooseV2Spec = { urlSuffix: string; matchText: string };
+  const chooseV2Specs: Array<ChooseV2Spec> = [
+    {
+      urlSuffix: "",
+      matchText: "Thanks for trying the script by script way",
+    },
+    {
+      urlSuffix: "tutorials",
+      matchText: "Script-by-script catch the apple",
+    },
+    {
+      urlSuffix: "my-projects",
+      matchText: "My projects", // Doesn't look different
+    },
+  ];
+
+  chooseV2Specs.forEach(({ urlSuffix, matchText }) => {
+    it(`for url-suffix "${urlSuffix}"`, () => {
+      cy.visit(`/${urlSuffix}?${enableV2Query}`);
+      cy.contains(matchText);
+      cy.location()
+        .then((location) => location.toString())
+        .should("not.contain", enableV2Query);
+    });
+  });
+});
