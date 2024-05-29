@@ -15,6 +15,9 @@ export type VersionTag = "v1" | "v2";
  * such an operation is currently in progress.  */
 export type V2_OperationState = "idle" | "in-progress";
 
+// URL search param which enables the "v2" UI.
+const kEnableUiV2SearchParam = "ui-v2";
+
 // "Slice action" — Action<> specialised for this slice-type.
 type SAction<PayloadT> = GenericAction<VersionOptIn, PayloadT>;
 
