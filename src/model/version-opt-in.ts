@@ -1,5 +1,9 @@
-import { Action as GenericAction } from "easy-peasy";
+import {
+  Action as GenericAction,
+  Thunk as GenericThunk,
+} from "easy-peasy";
 import { propSetterAction } from "../utils";
+import { IPytchAppModel } from ".";
 
 /** Whether we are showing the "Pytch v2" user-interface elements, such
  * as the ability to create script-by-script projects and the
@@ -13,6 +17,15 @@ export type V2_OperationState = "idle" | "in-progress";
 
 // "Slice action" — Action<> specialised for this slice-type.
 type SAction<PayloadT> = GenericAction<VersionOptIn, PayloadT>;
+
+// "Slice thunk" — Thunk<> specialised for this slice-type.
+type SThunk<PayloadT = void, ResultT = void> = GenericThunk<
+  VersionOptIn,
+  PayloadT,
+  void,
+  IPytchAppModel,
+  ResultT
+>;
 
 export type VersionOptIn = {
   activeUiVersion: VersionTag;
