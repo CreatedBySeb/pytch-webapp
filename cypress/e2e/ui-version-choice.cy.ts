@@ -174,4 +174,14 @@ context("Choose UIv2 with query param", () => {
       matchText: "My projects", // Doesn't look different
     },
   ];
+
+  chooseV2Specs.forEach(({ urlSuffix, matchText }) => {
+    it(`for url-suffix "${urlSuffix}"`, () => {
+      cy.visit(`/${urlSuffix}?${enableV2Query}`);
+      cy.contains(matchText);
+      cy.location()
+        .then((location) => location.toString())
+        .should("not.contain", enableV2Query);
+    });
+  });
 });
