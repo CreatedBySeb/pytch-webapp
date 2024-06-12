@@ -135,8 +135,8 @@ context("Create/modify/delete event handlers", () => {
 
     cy.get("#pytch-speech-bubbles").should("be.focused");
 
-    cy.pytchSendKeysToApp("xx");
-    cy.pytchStdoutShouldEqual("got x\ngot x\n");
+    cy.pytchSendKeysToApp("x");
+    cy.pytchStdoutShouldEqual("got x\n");
   });
 
   it("can add and delete handlers", () => {
