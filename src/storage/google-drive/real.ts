@@ -157,12 +157,13 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
     });
 
     const picker = builder.build();
-    picker.setVisible(true);
 
     function cancel() {
       picker.setVisible(false);
       picker.dispose();
     }
+
+    picker.setVisible(true);
 
     return { cancel, files };
   }
