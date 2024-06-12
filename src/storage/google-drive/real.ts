@@ -123,7 +123,7 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
     docsView.setMimeTypes("application/zip,application/x-zip-compressed");
     builder.addView(docsView);
 
-    const files = new Promise<Array<AsyncFile>>((resolve, reject) => {
+    const rawFiles = new Promise<Array<AsyncFile>>((resolve, reject) => {
       const callback = async (data: any) => {
         switch (data.action) {
           case google.picker.Action.PICKED: {
@@ -157,12 +157,15 @@ const realApi = (google: any, tokenClient: any): GoogleDriveApi => {
     });
 
     const picker = builder.build();
-    picker.setVisible(true);
+
+    const files = rawFiles.finally(() => picker.dispose());
 
     function cancel() {
       picker.setVisible(false);
       picker.dispose();
     }
+
+    picker.setVisible(true);
 
     return { cancel, files };
   }
