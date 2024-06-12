@@ -129,15 +129,16 @@ context("Create/modify/delete event handlers", () => {
 
     assertHatBlockLabels(["when green flag clicked", 'when "x" key pressed']);
 
+    typeIntoScriptEditor(0, '{home}print("started"){enter}');
     typeIntoScriptEditor(1, 'print("got x"){enter}');
 
     cy.pytchGreenFlag();
 
-    // The stage should get focus, but it's racy:
-    cy.pytchClickStage(0, 0);
+    cy.pytchStdoutShouldEqual("started\n");
+    cy.get("#pytch-speech-bubbles").should("be.focused");
 
-    cy.pytchSendKeysToApp("xx");
-    cy.pytchStdoutShouldEqual("got x\ngot x\n");
+    cy.pytchSendKeysToApp("x");
+    cy.pytchStdoutShouldEqual("started\ngot x\n");
   });
 
   it("can add and delete handlers", () => {
