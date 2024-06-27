@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useStoreState, useStoreActions } from "../store";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { ProjectId } from "../model/project-core";
 import { equalILoadSaveStatus } from "../model/project";
@@ -123,9 +121,7 @@ const IDE: React.FC<EmptyProps> = () => {
     case "succeeded": {
       return (
         <ErrorBoundary FallbackComponent={ExceptionDisplay}>
-          <DndProvider backend={HTML5Backend}>
-            <IDEContents />
-          </DndProvider>
+          <IDEContents />
         </ErrorBoundary>
       );
     }

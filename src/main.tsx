@@ -4,6 +4,8 @@ import App from "./App";
 import { StoreProvider } from "easy-peasy";
 import store from "./store";
 import { envVarMap } from "./env-utils";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 // This is a bit repetitive, but Vite does not support dynamic expansion
 // of env.vars.  Gather all the ones we use in one place, ready for
@@ -30,7 +32,9 @@ const root = createRoot(rootElt);
 root.render(
   <React.StrictMode>
     <StoreProvider store={store}>
-      <App />
+      <DndProvider backend={HTML5Backend}>
+        <App />
+      </DndProvider>
     </StoreProvider>
   </React.StrictMode>
 );
