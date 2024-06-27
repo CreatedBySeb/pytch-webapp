@@ -1,6 +1,7 @@
 import { range } from "../../../src/utils";
 import {
   addFromMediaLib,
+  assertCostumeIndexLabels,
   assertCostumeNames,
   assertSoundNames,
   initiateAddFromMediaLib,
@@ -30,8 +31,12 @@ context("Drag/drop of junior assets", () => {
       /* 5 */ "orange.png",
     ];
 
+    const nCostumes = originalOrder.length;
+
+    // Also asserts that index labels remain correct throughout:
     const assertCostumesOrder = (indexes: Array<number>) => {
       assertCostumeNames(indexes.map((i) => originalOrder[i]));
+      assertCostumeIndexLabels(nCostumes);
     };
 
     const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
@@ -171,5 +176,6 @@ context("Drag/drop of junior assets", () => {
     addAllFromMediaLibEntry("digits", 10);
     addAllFromMediaLibEntry("quiz buttons", 5);
     assertCostumeNames(expCostumeNames);
+    assertCostumeIndexLabels(expCostumeNames.length);
   });
 });
