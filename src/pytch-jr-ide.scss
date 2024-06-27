@@ -476,22 +476,27 @@
   }
 
   display: grid;
+  justify-content: end;
   position: sticky;
   right: 0px;
   bottom: 0px;
   margin-bottom: 0px;
   z-index: 1;
 
+  pointer-events: none;
+
   > * {
     grid-area: 1 / 1 / 2 / 2;
   }
 
   .AddSomethingButtonStrip-blur {
+    border-top-left-radius: 0.75rem;
     background-color: $main-bg-color;
     opacity: 0.6;
   }
 
   .AddSomethingButtonStrip {
+    pointer-events: all;
     margin-bottom: 0px;
     z-index: 1;
   }
