@@ -282,6 +282,7 @@
   }
 
   &.isCollapsed {
+    min-height: 27px;
     row-gap: 0px;
     .tab-content {
       display: none;
