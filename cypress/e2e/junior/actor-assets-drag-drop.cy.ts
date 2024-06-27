@@ -30,8 +30,9 @@ context("Drag/drop of junior assets", () => {
       /* 5 */ "orange.png",
     ];
 
-    const assertCostumesOrder = (indexes: Array<number>) =>
+    const assertCostumesOrder = (indexes: Array<number>) => {
       assertCostumeNames(indexes.map((i) => originalOrder[i]));
+    };
 
     const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
     const dragCostume = (movingStem: string, targetStem: string) =>
