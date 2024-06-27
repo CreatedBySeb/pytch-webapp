@@ -45,12 +45,13 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
 
   return (
     <>
-      {appearances.map((a) => (
+      {appearances.map((a, idx) => (
         <AssetCard
           key={a.name}
           assetKind="image"
           expectedPresentationKind="image"
           actorKind={actorKind}
+          displayIndex={idx}
           assetPresentation={a}
           canBeDeleted={canBeDeleted}
         />
