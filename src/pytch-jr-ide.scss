@@ -390,6 +390,27 @@
     }
   }
 
+  .asset-card-display-index {
+    &.sprite {
+      background-color: $pytch-colour-main-blue;
+    }
+    &.stage {
+      background-color: $pytch-colour-accent-blue;
+    }
+    border-radius: 4px;
+    position: absolute;
+    left: 0rem;
+    top: 0rem;
+
+    p {
+      margin: 0px;
+      padding: 0.2rem 0.4rem;
+      code {
+        color: white;
+      }
+    }
+  }
+
   .AssetCardContent,
   .ActorCardContent {
     position: relative;
