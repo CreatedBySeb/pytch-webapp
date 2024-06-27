@@ -129,14 +129,16 @@ context("Create/modify/delete event handlers", () => {
 
     assertHatBlockLabels(["when green flag clicked", 'when "x" key pressed']);
 
+    typeIntoScriptEditor(0, '{home}print("started"){enter}');
     typeIntoScriptEditor(1, 'print("got x"){enter}');
 
     cy.pytchGreenFlag();
 
+    cy.pytchStdoutShouldEqual("started\n");
     cy.get("#pytch-speech-bubbles").should("be.focused");
 
     cy.pytchSendKeysToApp("x");
-    cy.pytchStdoutShouldEqual("got x\n");
+    cy.pytchStdoutShouldEqual("started\ngot x\n");
   });
 
   it("can add and delete handlers", () => {
