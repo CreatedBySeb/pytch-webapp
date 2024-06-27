@@ -9,6 +9,7 @@ import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
 import { launchProjectInListDropdownAction } from "../utils";
 import { Actions } from "easy-peasy";
 import { IActiveProject } from "../../../src/model/project";
+import { range } from "../../../src/utils";
 
 /** Click on the Sprite with the given `spriteName`, thereby selecting
  * it. */
@@ -94,6 +95,14 @@ function assertInnerTexts(selector: string, expInnerTexts: Array<string>) {
     errorMsg: `exp ${expInnerTexts}`,
   });
 }
+
+/** Assert that the assert cards have labels whose texts are the decimal
+ * representations of numbers from 0 up to one before the given
+ * `nExpected`. */
+export const assertCostumeIndexLabels = (nExpected: number) => {
+  const expLabels = range(nExpected).map((n) => n.toString());
+  assertInnerTexts(".AssetCard .asset-card-display-index", expLabels);
+};
 
 /** Assert that the tabs within the Actor Aspects pane have the given
  * array `expLabels` of labels. */
