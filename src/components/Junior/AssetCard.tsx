@@ -162,6 +162,7 @@ type AssetCardProps = {
   assetKind: AssetPresentationDataKind;
   expectedPresentationKind: "image" | "sound";
   actorKind: ActorKind;
+  displayIndex?: number;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
@@ -169,6 +170,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   assetKind,
   expectedPresentationKind,
   actorKind,
+  displayIndex,
   assetPresentation,
   canBeDeleted,
 }) => {
