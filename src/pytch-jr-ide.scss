@@ -282,6 +282,10 @@
   }
 
   &.isCollapsed {
+    // I did not get to the bottom of this, but I think due to rounding
+    // of non-integer heights, without the following "min-height", there
+    // is a tiny vertical overflow at certain zoom levels.  The value of
+    // "27" was chosen by trial and error.
     min-height: 27px;
     row-gap: 0px;
     .tab-content {
