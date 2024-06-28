@@ -224,10 +224,10 @@
         "python": "self.play_sound_until_done(sound)",
         "scratch": "play sound (splash v) until done",
         "help": {
-            "flat": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so your code will not move on to its next statement until the sound is done playing.\n\n```\n# (This example is for a Sprite)\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
+            "flat": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  This function will not return until the entire sound has played, so your code will not move on to its next statement until the sound is done playing.\n\n```\n# (This example is for a Sprite)\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
             "per-method": {
-                "sprite": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
-                "stage": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash\")\nself.next_backdrop()\n```"
+                "sprite": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
+                "stage": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash\")\nself.next_backdrop()\n```"
             }
         }
     },
