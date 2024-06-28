@@ -29,12 +29,13 @@ const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
 
   return (
     <>
-      {sounds.map((a) => (
+      {sounds.map((a, idx) => (
         <AssetCard
           key={a.name}
           assetKind="sound"
           expectedPresentationKind="sound"
           actorKind={actorKind}
+          displayIndex={idx}
           assetPresentation={a}
           canBeDeleted={true}
         />

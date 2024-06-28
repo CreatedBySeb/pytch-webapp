@@ -162,7 +162,7 @@ type AssetCardProps = {
   assetKind: AssetPresentationDataKind;
   expectedPresentationKind: "image" | "sound";
   actorKind: ActorKind;
-  displayIndex?: number;
+  displayIndex: number;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
@@ -206,7 +206,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   // first time you drag a particular asset.  It works correctly in a
   // static preview or release build.
 
-  const maybeIndexLabel = displayIndex != null && (
+  const indexLabel = (
     <div className={classNames("asset-card-display-index", actorKind)}>
       <p>
         <code>{displayIndex}</code>
@@ -230,7 +230,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     <pre>{basename}</pre>
                   </div>
                 </div>
-                {maybeIndexLabel}
+                {indexLabel}
                 <AssetCardDropdown
                   actorKind={actorKind}
                   presentation={assetPresentation}
