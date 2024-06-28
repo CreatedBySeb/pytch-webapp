@@ -361,7 +361,10 @@
         "scratch": "broadcast [dance v] and wait",
         "help": {
             "flat": "Broadcast the `message`.  This makes any methods with matching `@pytch.when_I_receive()` run.  Your method then waits until all methods which have responded to that message have finished running.\n\n```\n# Tell the dog to dance, and then\n# praise it when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.say(\"Very good!\")\n```",
-            "per-method": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running."
+            "per-method": {
+                "sprite": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running.\n\n```\n# Tell the dog to dance, and then praise it\n# when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.say(\"Very good!\")\n```",
+                "stage": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running.\n\n```\n# Tell the dog to dance, and then show the\n# sky backdrop when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.switch_backdrop(\"sky.jpg\")\n```"
+            }
         }
     },
 
