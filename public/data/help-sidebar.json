@@ -224,10 +224,10 @@
         "python": "self.play_sound_until_done(sound)",
         "scratch": "play sound (splash v) until done",
         "help": {
-            "flat": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so your code will not move on to its next statement until the sound is done playing.\n\n```\n# (This example is for a Sprite)\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
+            "flat": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  This function will not return until the entire sound has played, so your code will not move on to its next statement until the sound is done playing.\n\n```\n# (This example is for a Sprite)\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
             "per-method": {
-                "sprite": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
-                "stage": "Start the sound called `sound` playing.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash\")\nself.next_backdrop()\n```"
+                "sprite": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
+                "stage": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash\")\nself.next_backdrop()\n```"
             }
         }
     },
@@ -236,10 +236,10 @@
         "python": "self.start_sound(sound)",
         "scratch": "start sound (my-song v)",
         "help": {
-            "flat": "Start the sound called `sound` playing.  Once the sound has started, the Sprite (or Stage) will straight away move on to the next statement in your code.\n\n```\n# (This example is for a Sprite.)\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
+            "flat": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  Once the sound has started, the Sprite (or Stage) will straight away move on to the next statement in your code.\n\n```\n# (This example is for a Sprite.)\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
             "per-method": {
-                "sprite": "Start the sound called `sound` playing.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
-                "stage": "Start the sound called `sound` playing.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
+                "sprite": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
+                "stage": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
             }
         }
     },
@@ -349,7 +349,10 @@
         "scratch": "broadcast [caught-cat v]",
         "help": {
             "flat": "Broadcast the `message`.  This makes any methods with matching `@pytch.when_I_receive()` run.  Your method immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and\n# straight away start barking:\npytch.broadcast(\"caught-cat\")\nself.start_sound(\"woof\")\n```",
-            "per-method": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent."
+            "per-method": {
+                "sprite": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and straight\n# away start barking:\npytch.broadcast(\"caught-cat\")\nself.start_sound(\"woof\")\n```",
+                "stage": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and straight\n# away show the sky backdrop:\npytch.broadcast(\"caught-cat\")\nself.switch_backdrop(\"sky.jpg\")\n```"
+            }
         }
     },
     {
@@ -358,7 +361,10 @@
         "scratch": "broadcast [dance v] and wait",
         "help": {
             "flat": "Broadcast the `message`.  This makes any methods with matching `@pytch.when_I_receive()` run.  Your method then waits until all methods which have responded to that message have finished running.\n\n```\n# Tell the dog to dance, and then\n# praise it when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.say(\"Very good!\")\n```",
-            "per-method": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running."
+            "per-method": {
+                "sprite": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running.\n\n```\n# Tell the dog to dance, and then praise it\n# when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.say(\"Very good!\")\n```",
+                "stage": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code then waits until all code which has responded to that message has finished running.\n\n```\n# Tell the dog to dance, and then show the\n# sky backdrop when it has finished:\npytch.broadcast_and_wait(\"dance\")\nself.switch_backdrop(\"sky.jpg\")\n```"
+            }
         }
     },
 
