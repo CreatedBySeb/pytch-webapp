@@ -236,10 +236,10 @@
         "python": "self.start_sound(sound)",
         "scratch": "start sound (my-song v)",
         "help": {
-            "flat": "Start the sound called `sound` playing.  Once the sound has started, the Sprite (or Stage) will straight away move on to the next statement in your code.\n\n```\n# (This example is for a Sprite.)\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
+            "flat": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  Once the sound has started, the Sprite (or Stage) will straight away move on to the next statement in your code.\n\n```\n# (This example is for a Sprite.)\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
             "per-method": {
-                "sprite": "Start the sound called `sound` playing.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
-                "stage": "Start the sound called `sound` playing.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
+                "sprite": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
+                "stage": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
             }
         }
     },
