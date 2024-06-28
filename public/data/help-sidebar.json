@@ -349,7 +349,10 @@
         "scratch": "broadcast [caught-cat v]",
         "help": {
             "flat": "Broadcast the `message`.  This makes any methods with matching `@pytch.when_I_receive()` run.  Your method immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and\n# straight away start barking:\npytch.broadcast(\"caught-cat\")\nself.start_sound(\"woof\")\n```",
-            "per-method": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent."
+            "per-method": {
+                "sprite": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and straight\n# away start barking:\npytch.broadcast(\"caught-cat\")\nself.start_sound(\"woof\")\n```",
+                "stage": "Broadcast the `message`.  This runs any code under a matching *when I receive* hat block.  Your code immediately continues running after the message has been sent.\n\n```\n# Tell cat it has been caught, and straight\n# away show the sky backdrop:\npytch.broadcast(\"caught-cat\")\nself.switch_backdrop(\"sky.jpg\")\n```"
+            }
         }
     },
     {
