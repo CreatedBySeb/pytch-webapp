@@ -1,12 +1,7 @@
 import React, { useEffect } from "react";
 import NavBanner from "./NavBanner";
-import Button from "react-bootstrap/Button";
-import TutorialMiniCard from "./TutorialMiniCard";
 import { EmptyProps, assertNever } from "../utils";
 import { useStoreActions, useStoreState } from "../store";
-import { urlWithinApp } from "../env-utils";
-import { Link } from "./LinkWithinApp";
-import { pytchResearchSiteUrl } from "../constants";
 import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
