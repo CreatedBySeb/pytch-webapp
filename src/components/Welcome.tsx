@@ -12,6 +12,7 @@ import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
 import { CardCarousel } from "./front-page/CardCarousel";
 import { LearnPython } from "./front-page/LearnPython";
+import { ContactInvitation } from "./front-page/ContactInvitation";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
@@ -135,14 +136,7 @@ const Welcome: React.FC<EmptyProps> = () => {
         <ToggleUiStylePanel />
         <CardCarousel />
         <LearnPython />
-        <p>
-          Please email us at{" "}
-          <a href="mailto:info@pytch.org">
-            <code>info@pytch.org</code>
-          </a>{" "}
-          with any feedback or questions.
-        </p>
-
+        <ContactInvitation />
         <div className="logo-strip">
           <img src="assets/logos/TCD.png" alt="TCD logo" />
           <img src="assets/logos/TUD.png" alt="TUD logo" />
