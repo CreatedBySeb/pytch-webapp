@@ -1,21 +1,17 @@
 import React from "react";
-import { envVarOrFail, withinSite } from "../env-utils";
+import { withinSite } from "../env-utils";
 import { Link } from "./LinkWithinApp";
 import { pytchResearchSiteUrl } from "../constants";
 
 import "../pytch-navbar.scss";
 
 const NavBanner = () => {
-  const versionTag = envVarOrFail("VITE_VERSION_TAG");
   return (
     <div className="NavBar">
       <div className="title-and-version">
         <Link to="/">
           <h1>Pytch</h1>
         </Link>
-        <p className="version-tag">
-          <a href={withinSite("/doc/releases/changelog.html")}>{versionTag}</a>
-        </p>
       </div>
       <ul>
         <a href={pytchResearchSiteUrl}>
