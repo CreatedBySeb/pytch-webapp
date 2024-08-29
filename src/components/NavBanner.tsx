@@ -6,6 +6,8 @@ import { pytchResearchSiteUrl } from "../constants";
 import "../pytch-navbar.scss";
 
 const NavBanner = () => {
+  // TODO: UL is supposed to directly contain LIs, so the below needs
+  // restructuring.
   return (
     <div className="NavBar">
       <div className="title-and-version">
