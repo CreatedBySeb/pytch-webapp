@@ -11,6 +11,7 @@ import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
 import { CardCarousel } from "./front-page/CardCarousel";
+import { LearnPython } from "./front-page/LearnPython";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
@@ -133,34 +134,7 @@ const Welcome: React.FC<EmptyProps> = () => {
         <Header />
         <ToggleUiStylePanel />
         <CardCarousel />
-        <h2>Using Pytch</h2>
-
-        <div className="way-of-using-pytch">
-          <p className="button-wrapper">
-            <Link to="/tutorials/">
-              <Button variant="outline-primary">Tutorials</Button>
-            </Link>
-          </p>
-          <p>
-            If you’d like to learn how to make the games in{" "}
-            <i>Featured projects</i> above, each one has its own tutorial,
-            taking you step by step through the process of writing the code.
-          </p>
-        </div>
-
-        <div className="way-of-using-pytch">
-          <p className="button-wrapper">
-            <Link to="/my-projects/">
-              <Button variant="outline-primary">My projects</Button>
-            </Link>
-          </p>
-          <p>
-            If you’re already using Pytch on this device, you can continue
-            working on one of your projects. Or, if you have a Pytch zipfile,
-            you can upload it to continue working on your project.
-          </p>
-        </div>
-
+        <LearnPython />
         <h2>About Pytch</h2>
 
         <p>
