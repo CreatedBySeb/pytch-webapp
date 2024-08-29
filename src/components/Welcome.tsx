@@ -10,6 +10,7 @@ import { CardCarousel } from "./front-page/CardCarousel";
 import { LearnPython } from "./front-page/LearnPython";
 import { ContactInvitation } from "./front-page/ContactInvitation";
 import { Footer } from "./front-page/Footer";
+import "./Welcome.scss";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
