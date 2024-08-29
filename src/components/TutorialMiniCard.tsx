@@ -47,12 +47,11 @@ const TutorialMiniCard: React.FC<TutorialMiniCardProps> = ({
   );
 
   return (
-    <Alert className={alertClass}>
+    <Alert className={alertClass} onClick={maybeLaunchDemo}>
       <h3>{title}</h3>
       <p className="screenshot-container">
         <img
           className="screenshot"
-          onClick={maybeLaunchDemo}
           src={`${tutorialsDataRoot}/${slug}/tutorial-assets/${screenshotBasename}`}
           alt={`screenshot of ${title}`}
         />
