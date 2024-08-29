@@ -10,6 +10,7 @@ import { pytchResearchSiteUrl } from "../constants";
 import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
+import { CardCarousel } from "./front-page/CardCarousel";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
@@ -121,9 +122,6 @@ const ToggleUiStylePanel: React.FC<EmptyProps> = () => {
 };
 
 const Welcome: React.FC<EmptyProps> = () => {
-  // TODO: Replace the hard-coded list of tutorial mini-cards with something
-  // driven by the pytch-tutorials repo.
-
   useEffect(() => {
     document.title = "Pytch";
   });
@@ -134,52 +132,7 @@ const Welcome: React.FC<EmptyProps> = () => {
       <div className="welcome-text">
         <Header />
         <ToggleUiStylePanel />
-
-        <h2>Featured projects</h2>
-
-        <div className="demo-cards">
-          <TutorialMiniCard
-            title="Catch a star"
-            slug="chase"
-            screenshotBasename="screenshot.png"
-          >
-            <p>
-              In this introduction to coding in Pytch, you control a bird using
-              the keyboard, and your job is to catch the star.
-            </p>
-          </TutorialMiniCard>
-
-          <TutorialMiniCard
-            title="Boing"
-            slug="boing"
-            screenshotBasename="summary-screenshot.png"
-          >
-            <p>
-              In the game <i>Pong</i> from 1972, players hit a ball back and
-              forth. Our <i>Boing</i> game, adapted from one in{" "}
-              <a href="https://wireframe.raspberrypi.org/books/code-the-classics1">
-                Code the Classics
-              </a>
-              , lets you play against the computer.
-            </p>
-          </TutorialMiniCard>
-
-          <TutorialMiniCard
-            title="Q*bert"
-            slug="qbert"
-            screenshotBasename="screenshot.png"
-          >
-            <p>
-              Jump around a pyramid of blocks, trying to change the whole stack
-              yellow without falling off! Our version is adapted from one in{" "}
-              <a href="https://wireframe.raspberrypi.org/issues/42">
-                Wireframe magazine
-              </a>
-              , inspired by the 1982 arcade classic.
-            </p>
-          </TutorialMiniCard>
-        </div>
-
+        <CardCarousel />
         <h2>Using Pytch</h2>
 
         <div className="way-of-using-pytch">
