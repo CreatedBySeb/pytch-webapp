@@ -17,6 +17,9 @@ const NavBanner = () => {
         <a href={pytchResearchSiteUrl}>
           <li>About</li>
         </a>
+        <a href={`${pytchResearchSiteUrl}lesson-plans`}>
+          <li>Lesson plans</li>
+        </a>
         <a href={withinSite("/doc/index.html")}>
           <li>Help</li>
         </a>
