@@ -47,7 +47,7 @@ const TutorialMiniCard: React.FC<TutorialMiniCardProps> = ({
   );
 
   return (
-    <Alert className={alertClass} variant="success">
+    <Alert className={alertClass}>
       <h3>{title}</h3>
       <p className="screenshot-container">
         <img
