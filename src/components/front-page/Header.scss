@@ -1,0 +1,88 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+.Header {
+  border-top: 4px solid $pytch-colour-main-yellow;
+
+  // The background-image is supplied by the code, to ensure correct
+  // behaviour if app entered via non-root route.
+  background-size: cover;
+  background-position: 80% center;
+  position: relative;
+
+  .background-darken {
+    background-color: $pytch-colour-main-blue;
+    opacity: 0.8;
+  }
+
+  h2.header {
+    font-size: 40px;
+    @media screen and (min-width: 200px) {
+      font-size: 20vw;
+    }
+    @media screen and (min-width: 320px) {
+      font-size: 64px;
+    }
+
+    margin: 3.5rem 0rem 1.5rem;
+  }
+
+  h3.header {
+    font-family: $pytch-body-font;
+  }
+
+  .content {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    text-align: center;
+
+    padding-bottom: 6rem;
+
+    .content-text {
+      margin: 0px 1.5rem 1rem;
+      max-width: 30rem;
+      color: white;
+      text-shadow: black 0px 0px 12px;
+    }
+
+    .subgrid-video {
+      svg {
+        width: 50vw;
+        @media screen and (min-width: 320px) {
+          width: 160px;
+        }
+
+        cursor: pointer;
+
+        path {
+          fill: $pytch-colour-main-yellow;
+        }
+        &:hover path {
+          fill: white;
+        }
+
+        filter: drop-shadow(0 0 12px black);
+      }
+    }
+
+    @media screen and (min-width: $width-breakpoint-md) {
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr 2fr;
+      align-items: center;
+      padding-top: 4rem;
+      padding-bottom: 6rem;
+
+      margin: 1rem auto 0rem;
+      max-width: $width-breakpoint-md;
+
+      .content-text {
+        h2 {
+          margin-top: 1rem;
+        }
+        margin: 0px 1rem 1rem;
+      }
+    }
+  }
+}
