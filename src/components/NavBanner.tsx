@@ -3,6 +3,8 @@ import { envVarOrFail, withinSite } from "../env-utils";
 import { Link } from "./LinkWithinApp";
 import { pytchResearchSiteUrl } from "../constants";
 
+import "../pytch-navbar.scss";
+
 const NavBanner = () => {
   const versionTag = envVarOrFail("VITE_VERSION_TAG");
   return (

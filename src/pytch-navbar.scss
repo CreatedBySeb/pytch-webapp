@@ -1,0 +1,52 @@
+@import "./pytch-variables.scss";
+
+.NavBar {
+  background-color: $pytch-colour-main-blue;
+  color: white;
+  padding: 4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  .title-and-version {
+    h1 {
+      display: inline-block;
+      margin-right: 0px;
+    }
+    p.version-tag {
+      display: inline-block;
+      font-size: 0.875rem;
+      margin-bottom: 0px;
+      margin-left: 6px;
+      a {
+        color: $text-very-subdued-color;
+      }
+    }
+  }
+  h1 {
+    padding: 8px;
+    margin: 0px 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+  }
+  h1:hover,
+  li:hover {
+    color: $pytch-colour-main-yellow;
+  }
+  ul {
+    margin: 0px;
+    li {
+      display: inline-block;
+      margin-right: 2rem;
+      padding: 8px;
+      font-size: 1.25rem;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      a {
+        color: white;
+      }
+    }
+  }
+}
