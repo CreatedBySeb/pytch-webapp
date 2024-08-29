@@ -53,7 +53,7 @@ const TutorialMiniCard: React.FC<TutorialMiniCardProps> = ({
           alt={`screenshot of ${title}`}
         />
       </p>
-      {children}
+      <div className="description">{children}</div>
       <LoadingOverlay show={loadingThisDemo}>
         <p>Loading...</p>
       </LoadingOverlay>
