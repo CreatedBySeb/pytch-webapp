@@ -1,9 +1,12 @@
 @import "./pytch-variables.scss";
 
+$navbar-single-row-height: 3.5rem;
+
 .NavBar {
+  min-height: $navbar-single-row-height;
+
   background-color: $pytch-colour-main-blue;
   color: white;
-  padding: 4px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -15,29 +18,84 @@
     }
   }
   h1 {
-    padding: 8px;
-    margin: 0px 2rem;
+    padding: 0px;
+    margin: 0px 2rem 0px 0px;
     font-size: 1.5rem;
     font-weight: bold;
-    color: white;
+    color: $pytch-colour-main-yellow;
+    font-family: $pytch-title-font;
   }
   h1:hover,
   li:hover {
-    color: $pytch-colour-main-yellow;
+    color: white;
   }
+
+  h1,
   ul {
+    padding-left: 9px;
+    @media screen and (min-width: 180px) {
+      padding-left: calc(9px + (23 / 120) * (100vw - 180px));
+    }
+    @media screen and (min-width: 300px) {
+      padding-left: 32px;
+    }
+  }
+
+  ul {
+    display: none;
+    &.menuIsExpanded {
+      display: block;
+      z-index: 1;
+    }
+
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: $navbar-single-row-height;
+    min-height: calc(100vh - $navbar-single-row-height);
+
+    background-color: inherit;
+    list-style-type: none;
     margin: 0px;
+    padding-top: 1rem;
+
     li {
-      display: inline-block;
-      margin-right: 2rem;
-      padding: 8px;
-      font-size: 1.25rem;
-      color: white;
+      padding: 12px 0px;
+      font-size: 20px;
+      color: $pytch-colour-main-yellow;
       cursor: pointer;
       user-select: none;
       a {
         color: white;
       }
+    }
+  }
+
+  .burger-menu {
+    color: $pytch-colour-main-yellow;
+    &:hover {
+      color: white;
+    }
+    font-size: 32px;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: $width-breakpoint-md) {
+    ul {
+      display: block;
+      position: relative;
+      min-height: auto;
+      padding-top: 0px;
+      margin-right: 12px;
+      top: 0px;
+      li {
+        display: inline-block;
+        padding: 12px;
+      }
+    }
+    .burger-menu {
+      display: none;
     }
   }
 }
