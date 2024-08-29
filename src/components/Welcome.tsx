@@ -10,6 +10,7 @@ import { pytchResearchSiteUrl } from "../constants";
 import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
+import { CodingJourney } from "./front-page/CodingJourney";
 import { CardCarousel } from "./front-page/CardCarousel";
 import { LearnPython } from "./front-page/LearnPython";
 import { ContactInvitation } from "./front-page/ContactInvitation";
@@ -134,6 +135,7 @@ const Welcome: React.FC<EmptyProps> = () => {
       <NavBanner />
       <div className="welcome-text">
         <Header />
+        <CodingJourney />
         <ToggleUiStylePanel />
         <CardCarousel />
         <LearnPython />
