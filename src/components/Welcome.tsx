@@ -13,6 +13,7 @@ import { Header } from "./front-page/Header";
 import { CardCarousel } from "./front-page/CardCarousel";
 import { LearnPython } from "./front-page/LearnPython";
 import { ContactInvitation } from "./front-page/ContactInvitation";
+import { Footer } from "./front-page/Footer";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
@@ -137,11 +138,7 @@ const Welcome: React.FC<EmptyProps> = () => {
         <CardCarousel />
         <LearnPython />
         <ContactInvitation />
-        <div className="logo-strip">
-          <img src="assets/logos/TCD.png" alt="TCD logo" />
-          <img src="assets/logos/TUD.png" alt="TUD logo" />
-          <img src="assets/logos/SFI.png" alt="SFI logo" />
-        </div>
+        <Footer />
       </div>
     </>
   );
