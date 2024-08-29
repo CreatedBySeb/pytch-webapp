@@ -45,7 +45,7 @@ const TutorialMiniCard: React.FC<TutorialMiniCardProps> = ({
   return (
     <Alert className="TutorialMiniCard" variant="success">
       <h3>{title}</h3>
-      <p>
+      <p className="screenshot-container">
         <img
           className={`screenshot${enabledOrDisabled}`}
           onClick={maybeLaunchDemo}
