@@ -15,7 +15,7 @@ const NavBanner = () => {
       </div>
       <ul>
         <a href={pytchResearchSiteUrl}>
-          <li>About Pytch</li>
+          <li>About</li>
         </a>
         <a href={withinSite("/doc/index.html")}>
           <li>Help</li>
