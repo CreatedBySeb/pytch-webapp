@@ -135,17 +135,6 @@ const Welcome: React.FC<EmptyProps> = () => {
         <ToggleUiStylePanel />
         <CardCarousel />
         <LearnPython />
-        <h2>About Pytch</h2>
-
-        <p>
-          Pytch is part of a research project at Trinity College Dublin and TU
-          Dublin, supported by Science Foundation Ireland. Pytch helps learners
-          move from Scratch to Python.{" "}
-          <a href={pytchResearchSiteUrl}>
-            Learn more at the project’s website.
-          </a>
-        </p>
-
         <p>
           Please email us at{" "}
           <a href="mailto:info@pytch.org">
