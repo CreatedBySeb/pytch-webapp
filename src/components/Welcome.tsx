@@ -10,6 +10,7 @@ import { CardCarousel } from "./front-page/CardCarousel";
 import { LearnPython } from "./front-page/LearnPython";
 import { ContactInvitation } from "./front-page/ContactInvitation";
 import { Footer } from "./front-page/Footer";
+import { useScrollToUrlFragment } from "./hooks/use-fragment-scroll";
 import "./Welcome.scss";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
@@ -125,6 +126,8 @@ const Welcome: React.FC<EmptyProps> = () => {
   useEffect(() => {
     document.title = "Pytch";
   });
+
+  useScrollToUrlFragment();
 
   return (
     <>
