@@ -9,6 +9,7 @@ import { Link } from "./LinkWithinApp";
 import { pytchResearchSiteUrl } from "../constants";
 import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
+import { Header } from "./front-page/Header";
 
 const ToggleUiStylePanel_v1: React.FC<EmptyProps> = () => {
   const setUiVersion2 = useSetActiveUiVersionFun("v2");
@@ -127,39 +128,11 @@ const Welcome: React.FC<EmptyProps> = () => {
     document.title = "Pytch";
   });
 
-  const scratchLogoUrl = urlWithinApp("/assets/scratch-logo.png");
-  const pythonLogoUrl = urlWithinApp("/assets/python-logo.png");
-
   return (
-    // The style on the Python logo <img> is to make it the same width
-    // as the Scratch logo, otherwise the text block is off-centre.
     <>
       <NavBanner />
       <div className="welcome-text">
-        <div className="bridge-text-wrapper">
-          <div className="bridge-text">
-            <img src={scratchLogoUrl} alt="Scratch logo" />
-            <div>
-              <p>
-                Pytch is a bridge from Scratch to Python. It helps people to
-                learn Python by building on skills they have developed in
-                Scratch.
-              </p>
-              <p>Questions or comments? Email us!</p>
-              <p className="contact-email">
-                <a href="mailto:info@pytch.org">
-                  <code>info@pytch.org</code>
-                </a>
-              </p>
-            </div>
-            <img
-              src={pythonLogoUrl}
-              style={{ paddingRight: "64px" }}
-              alt="Python snake"
-            />
-          </div>
-        </div>
-
+        <Header />
         <ToggleUiStylePanel />
 
         <h2>Featured projects</h2>
