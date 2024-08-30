@@ -1,0 +1,104 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+.CodingJourney {
+  display: grid;
+  transform: translate(0, -50%);
+  place-items: center left;
+  > * {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  .separator {
+    background-color: $pytch-colour-main-yellow;
+    height: 10px;
+    width: 100%;
+  }
+
+  .button {
+    display: grid;
+    > * {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+
+    width: calc(100vw * 7 / 8);
+    @media screen and (min-width: 240px) {
+      width: 210px;
+    }
+
+    margin-left: calc(100vw / 16);
+    @media screen and (min-width: $width-breakpoint-xl) {
+      margin-left: calc(50vw - 640px + 80px);
+    }
+
+    // The background-image is supplied by the code, to ensure correct
+    // behaviour if app entered via non-root route.
+    background-size: cover;
+    background-position: center center;
+    border: 4px solid $pytch-colour-main-yellow;
+    border-radius: 12px;
+
+    .hover-darken {
+      background-color: transparent;
+      opacity: 15%;
+      transition: background-color 0.15s ease-in-out;
+    }
+    &:hover .hover-darken {
+      background-color: black;
+    }
+
+    cursor: pointer;
+
+    p {
+      user-select: none;
+      z-index: 1;
+      font-size: 18px;
+      text-shadow: black 0px 0px 6px;
+      padding: 10px;
+      color: $pytch-colour-main-yellow;
+      margin: 0px 1rem 0px 0.5rem;
+    }
+
+    &:hover {
+      p {
+        color: white;
+      }
+    }
+  }
+}
+
+.CodingJourneysModal {
+  width: 18rem;
+  .modal-body {
+    margin: auto;
+    display: grid;
+    grid-template-rows: auto;
+    justify-items: center;
+    max-width: 15rem;
+
+    .narrow-screen-warning {
+      .icon {
+        margin-bottom: 0px;
+        text-align: center;
+        font-size: 2rem;
+        color: $pytch-colour-accent-cyan;
+      }
+      .text-content {
+        text-align: center;
+      }
+      @media screen and (min-width: $width-breakpoint-lg) {
+        display: none;
+      }
+    }
+
+    button {
+      @include background-color-as-button($pytch-colour-main-blue);
+      border-color: $pytch-colour-main-blue;
+      color: $pytch-colour-main-yellow;
+      margin-bottom: 1rem;
+      &:last-child {
+        margin-bottom: 0px;
+      }
+    }
+  }
+}
