@@ -134,7 +134,7 @@ function App() {
   });
 
   return (
-    <div className="App">
+    <div id="App-react-root" className="App">
       <RouterProvider router={router} />
       <AllModals />
     </div>
