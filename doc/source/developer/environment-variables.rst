@@ -10,6 +10,11 @@ make them available to the browser.
 ``VITE_VERSION_TAG``
   String to display in the header navigation bar, e.g., ``"v1.2.3"``.
 
+``VITE_STATIC_BLOBS_BASE``
+  Initial portion of URL from which to fetch large blobs like font
+  files and movie files which change outside the development process
+  of the front-end app.
+
 ``VITE_SKULPT_BASE``
   Initial portion of URL from which the Skulpt JavaScript files will
   be fetched.

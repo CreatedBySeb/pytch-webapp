@@ -12,6 +12,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 // populating the map relied on by the rest of the app.
 envVarMap.populate([
   ["BASE_URL", import.meta.env.BASE_URL],
+  ["VITE_STATIC_BLOBS_BASE", import.meta.env.VITE_STATIC_BLOBS_BASE],
   ["VITE_DEMOS_BASE", import.meta.env.VITE_DEMOS_BASE],
   ["VITE_DEPLOY_BASE_URL", import.meta.env.VITE_DEPLOY_BASE_URL],
   ["VITE_LIVE_RELOAD_WEBSOCKET", import.meta.env.VITE_LIVE_RELOAD_WEBSOCKET],
