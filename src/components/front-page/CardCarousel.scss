@@ -1,0 +1,131 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+$tutorial-mini-card-screenshot-width: 240px;
+$tutorial-mini-card-border-gap: 2px;
+$tutorial-mini-card-border-width: 3px;
+
+.CardCarousel {
+  width: fit-content;
+  margin: 2.5rem auto 3rem;
+
+  display: grid;
+  place-items: center center;
+
+  grid-template:
+    "cards cards"
+    "p-arr n-arr";
+
+  .prev-arrow,
+  .next-arrow {
+    @include background-color-as-button($pytch-colour-main-blue);
+    color: $pytch-colour-main-yellow;
+    border: none;
+    font-size: 36px;
+    padding: 1rem 1rem;
+    border-radius: 8px;
+  }
+
+  @media screen and (min-width: $width-breakpoint-md) {
+    grid-template: "p-arr cards n-arr";
+    .prev-arrow,
+    .next-arrow {
+      padding: 2rem 1rem;
+    }
+  }
+
+  .prev-arrow {
+    grid-area: p-arr;
+  }
+
+  .next-arrow {
+    grid-area: n-arr;
+  }
+
+  .cards-content {
+    grid-area: cards;
+
+    @media screen and (min-width: $width-breakpoint-md) {
+      display: flex;
+      flex-direction: row;
+    }
+
+    > .TutorialMiniCard {
+      background-color: $pytch-colour-main-blue;
+      color: white;
+
+      &.enabled {
+        @include background-color-as-button($pytch-colour-main-blue);
+        cursor: pointer;
+      }
+
+      margin: 0.5rem 0px;
+      position: relative;
+
+      p.screenshot-container {
+        img {
+          max-width: 75vw;
+          max-height: calc(75vw * 3 / 4);
+        }
+      }
+
+      .description {
+        min-height: 12rem;
+
+        p {
+          width: 75vw;
+          @media screen and (min-width: 320px) {
+            width: 240px;
+          }
+
+          a {
+            color: $pytch-colour-main-yellow;
+            font-style: italic;
+          }
+        }
+      }
+
+      h3 {
+        margin: 0.25rem 0rem 0.75rem;
+        text-align: center;
+      }
+
+      .screenshot-container {
+        text-align: center;
+
+        .screenshot {
+          border-radius: 4px;
+          box-shadow: black 0px 0px 16px;
+          transform-origin: 50% 0%;
+          transition: transform 0.3s ease-in-out;
+        }
+      }
+
+      &:hover .screenshot {
+        transform: scale(1.0625);
+      }
+
+      width: fit-content;
+      display: none;
+
+      &:first-child {
+        display: block;
+      }
+
+      @media screen and (min-width: $width-breakpoint-md) {
+        margin-left: 1rem;
+        margin-right: 1rem;
+
+        &:nth-child(2) {
+          display: block;
+        }
+      }
+
+      @media screen and (min-width: $width-breakpoint-xl) {
+        &:nth-child(3) {
+          display: block;
+        }
+      }
+    }
+  }
+}
