@@ -1,0 +1,92 @@
+@use "sass:map";
+@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../pytch-mixins.scss";
+@import "../pytch-variables.scss";
+
+.welcome-text {
+  font-size: 17px;
+
+  h2,
+  h3,
+  h4 {
+    font-family: $pytch-title-font;
+  }
+
+  // Override Bootstrap's RFS calculations with (mostly) fixed values to
+  // avoid creeping resize when resizing window.
+  h2 {
+    font-size: 27px;
+    @media screen and (min-width: 180px) {
+      font-size: 15vw;
+    }
+    @media screen and (min-width: 213px) {
+      font-size: 32px;
+    }
+  }
+  h3 {
+    font-size: 24px;
+    @media screen and (min-width: 180px) {
+      font-size: calc(100vw * 24 / 180);
+    }
+    @media screen and (min-width: 210px) {
+      font-size: 28px;
+    }
+  }
+
+  .pytch-summary {
+    color: $pytch-colour-main-blue;
+    text-align: center;
+    max-width: 32rem;
+
+    padding: 1rem;
+    margin: -1rem auto 2rem;
+  }
+}
+
+.ToggleUiStylePanel {
+  width: calc(100vw - 3rem);
+  padding: map.get($spacers, 3);
+  margin: 1rem auto;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid $pytch-colour-main-blue;
+
+  > .summary {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    justify-items: center;
+    > .EditorKindThumbnail {
+      margin-right: 0px;
+      margin-top: 0.5rem;
+      img {
+        width: 50vw;
+        @media screen and (min-width: 228px) {
+          width: auto;
+        }
+      }
+    }
+    .content {
+      margin-top: 1rem;
+    }
+  }
+
+  > .explanation {
+    margin-top: map.get($spacers, 3);
+  }
+
+  p:last-child {
+    margin-bottom: 0px;
+  }
+
+  .pseudo-link {
+    @include pytch-colours-hover();
+  }
+
+  .welcome-change-ui-style {
+    text-align: center;
+  }
+
+  @media screen and (min-width: $width-breakpoint-sm) {
+    width: calc($width-breakpoint-sm - 3rem);
+  }
+}
