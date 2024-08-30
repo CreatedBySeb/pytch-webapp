@@ -1,0 +1,128 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+.LearnPython {
+  background-color: $pytch-colour-accent-cyan;
+  color: white;
+
+  .content {
+    margin: auto;
+    padding: 1.5rem 0px 3rem;
+    max-width: $width-breakpoint-lg;
+
+    h2 {
+      margin: 1rem;
+    }
+
+    .content-text {
+      margin: 1rem calc(100vw / 30);
+      @media screen and (min-width: 480px) {
+        margin: 1rem;
+      }
+
+      h3 {
+        margin-top: 2.5rem;
+      }
+    }
+
+    .feature-summary {
+      display: grid;
+      grid-template-rows: auto auto;
+      justify-items: center;
+
+      p {
+        margin: 2rem auto;
+        font-size: 28px;
+      }
+
+      .logo-container {
+        margin: 1rem auto;
+        > img {
+          width: 160px;
+          @media screen and (min-width: 180px) {
+            width: calc(100vw * 160 / 180);
+          }
+          @media screen and (min-width: 360px) {
+            width: 320px;
+          }
+        }
+      }
+    }
+
+    .annotated-screenshot {
+      width: fit-content;
+      display: grid;
+      grid-template-rows: auto auto;
+      justify-items: center;
+
+      margin: 2rem auto 1rem;
+
+      p {
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .laptop-screenshots {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+
+      @media screen and (min-width: $width-breakpoint-md) {
+        grid-template-rows: 1fr;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    // Aspect ratio must match true aspect ratio of image.
+    $screenshot-image-width: 270px;
+    $laptop-image-height: 180px;
+
+    .LaptopScreenshot {
+      width: fit-content;
+
+      .screen-wrapper {
+        margin: auto;
+
+        width: fit-content;
+        background-color: #727272;
+        padding: 6px;
+        border: 2px solid #444;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+
+        img {
+          box-sizing: content-box;
+          border: 1px solid #444;
+          border-radius: 2px;
+          width: $screenshot-image-width;
+          max-width: calc(100vw * 2 / 3);
+          height: $laptop-image-height;
+          // Outer scaling must match aspect ratio of image.
+          max-height: calc((100vw * 2 / 3) * 2 / 3);
+        }
+      }
+
+      .angled-keyboard {
+        box-sizing: content-box;
+        width: calc($screenshot-image-width + 18px);
+        max-width: calc((100vw * 2 / 3) + 18px);
+        margin-top: 0px;
+        border-bottom: 16px solid #383838;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+      }
+
+      .front-edge {
+        width: 100%;
+        height: 8px;
+        background-color: #727272;
+        border-color: #444;
+        border-style: solid;
+        border-width: 2px;
+        border-top-width: 0px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+    }
+  }
+}
