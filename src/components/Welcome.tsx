@@ -132,6 +132,12 @@ const Welcome: React.FC<EmptyProps> = () => {
       <div className="welcome-text">
         <Header />
         <CodingJourney />
+
+        <h3 className="pytch-summary">
+          Pytch helps people to learn Python by building on skills they have
+          developed in Scratch
+        </h3>
+
         <ToggleUiStylePanel />
         <CardCarousel />
         <LearnPython />
