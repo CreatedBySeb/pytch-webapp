@@ -40,16 +40,21 @@ const NavBanner = () => {
   };
 
   const burgerIcon: IconProp = menuIsExpanded ? "xmark" : "bars";
+  const burgerClass = classNames(
+    "burger-menu",
+    menuIsExpanded ? "is-expanded" : "is-collapsed"
+  );
+
   // TODO: UL is supposed to directly contain LIs, so the below needs
   // restructuring.
   return (
     <div className="NavBar">
       <div className="title-and-version">
         <Link to="/">
-          <h1>Pytch</h1>
+          <h1 className="home-link">Pytch</h1>
         </Link>
       </div>
-      <div className="burger-menu" onClick={toggleMenu} ref={menuRef}>
+      <div className={burgerClass} onClick={toggleMenu} ref={menuRef}>
         <FontAwesomeIcon icon={burgerIcon} />
       </div>
       <ul className={ulClass}>
@@ -69,7 +74,7 @@ const NavBanner = () => {
           <li>My projects</li>
         </Link>
         <Link to="/#contact-info" onClick={() => setMenuIsExpanded(false)}>
-          <li>
+          <li className="contact-us-link">
             <FontAwesomeIcon icon={["far", "envelope"]} />
           </li>
         </Link>
