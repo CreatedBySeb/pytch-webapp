@@ -172,4 +172,17 @@ context("Front page", () => {
       assertVisibleCardNames(allNames.slice(0, 3));
     });
   });
+
+  context("video player", () => {
+    beforeEach(() => {
+      cy.visit("/");
+    });
+
+    it("opens and closes", () => {
+      cy.get(".video-container").click();
+      cy.get(".OverviewVideoModal").should("be.visible");
+      cy.get("button").contains("Close").click();
+      cy.get(".OverviewVideoModal").should("not.exist");
+    });
+  });
 });
