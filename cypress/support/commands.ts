@@ -21,6 +21,7 @@ import {
 import { DexieStorage } from "../../src/database/indexed-db";
 import { ProjectId } from "../../src/model/project-core";
 import { deIndent } from "../common/utils";
+import { assertOnHomepage } from "../e2e/utils";
 
 const ArrayBufferFromString = (strData: string) => {
   const data = new Uint8Array(strData.length);
@@ -168,7 +169,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("pytchHomeFromIDE", () => {
   cy.get('button *[aria-label="Home"]').click();
-  cy.contains("Pytch is a bridge");
+  assertOnHomepage();
 });
 
 Cypress.Commands.add("pytchSwitchProject", (name: string) => {
