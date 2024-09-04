@@ -116,4 +116,60 @@ context("Front page", () => {
 
     itRunsCodingJourneys({ expectDeviceSizeWarning: false });
   });
+
+  context("card carousel", () => {
+    const kTotalNCards = 4;
+    const visibleCards = ($alerts: JQuery<HTMLElement>) =>
+      $alerts.toArray().filter((elt) => {
+        const style = getComputedStyle(elt);
+        return style.getPropertyValue("display") === "block";
+      });
+    const assertVisibleCardNames = (expNames: Array<string>) => {
+      cy.get(".alert.TutorialMiniCard")
+        .should("have.length", kTotalNCards)
+        .then(($alerts) => {
+          const gotNames = visibleCards($alerts).map(
+            (elt) => elt.querySelector("h3")?.innerText
+          );
+          cy.wrap(gotNames).should("deep.equal", expNames);
+        });
+    };
+
+    const allNames = ["Catch a star", "Boing", "Q*bert", "Splat the moles"];
+
+    beforeEach(() => cy.visit("/"));
+
+    it("shows correct number", () => {
+      cy.viewport(720, 960);
+      assertVisibleCardNames(allNames.slice(0, 1));
+
+      cy.viewport(780, 960);
+      assertVisibleCardNames(allNames.slice(0, 2));
+
+      cy.viewport(1380, 960);
+      assertVisibleCardNames(allNames.slice(0, 3));
+    });
+
+    it("cycles with arrows", () => {
+      cy.viewport(1440, 960);
+
+      cy.get("button.next-arrow").click();
+      assertVisibleCardNames(allNames.slice(1, 4));
+
+      cy.get("button.prev-arrow").click();
+      assertVisibleCardNames(allNames.slice(0, 3));
+
+      cy.get("button.prev-arrow").click();
+      assertVisibleCardNames([allNames[3], ...allNames.slice(0, 2)]);
+    });
+
+    it("launches demo", () => {
+      cy.viewport(1440, 960);
+      cy.get(".alert.TutorialMiniCard").contains("Boing").click();
+      cy.get("h1").contains("images and sounds");
+      cy.get(".ReadOnlyOverlay").should("not.exist");
+      cy.go("back");
+      assertVisibleCardNames(allNames.slice(0, 3));
+    });
+  });
 });
