@@ -126,3 +126,7 @@ export function launchCreateProjectModal(name?: string) {
     cy.get("input[type=text]").clear().type(name);
   }
 }
+
+export function assertOnHomepage() {
+  cy.get(".welcome-text .CodingJourney");
+}
