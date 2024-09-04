@@ -26,6 +26,11 @@ const NavBanner = () => {
         <Link to="/my-projects/">
           <li>My projects</li>
         </Link>
+        <Link to="/#contact-info">
+          <li>
+            <FontAwesomeIcon icon={["far", "envelope"]} />
+          </li>
+        </Link>
       </ul>
     </div>
   );
