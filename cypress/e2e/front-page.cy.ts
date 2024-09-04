@@ -97,4 +97,23 @@ context("Front page", () => {
 
     itRunsCodingJourneys({ expectDeviceSizeWarning: true });
   });
+
+  context("wide viewport", () => {
+    beforeEach(() => {
+      cy.viewport(1024, 960);
+      cy.visit("/");
+    });
+
+    it("looks OK", () => {
+      cy.get(".burger-menu").should("not.be.visible");
+      cy.get("li").contains("My projects").should("be.visible");
+    });
+
+    it("navigates to contact", () => {
+      cy.get("a.contact-us-link").should("be.visible").click();
+      cy.contains("Please email us").should("be.visible");
+    });
+
+    itRunsCodingJourneys({ expectDeviceSizeWarning: false });
+  });
 });
