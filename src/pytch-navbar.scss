@@ -2,32 +2,31 @@
 
 $navbar-single-row-height: 3.5rem;
 
-.NavBar {
-  min-height: $navbar-single-row-height;
+@mixin yellow-hover-white() {
+  color: $pytch-colour-main-yellow;
+  &:hover {
+    color: white;
+  }
+}
 
-  background-color: $pytch-colour-main-blue;
-  color: white;
+.NavBar {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  .title-and-version {
-    h1 {
-      display: inline-block;
-      margin-right: 0px;
-    }
-  }
+
+  min-height: $navbar-single-row-height;
+
+  background-color: $pytch-colour-main-blue;
+
   h1 {
+    display: inline-block;
     padding: 0px;
     margin: 0px 2rem 0px 0px;
     font-size: 1.5rem;
     font-weight: bold;
-    color: $pytch-colour-main-yellow;
     font-family: $pytch-title-font;
-  }
-  h1:hover,
-  li:hover {
-    color: white;
+    @include yellow-hover-white();
   }
 
   h1,
@@ -59,42 +58,41 @@ $navbar-single-row-height: 3.5rem;
     margin: 0px;
     padding-top: 1rem;
 
-    li {
-      padding: 12px 0px;
-      font-size: 20px;
-      color: $pytch-colour-main-yellow;
-      cursor: pointer;
-      user-select: none;
-      a {
-        color: white;
-      }
-    }
-  }
-
-  .burger-menu {
-    color: $pytch-colour-main-yellow;
-    &:hover {
-      color: white;
-    }
-    font-size: 32px;
-    margin-right: 1rem;
-    cursor: pointer;
-  }
-
-  @media screen and (min-width: $width-breakpoint-md) {
-    ul {
+    @media screen and (min-width: $width-breakpoint-md) {
       display: block;
       position: relative;
       min-height: auto;
       padding-top: 0px;
       margin-right: 12px;
       top: 0px;
-      li {
+    }
+
+    li {
+      padding: 12px 0px;
+      font-size: 20px;
+
+      @include yellow-hover-white();
+      cursor: pointer;
+      user-select: none;
+
+      a {
+        color: inherit;
+      }
+
+      @media screen and (min-width: $width-breakpoint-md) {
         display: inline-block;
         padding: 12px;
       }
     }
-    .burger-menu {
+  }
+
+  .burger-menu {
+    margin-right: 1rem;
+    font-size: 32px;
+    @include yellow-hover-white();
+    cursor: pointer;
+
+    @media screen and (min-width: $width-breakpoint-md) {
       display: none;
     }
   }

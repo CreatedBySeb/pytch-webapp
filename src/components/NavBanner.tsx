@@ -45,8 +45,6 @@ const NavBanner = () => {
     menuIsExpanded ? "is-expanded" : "is-collapsed"
   );
 
-  // TODO: UL is supposed to directly contain LIs, so the below needs
-  // restructuring.
   return (
     <div className="NavBar">
       <div className="title-and-version">
@@ -58,26 +56,30 @@ const NavBanner = () => {
         <FontAwesomeIcon icon={burgerIcon} />
       </div>
       <ul className={ulClass}>
-        <a href={pytchResearchSiteUrl}>
-          <li>About</li>
-        </a>
-        <a href={`${pytchResearchSiteUrl}lesson-plans`}>
-          <li>Lesson plans</li>
-        </a>
-        <a href={withinSite("/doc/index.html")}>
-          <li>Help</li>
-        </a>
-        <Link to="/tutorials/">
-          <li>Tutorials</li>
-        </Link>
-        <Link to="/my-projects/">
-          <li>My projects</li>
-        </Link>
-        <Link to="/#contact-info" onClick={() => setMenuIsExpanded(false)}>
-          <li className="contact-us-link">
+        <li>
+          <a href={pytchResearchSiteUrl}>About</a>
+        </li>
+        <li>
+          <a href={`${pytchResearchSiteUrl}lesson-plans`}>Lesson plans</a>
+        </li>
+        <li>
+          <a href={withinSite("/doc/index.html")}>Help</a>
+        </li>
+        <li>
+          <Link to="/tutorials/">Tutorials</Link>
+        </li>
+        <li>
+          <Link to="/my-projects/">My projects</Link>
+        </li>
+        <li>
+          <Link
+            className="contact-us-link"
+            to="/#contact-info"
+            onClick={() => setMenuIsExpanded(false)}
+          >
             <FontAwesomeIcon icon={["far", "envelope"]} />
-          </li>
-        </Link>
+          </Link>
+        </li>
       </ul>
     </div>
   );
