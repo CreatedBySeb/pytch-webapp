@@ -48,6 +48,7 @@ export const CreateProjectModal = () => {
       activeFsmState.runState;
     const settle = settleFunctions(isSubmittable, activeFsmState);
 
+    const uiVersionIsForced = forceUiVersion != undefined;
     const effectiveUiVersion = forceUiVersion ?? activeUiVersion;
 
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +104,7 @@ export const CreateProjectModal = () => {
     };
 
     const changeUiStyleLink =
+      !uiVersionIsForced &&
       (activeUiVersion === "v1"
         ? wrapUiStyleText("Try our new script-by-script editor!", setUiV2)
         : wrapUiStyleText("Go back to classic Pytch", setUiV1));
