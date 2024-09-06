@@ -44,8 +44,11 @@ export const CreateProjectModal = () => {
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-    const { name, editorKind, whetherExample } = activeFsmState.runState;
+    const { name, editorKind, forceUiVersion, whetherExample } =
+      activeFsmState.runState;
     const settle = settleFunctions(isSubmittable, activeFsmState);
+
+    const effectiveUiVersion = forceUiVersion ?? activeUiVersion;
 
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
       setName(evt.target.value);
@@ -56,7 +59,7 @@ export const CreateProjectModal = () => {
     const editorKindThumbnail =
       editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
 
-    const mEditingModeContent = activeUiVersion === "v2" && (
+    const mEditingModeContent = effectiveUiVersion === "v2" && (
       <>
         <hr />
         <Form.Group className="editor-kind">
