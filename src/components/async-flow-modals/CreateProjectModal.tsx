@@ -103,9 +103,9 @@ export const CreateProjectModal = () => {
     };
 
     const changeUiStyleLink =
-      activeUiVersion === "v1"
+      (activeUiVersion === "v1"
         ? wrapUiStyleText("Try our new script-by-script editor!", setUiV2)
-        : wrapUiStyleText("Go back to classic Pytch", setUiV1);
+        : wrapUiStyleText("Go back to classic Pytch", setUiV1));
 
     return (
       <Modal
