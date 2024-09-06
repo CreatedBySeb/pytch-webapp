@@ -44,10 +44,12 @@ export type CreateProjectFlow = CreateProjectBase & CreateProjectActions;
 async function prepare(
   args: CreateProjectRunArgs
 ): Promise<CreateProjectRunState> {
+  const effectiveUiVersion = args.forceUiVersion ?? args.activeUiVersion;
   return {
     name: "Untitled project",
     whetherExample: "with-example",
-    editorKind: args.activeUiVersion === "v1" ? "flat" : "per-method",
+    forceUiVersion: args.forceUiVersion,
+    editorKind: effectiveUiVersion === "v1" ? "flat" : "per-method",
   };
 }
 
