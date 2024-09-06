@@ -19,7 +19,10 @@ const CodingJourneysModal: React.FC<CodingJourneysModalProps> = ({
 }) => {
   const navigate = useNavigate();
   const activeUiVersion = useStoreState((s) => s.versionOptIn.activeUiVersion);
-  const runCreateProject = useRunFlow((f) => f.createProjectFlow);
+  const runCreateProjectFlow = useRunFlow((f) => f.createProjectFlow);
+  const runCreateProject = () =>
+    runCreateProjectFlow({ activeUiVersion, forceUiVersion: "v2" });
+
   return (
     <Modal
       className="CodingJourneysModal"
@@ -46,7 +49,7 @@ const CodingJourneysModal: React.FC<CodingJourneysModalProps> = ({
         <Button
           onClick={() => {
             dismiss();
-            runCreateProject({ activeUiVersion });
+            runCreateProject();
           }}
         >
           Start a new project and work on my own

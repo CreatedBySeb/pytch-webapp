@@ -44,8 +44,12 @@ export const CreateProjectModal = () => {
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-    const { name, editorKind, whetherExample } = activeFsmState.runState;
+    const { name, editorKind, forceUiVersion, whetherExample } =
+      activeFsmState.runState;
     const settle = settleFunctions(isSubmittable, activeFsmState);
+
+    const uiVersionIsForced = forceUiVersion != undefined;
+    const effectiveUiVersion = forceUiVersion ?? activeUiVersion;
 
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
       setName(evt.target.value);
@@ -56,7 +60,7 @@ export const CreateProjectModal = () => {
     const editorKindThumbnail =
       editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
 
-    const mEditingModeContent = activeUiVersion === "v2" && (
+    const mEditingModeContent = effectiveUiVersion === "v2" && (
       <>
         <hr />
         <Form.Group className="editor-kind">
@@ -100,9 +104,10 @@ export const CreateProjectModal = () => {
     };
 
     const changeUiStyleLink =
-      activeUiVersion === "v1"
+      !uiVersionIsForced &&
+      (activeUiVersion === "v1"
         ? wrapUiStyleText("Try our new script-by-script editor!", setUiV2)
-        : wrapUiStyleText("Go back to classic Pytch", setUiV1);
+        : wrapUiStyleText("Go back to classic Pytch", setUiV1));
 
     return (
       <Modal
