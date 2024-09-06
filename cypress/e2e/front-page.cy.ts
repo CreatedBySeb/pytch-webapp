@@ -34,6 +34,7 @@ context("Front page", () => {
       cy.contains("Start a new project").click();
       cy.contains("Start a new project").should("not.exist");
       cy.get(".modal-title").contains("Create a new project");
+      cy.get("button").contains("sprites and scripts");
       cy.get("button").contains("Cancel").click();
       cy.get(".modal").should("not.exist");
 
@@ -43,6 +44,7 @@ context("Front page", () => {
         "{selectAll}{del}E2E test project{enter}"
       );
       cy.get(".StageControls");
+      cy.get(".ActorsList");
       cy.go("back");
     });
 
