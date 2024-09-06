@@ -1,0 +1,31 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+.ContactInvitation {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  text-align: center;
+
+  margin: 1rem 2rem;
+
+  .mail-icon {
+    margin: 0px 2rem;
+    font-size: 2.5rem;
+    a {
+      color: $pytch-colour-main-blue;
+    }
+  }
+
+  @media screen and (min-width: $width-breakpoint-sm) {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+
+    margin: 1rem auto;
+    max-width: $width-breakpoint-md;
+
+    .content-text {
+      margin: 0px 1rem;
+    }
+  }
+}

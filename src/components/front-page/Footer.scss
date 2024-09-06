@@ -1,0 +1,72 @@
+@import "../../pytch-mixins.scss";
+@import "../../pytch-variables.scss";
+
+.Footer {
+  background-color: $pytch-colour-main-blue;
+
+  text-align: center;
+  .section-content {
+    max-width: $width-breakpoint-lg;
+    margin: auto;
+  }
+
+  .sitemap {
+    margin-top: 1rem;
+
+    h2 {
+      padding-top: 1.5rem;
+      color: white;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0px;
+
+      li {
+        font-size: 18px;
+        margin: 0.5rem 0px;
+      }
+      a {
+        color: $pytch-colour-main-yellow;
+        &:hover {
+          color: white;
+        }
+      }
+    }
+
+    @media screen and (min-width: $width-breakpoint-sm) {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .section-images {
+    display: grid;
+    grid-template-rows: 1fr;
+    justify-items: center;
+
+    margin-top: 2rem;
+
+    img {
+      width: 40vw;
+      max-width: 240px;
+      &:nth-child(2) {
+        width: 50vw;
+        max-width: 300px;
+      }
+
+      margin: 2rem 0px;
+    }
+
+    @media screen and (min-width: $width-breakpoint-md) {
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      img {
+        width: 25vw;
+        &:nth-child(2) {
+          width: 30vw;
+        }
+      }
+    }
+  }
+}

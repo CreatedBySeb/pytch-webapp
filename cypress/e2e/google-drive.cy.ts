@@ -3,6 +3,7 @@
 import { AsyncFile } from "../../src/storage/google-drive";
 import { MockApiBehaviour } from "../../src/storage/google-drive/mock";
 import { valueCell } from "../../src/utils";
+import { assertOnHomepage } from "./utils";
 type MatchContent = Parameters<Cypress.Chainable["contains"]>[1];
 
 context("Google Drive import and export", () => {
@@ -114,7 +115,7 @@ context("Google Drive import and export", () => {
 
       afterEach(() => {
         cy.get(".modal").should("not.exist");
-        cy.contains("Pytch is a bridge");
+        assertOnHomepage();
       });
 
       it("can navigate back from auth failure", () => {

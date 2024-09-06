@@ -51,3 +51,30 @@ $activity-bar-tab-height: 2.75rem;
 $panel-divider-border-spec: 1px solid $panel-divider-color;
 
 $canvas-border-width: 1px;
+
+////////////////////////////////////////////////////////////////////////
+
+$pytch-title-font: "PxGrotesk-Bold", sans-serif;
+$pytch-body-font:
+  "Hanken Grotesk",
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Arial,
+  "Noto Sans",
+  sans-serif,
+  "Apple Color Emoji",
+  "Segoe UI Emoji",
+  "Segoe UI Symbol",
+  "Noto Color Emoji";
+
+////////////////////////////////////////////////////////////////////////
+
+// As used by Tailwind:
+$width-breakpoint-sm: 640px;
+$width-breakpoint-md: 768px;
+$width-breakpoint-lg: 1024px;
+$width-breakpoint-xl: 1280px;
+$width-breakpoint-2xl: 1536px;

@@ -7,6 +7,7 @@ import {
   launchProjectInListDropdownAction,
   launchShareTutorialModal,
   selectUniqueProject,
+  assertOnHomepage,
 } from "./utils";
 import {
   assertActorNames,
@@ -80,7 +81,7 @@ context("Modals are cancelled when navigating away", () => {
   const assertNoModals = () => cy.get(".modal").should("not.exist");
 
   const assertHomePageNoModals = () => {
-    cy.contains("Pytch is a bridge from Scratch to Python");
+    assertOnHomepage();
     assertNoModals();
   };
 

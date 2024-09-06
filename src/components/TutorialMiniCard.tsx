@@ -3,6 +3,7 @@ import Alert from "react-bootstrap/Alert";
 import { useStoreActions, useStoreState } from "../store";
 import { envVarOrFail } from "../env-utils";
 import LoadingOverlay from "./LoadingOverlay";
+import classNames from "classnames";
 
 // TODO: Replace this temporary solution with something more integrated
 // with the pytch-tutorials repo.
@@ -37,25 +38,25 @@ const TutorialMiniCard: React.FC<TutorialMiniCardProps> = ({
   const loadingThisDemo = maybeSlugCreating === slug;
 
   const maybeLaunchDemo = loadingSomeDemo
-    ? () => {
-        /* Do nothing. */
-      }
+    ? () => void 0
     : () => createDemoFromTutorial(slug);
 
-  const enabledOrDisabled = loadingSomeDemo ? " disabled" : " enabled";
+  const alertClass = classNames(
+    "TutorialMiniCard",
+    loadingSomeDemo ? "disabled" : "enabled"
+  );
 
   return (
-    <Alert className="TutorialMiniCard" variant="success">
-      <h2>{title}</h2>
-      <p>
+    <Alert className={alertClass} onClick={maybeLaunchDemo}>
+      <h3>{title}</h3>
+      <p className="screenshot-container">
         <img
-          className={`screenshot${enabledOrDisabled}`}
-          onClick={maybeLaunchDemo}
+          className="screenshot"
           src={`${tutorialsDataRoot}/${slug}/tutorial-assets/${screenshotBasename}`}
           alt={`screenshot of ${title}`}
         />
       </p>
-      {children}
+      <div className="description">{children}</div>
       <LoadingOverlay show={loadingThisDemo}>
         <p>Loading...</p>
       </LoadingOverlay>
