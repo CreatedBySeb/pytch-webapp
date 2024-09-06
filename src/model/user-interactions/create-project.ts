@@ -15,6 +15,7 @@ import { VersionTag } from "../version-opt-in";
 
 type CreateProjectRunArgs = {
   activeUiVersion: VersionTag;
+  forceUiVersion?: VersionTag;
 };
 
 type CreateProjectRunState = {
