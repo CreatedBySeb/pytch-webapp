@@ -20,7 +20,8 @@ const CodingJourneysModal: React.FC<CodingJourneysModalProps> = ({
   const navigate = useNavigate();
   const activeUiVersion = useStoreState((s) => s.versionOptIn.activeUiVersion);
   const runCreateProjectFlow = useRunFlow((f) => f.createProjectFlow);
-  const runCreateProject = () => runCreateProjectFlow({ activeUiVersion });
+  const runCreateProject = () =>
+    runCreateProjectFlow({ activeUiVersion, forceUiVersion: "v2" });
 
   return (
     <Modal
