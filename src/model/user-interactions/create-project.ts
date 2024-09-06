@@ -21,6 +21,7 @@ type CreateProjectRunArgs = {
 type CreateProjectRunState = {
   name: string;
   whetherExample: WhetherExampleTag;
+  forceUiVersion: VersionTag | undefined;
   editorKind: PytchProgramKind;
 };
 
