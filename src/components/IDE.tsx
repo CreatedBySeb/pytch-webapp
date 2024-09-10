@@ -13,6 +13,8 @@ import { IDEContents_Flat } from "./IDEContents_Flat";
 import { IDEContents as IDEContents_Junior } from "./Junior/IDEContents";
 import { ExceptionDisplay } from "./ExceptionDisplay";
 
+import "./ace-theme-pytch";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
 
