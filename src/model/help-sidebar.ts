@@ -153,16 +153,11 @@ const helpStringForContext = (
   if (typeof rawHelp === "string") {
     // If we have a bare string, then it's the help to show whether
     // we're in "flat" or "per-method" mode.
-    switch (displayContext.programKind) {
-      case "flat":
-        // But!  In "flat" mode, all methods are shown, so we might
-        // need to clarify which methods apply to only one actor-kind.
-        return maybeApplyActorKindPrefix(rawHelp, forActorKinds);
-      case "per-method":
-        return rawHelp;
-      default:
-        return assertNever(displayContext);
-    }
+    return maybeApplyActorKindPrefix(
+      displayContext.programKind,
+      rawHelp,
+      forActorKinds
+    );
   } else {
     const helpForProgramKind = failIfNull(
       rawHelp[displayContext.programKind],
