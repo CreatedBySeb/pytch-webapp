@@ -106,7 +106,10 @@
         "actorKind": "sprite",
         "python": "self.switch_costume(name_or_index)",
         "scratch": "switch costume to (smiling v)",
-        "help": "Switch to one of the costumes listed in this Sprite's *Costumes* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```"
+        "help": {
+            "flat": "Switch to one of the costumes listed in this Sprite's *Costumes* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```",
+            "per-method": "Switch to one of the costumes listed in this Sprite's *Costumes* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling.png\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```"
+        }
     },
     {
         "kind": "block",
