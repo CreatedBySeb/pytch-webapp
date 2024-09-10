@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Manually sorted to put light first then dark:
   let allThemes = [
+    ["./ace-theme-pytch.css", "pytch"],
     "chrome.css",
     "cloud9_day.css",
     "clouds.css",
@@ -85,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const themeProps = (themeDescr) => {
     let themePath, themeClassNub;
     if (Array.isArray(themeDescr)) {
-      themePath = themeDescr[0].split(".")[0];
+      themePath = themeDescr[0].replace(/\.css$/, "");
       themeClassNub = themeDescr[1];
     } else {
       themePath = themeDescr.split(".")[0];
@@ -99,7 +100,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       let link = document.createElement("link");
       link.rel = "stylesheet";
       link.type = "text/css";
-      link.href = `./ace-builds-css-theme/${themeBasename}.css`;
+      link.href = themeBasename.match(/\//)
+        ? `${themeBasename}.css`
+        : `./ace-builds-css-theme/${themeBasename}.css`;
       link.onload = resolve;
 
       document.head.appendChild(link);
