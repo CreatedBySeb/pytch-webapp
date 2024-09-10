@@ -1,6 +1,13 @@
 /// <reference types="cypress" />
 
 context("Front page", () => {
+  const urlWithinBase = (path: string) => {
+    const base = Cypress.config("baseUrl");
+    const baseOk = base != null && base.endsWith("/");
+    if (!baseOk) throw new Error("Cypress baseUrl config should end in a /");
+    return `${base}${path}`;
+  };
+
   type LaunchCodingJourneyModalOpts = { expectDeviceSizeWarning: boolean };
   const launchCodingJourneyModal = (opts: LaunchCodingJourneyModalOpts) => {
     cy.contains("coding journey").click();
