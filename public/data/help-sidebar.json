@@ -106,14 +106,20 @@
         "actorKind": "sprite",
         "python": "self.switch_costume(name_or_index)",
         "scratch": "switch costume to (smiling v)",
-        "help": "Switch to one of the costumes listed in this Sprite's *Costumes* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```"
+        "help": {
+            "flat": "Switch to one of the costumes listed in this Sprite's *Costumes* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```",
+            "per-method": "Switch to one of this Sprite's costumes.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to smiling costume:\nself.switch_costume(\"smiling.png\")\n```\n\nIf you want to use a *number* to say which costume, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first costume:\nself.switch_costume(0)\n```\n\n```\n# Switch to second costume:\nself.switch_costume(1)\n```"
+        }
     },
     {
         "kind": "block",
         "actorKind": "stage",
         "python": "self.switch_backdrop(name_or_index)",
         "scratch": "switch backdrop to (sunny v)",
-        "help": "Switch to one of the backdrops listed in your Stage's *Backdrops* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```"
+        "help": {
+            "flat": "Switch to one of the backdrops listed in your Stage's *Backdrops* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```",
+            "per-method": "Switch to one of the Stage's backdrops.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny.jpg\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```"
+        }
     },
     {
         "kind": "block",
@@ -226,8 +232,8 @@
         "help": {
             "flat": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  This function will not return until the entire sound has played, so your code will not move on to its next statement until the sound is done playing.\n\n```\n# (This example is for a Sprite)\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
             "per-method": {
-                "sprite": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash\")\nself.hide()\n```",
-                "stage": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash\")\nself.next_backdrop()\n```"
+                "sprite": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  This function will not return until the entire sound has played, so your Sprite will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then disappear:\nself.play_sound_until_done(\"splash.mp3\")\nself.hide()\n```",
+                "stage": "Start a sound playing and wait for it to finish.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  This function will not return until the entire sound has played, so the Stage will not move on to the next statement in the code until the sound is done playing.\n\n```\n# Make noise, then change scenery:\nself.play_sound_until_done(\"splash.mp3\")\nself.next_backdrop()\n```"
             }
         }
     },
@@ -238,8 +244,8 @@
         "help": {
             "flat": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's (or Stage's) list of sounds.  Once the sound has started, the Sprite (or Stage) will straight away move on to the next statement in your code.\n\n```\n# (This example is for a Sprite.)\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
             "per-method": {
-                "sprite": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song\")\nself.glide_to_xy(0, 0, 1.5)\n```",
-                "stage": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
+                "sprite": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Sprite's list of sounds.  Once the sound has started, the Sprite will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and glide\n# to centre while tune is playing:\nself.start_sound(\"my-song.mp3\")\nself.glide_to_xy(0, 0, 1.5)\n```",
+                "stage": "Start a sound playing.  The given `sound` can either be the name of the sound or its index (zero-based position) in the Stage's list of sounds.  Once the sound has started, the Stage will straight away move on to the next statement in your code.\n\n```\n# Start playing tune, and count up\n# the score while tune is playing:\nself.start_sound(\"my-song.mp3\")\nfor i in range(5):\n    self.score += 1\n    pytch.wait_seconds(1)\n```"
             }
         }
     },

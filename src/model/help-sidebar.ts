@@ -117,18 +117,28 @@ type RawHelpValue =
   | Record<string, Record<string, string>>;
 
 const maybeApplyActorKindPrefix = (
+  programKind: PytchProgramKind,
   helpContent: string,
   forActorKinds: Array<ActorKind>
 ): string => {
-  if (forActorKinds.length === 2) {
-    // Applicable to both Sprite and Stage; no prefix needed.
-    return helpContent;
-  } else {
-    // Applicable to just one; add prefix.
-    const actorKind = forActorKinds[0];
-    const actorKindName = ActorKindOps.names(actorKind).displayTitle;
-    const actorKindIntro = `**${actorKindName} only:** `;
-    return actorKindIntro + helpContent;
+  switch (programKind) {
+    case "flat":
+      // In "flat" mode, all methods are shown, so we might need to
+      // clarify which methods apply to only one actor-kind.
+      if (forActorKinds.length === 2) {
+        // Applicable to both Sprite and Stage; no prefix needed.
+        return helpContent;
+      } else {
+        // Applicable to just one; add prefix.
+        const actorKind = forActorKinds[0];
+        const actorKindName = ActorKindOps.names(actorKind).displayTitle;
+        const actorKindIntro = `**${actorKindName} only:** `;
+        return actorKindIntro + helpContent;
+      }
+    case "per-method":
+      return helpContent;
+    default:
+      return assertNever(programKind);
   }
 };
 
@@ -142,17 +152,13 @@ const helpStringForContext = (
 ): string => {
   if (typeof rawHelp === "string") {
     // If we have a bare string, then it's the help to show whether
-    // we're in "flat" or "per-method" mode.
-    switch (displayContext.programKind) {
-      case "flat":
-        // But!  In "flat" mode, all methods are shown, so we might
-        // need to clarify which methods apply to only one actor-kind.
-        return maybeApplyActorKindPrefix(rawHelp, forActorKinds);
-      case "per-method":
-        return rawHelp;
-      default:
-        return assertNever(displayContext);
-    }
+    // we're in "flat" or "per-method" mode.  (Possibly once we have
+    // prefixed with, e.g., "Sprite only:".)
+    return maybeApplyActorKindPrefix(
+      displayContext.programKind,
+      rawHelp,
+      forActorKinds
+    );
   } else {
     const helpForProgramKind = failIfNull(
       rawHelp[displayContext.programKind],
@@ -160,7 +166,11 @@ const helpStringForContext = (
     );
 
     if (typeof helpForProgramKind === "string") {
-      return helpForProgramKind;
+      return maybeApplyActorKindPrefix(
+        displayContext.programKind,
+        helpForProgramKind,
+        forActorKinds
+      );
     } else {
       switch (displayContext.programKind) {
         case "flat":
