@@ -114,7 +114,7 @@ const CodeAceEditor = () => {
       <AceEditor
         ref={aceRef}
         mode="python"
-        theme="github"
+        theme="pytch"
         enableBasicAutocompletion={completers}
         value={codeText}
         name="pytch-ace-editor"
