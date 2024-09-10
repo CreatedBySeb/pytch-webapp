@@ -166,7 +166,11 @@ const helpStringForContext = (
     );
 
     if (typeof helpForProgramKind === "string") {
-      return helpForProgramKind;
+      return maybeApplyActorKindPrefix(
+        displayContext.programKind,
+        helpForProgramKind,
+        forActorKinds
+      );
     } else {
       switch (displayContext.programKind) {
         case "flat":
