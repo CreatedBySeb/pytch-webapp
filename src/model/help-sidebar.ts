@@ -117,9 +117,14 @@ type RawHelpValue =
   | Record<string, Record<string, string>>;
 
 const maybeApplyActorKindPrefix = (
+  programKind: PytchProgramKind,
   helpContent: string,
   forActorKinds: Array<ActorKind>
 ): string => {
+  switch (programKind) {
+    case "flat":
+      // In "flat" mode, all methods are shown, so we might need to
+      // clarify which methods apply to only one actor-kind.
   if (forActorKinds.length === 2) {
     // Applicable to both Sprite and Stage; no prefix needed.
     return helpContent;
@@ -129,6 +134,11 @@ const maybeApplyActorKindPrefix = (
     const actorKindName = ActorKindOps.names(actorKind).displayTitle;
     const actorKindIntro = `**${actorKindName} only:** `;
     return actorKindIntro + helpContent;
+  }
+    case "per-method":
+      return helpContent;
+    default:
+      return assertNever(programKind);
   }
 };
 
