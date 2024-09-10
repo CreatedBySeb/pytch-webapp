@@ -152,7 +152,8 @@ const helpStringForContext = (
 ): string => {
   if (typeof rawHelp === "string") {
     // If we have a bare string, then it's the help to show whether
-    // we're in "flat" or "per-method" mode.
+    // we're in "flat" or "per-method" mode.  (Possibly once we have
+    // prefixed with, e.g., "Sprite only:".)
     return maybeApplyActorKindPrefix(
       displayContext.programKind,
       rawHelp,
