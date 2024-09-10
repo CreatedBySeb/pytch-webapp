@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
 import { useStoreState, useStoreActions } from "../store";
