@@ -116,7 +116,10 @@
         "actorKind": "stage",
         "python": "self.switch_backdrop(name_or_index)",
         "scratch": "switch backdrop to (sunny v)",
-        "help": "Switch to one of the backdrops listed in your Stage's *Backdrops* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```"
+        "help": {
+            "flat": "Switch to one of the backdrops listed in your Stage's *Backdrops* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```",
+            "per-method": "Switch to one of the backdrops listed in your Stage's *Backdrops* variable.  You can do this either by giving the costume's *name*, or its *number*.\n\n```\n# Switch to sunny backdrop:\nself.switch_backdrop(\"sunny.jpg\")\n```\n\nIf you want to use a *number* to say which backdrop, remember that Python starts counting entries in a list at *zero*.\n\n```\n# Switch to first backdrop:\nself.switch_backdrop(0)\n```\n\n```\n# Switch to second backdrop:\nself.switch_backdrop(1)\n```"
+        }
     },
     {
         "kind": "block",
