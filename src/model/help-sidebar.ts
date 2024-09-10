@@ -125,16 +125,16 @@ const maybeApplyActorKindPrefix = (
     case "flat":
       // In "flat" mode, all methods are shown, so we might need to
       // clarify which methods apply to only one actor-kind.
-  if (forActorKinds.length === 2) {
-    // Applicable to both Sprite and Stage; no prefix needed.
-    return helpContent;
-  } else {
-    // Applicable to just one; add prefix.
-    const actorKind = forActorKinds[0];
-    const actorKindName = ActorKindOps.names(actorKind).displayTitle;
-    const actorKindIntro = `**${actorKindName} only:** `;
-    return actorKindIntro + helpContent;
-  }
+      if (forActorKinds.length === 2) {
+        // Applicable to both Sprite and Stage; no prefix needed.
+        return helpContent;
+      } else {
+        // Applicable to just one; add prefix.
+        const actorKind = forActorKinds[0];
+        const actorKindName = ActorKindOps.names(actorKind).displayTitle;
+        const actorKindIntro = `**${actorKindName} only:** `;
+        return actorKindIntro + helpContent;
+      }
     case "per-method":
       return helpContent;
     default:
