@@ -10,7 +10,7 @@ $block-category-backgrounds: (
   "operators": #40bf4a,
   "variables": #ff8c1a,
   "lists": #ff661a,
-  "instances": #4d97ff,
+  "instances": $pytch-colour-main-blue,
 );
 
 $hovered-method-bg: darken($secondary-bg-color, 5);
