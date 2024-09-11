@@ -199,7 +199,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
             <div className="hat-code-spacer" />
             <AceEditor
               mode="python"
-              theme="github"
+              theme="pytch"
               enableBasicAutocompletion={completers}
               value={handler.pythonCode}
               onChange={updateCodeText}

@@ -1,0 +1,162 @@
+$ace-pytch-dark-wong-green: #00835f;
+$ace-pytch-dark-wong-pink: #b94887;
+$ace-pytch-dark-wong-orange: #bb5300;
+$ace-pytch-pytch-blue: #306998;
+
+.ace-pytch {
+  background-color: white;
+  color: black;
+
+  //////////////////////////////////////////////////////////////////////
+  // Editor elements
+
+  .ace_gutter {
+    background: #ececec;
+    color: #333;
+  }
+
+  .ace_print-margin {
+    width: 1px;
+    background: #e8e8e8;
+  }
+
+  .ace_fold {
+    background-color: $ace-pytch-pytch-blue;
+  }
+
+  .ace_cursor {
+    color: black;
+  }
+
+  .ace_invisible {
+    color: rgb(191, 191, 191);
+  }
+
+  .ace_indent-guide,
+  .ace_indent-guide-active {
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePHixX8ACSwDuE5Z3xUAAAAASUVORK5CYII=")
+      right repeat-y;
+  }
+
+  .ace_marker-layer .ace_selection {
+    background: #c8e6ff;
+  }
+
+  .ace_multiselect .ace_selection.ace_start {
+    box-shadow: 0 0 3px 0px white;
+  }
+
+  .ace_marker-layer .ace_step {
+    background: rgb(247, 237, 137);
+  }
+
+  .ace_marker-layer .ace_stack {
+    background: #bae0a0;
+  }
+
+  .ace_marker-layer .ace_bracket {
+    margin: -1px 0 0 -1px;
+    border: 1px solid rgb(192, 192, 192);
+  }
+
+  &.ace_focus .ace_marker-layer .ace_active-line {
+    background: #fcfce8;
+  }
+
+  .ace_gutter-active-line {
+    background-color: #e5e5e5;
+  }
+
+  .ace_marker-layer .ace_selected-word {
+    background: rgb(250, 250, 255);
+    border: 1px solid rgb(200, 200, 250);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // Syntax elements
+
+  .ace_storage,
+  .ace_keyword,
+  .ace_keyword.ace_operator,
+  .ace_punctuation,
+  .ace_paren {
+    color: black;
+    font-weight: bold;
+  }
+
+  .ace_constant,
+  .ace_constant.ace_buildin,
+  .ace_constant.ace_language,
+  .ace_constant.ace_library,
+  .ace_constant.ace_numeric {
+    color: $ace-pytch-pytch-blue;
+  }
+
+  .ace_support.ace_function {
+    color: $ace-pytch-dark-wong-orange;
+  }
+
+  .ace_string {
+    color: $ace-pytch-dark-wong-pink;
+  }
+
+  .ace_comment {
+    font-style: italic;
+    color: $ace-pytch-dark-wong-green;
+  }
+
+  .ace_entity.ace_name.ace_function {
+    color: $ace-pytch-dark-wong-orange;
+    font-weight: bold;
+  }
+
+  .ace_variable.ace_language {
+    color: $ace-pytch-pytch-blue;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // Unused in Python
+
+  .ace_support.ace_constant {
+    color: rgb(6, 150, 14);
+  }
+
+  .ace_support.ace_type,
+  .ace_support.ace_class {
+    color: rgb(109, 121, 222);
+  }
+
+  // Not really used by us:
+  .ace_invalid {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: red;
+  }
+
+  .ace_comment.ace_doc {
+    color: rgb(0, 102, 255);
+  }
+
+  .ace_comment.ace_doc.ace_tag {
+    color: rgb(128, 159, 191);
+  }
+
+  .ace_xml-pe {
+    color: rgb(104, 104, 91);
+  }
+
+  .ace_heading {
+    color: rgb(12, 7, 255);
+  }
+
+  .ace_list {
+    color: rgb(185, 6, 144);
+  }
+
+  .ace_meta.ace_tag {
+    color: rgb(0, 22, 142);
+  }
+
+  .ace_string.ace_regex {
+    color: rgb(255, 0, 0);
+  }
+}
