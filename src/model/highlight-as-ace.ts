@@ -5,22 +5,25 @@ type AceRange = ReturnType<AceEditorT["getSelectionRange"]>;
 type AceToken = ReturnType<AceEditorT["session"]["getTokens"]>[number];
 
 const styleStringFromClass = (() => {
-  // The following was manually extracted from the github theme CSS
-  // within the Ace source.  Try to remember to check now and again that
-  // it still matches.
+  // The following was manually extracted from the rendered CSS of our
+  // Pytch theme.  If it becomes cumbersome to keep these in sync, we
+  // can try harder to find a better system.
   const defFromClass = new Map<string, string>([
-    ["keyword", "/bold"],
-    ["string", "#d14/"],
-    ["variable.class", "teal/"],
-    ["constant.numeric", "#099/"],
-    ["function.support", "#0086b3/"],
-    ["comment", "#998/italic"],
-    ["variable.language", "#0086b3/"],
-    ["keyword.operator", "/bold"],
-    ["paren", "/bold"],
-    ["boolean", "/bold"],
-    ["variable.instance", "teal/"],
-    ["constant.language", "/bold"],
+    ["comment", "#00835f/italic"],
+    ["constant.language", "#306998/"],
+    ["constant.numeric", "#306998/"],
+    ["entity.name.function", "#bb5300/bold"],
+    ["function.support", "#bb5300/"],
+    ["identifier", "/"],
+    ["keyword", "black/bold"],
+    ["keyword.operator", "black/bold"],
+    ["paren.lparen", "black/bold"],
+    ["paren.rparen", "black/bold"],
+    ["punctuation", "black/bold"],
+    ["string", "#b94887/"],
+    ["support.function", "#bb5300/"],
+    ["text", "/"],
+    ["variable.language", "#306998/"],
   ]);
 
   let styleFromClass = new Map<string, string>();
