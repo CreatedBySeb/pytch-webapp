@@ -1,3 +1,21 @@
+/** This is a quite ad-hoc.  We have copied and pasted an existing theme
+ * JavaScript file, and then copied and pasted in the rendered CSS from
+ * the source SCSS file (src/ace-theme-pytch.scss).  The rendered file
+ * also exists (tools/ace-theme-contrasts/ace-theme-pytch.css).  If it
+ * becomes cumbersom to keep all this in sync we can look into a system
+ * which has just one source of truth.
+ *
+ * To render, run:
+ *
+ *   cd $REPO_ROOT
+ *   npx sass src/ace-theme-pytch.scss > tools/ace-theme-contrasts/ace-theme-pytch.css
+ *
+ * and then copy/paste the CSS into this file as the `` string.
+ *
+ * See also the map in src/model/highlight-as-ace.ts, which ALSO needs to
+ * be kept in sync.
+ */
+
 ace.define(
   "ace/theme/pytch-css",
   ["require", "exports", "module"],
