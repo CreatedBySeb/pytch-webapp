@@ -127,6 +127,14 @@ $hovered-method-bg: darken($secondary-bg-color, 5);
       align-items: center;
       padding: 2px 8px;
 
+      color: $pytch-colour-main-blue;
+      border: 1px solid $pytch-colour-main-blue;
+
+      &:hover {
+        background-color: $pytch-colour-main-blue;
+        color: $pytch-colour-main-yellow;
+      }
+
       > *:first-child {
         margin-right: 0.5rem;
       }
