@@ -62,6 +62,11 @@ $hovered-method-bg: darken($secondary-bg-color, 5);
         margin: 6px 1rem 6px 0px;
         display: grid;
         align-items: center;
+
+        > svg {
+          // Chevron is not quite vertically centred in its box; fix:
+          transform: translateY(1px);
+        }
       }
     }
   }
