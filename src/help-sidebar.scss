@@ -4,13 +4,13 @@ $block-category-backgrounds: (
   "motion": #4797ff,
   "looks": #9966ff,
   "sound": #d65cd6,
-  "events": #ffd500,
+  "events": $scratch-hat-block-background,
   "control": #ffab19,
   "sensing": #4cbfe6,
   "operators": #40bf4a,
   "variables": #ff8c1a,
   "lists": #ff661a,
-  "instances": #4d97ff,
+  "instances": $pytch-colour-main-blue,
 );
 
 $hovered-method-bg: darken($secondary-bg-color, 5);
@@ -35,7 +35,7 @@ $hovered-method-bg: darken($secondary-bg-color, 5);
     h1 {
       display: grid;
       grid-template-columns: 1fr auto;
-      align-items: center;
+      align-items: stretch;
 
       color: white;
       border-radius: 4px;
@@ -44,16 +44,29 @@ $hovered-method-bg: darken($secondary-bg-color, 5);
       transition-property: background-color;
       transition-duration: 150ms;
 
+      .content,
+      .accordion-signifier {
+        padding: 2px 6px;
+        background-color: #ffffffa0;
+        color: #222;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+
       .content {
-        padding: 0.5rem;
-        font-size: 1.125rem;
-        font-weight: 500;
+        margin: 6px 1rem;
+        font-weight: normal;
       }
 
       .accordion-signifier {
+        margin: 6px 1rem 6px 0px;
         display: grid;
-        margin-right: 0.5rem;
-        font-size: 1.25rem;
+        align-items: center;
+
+        > svg {
+          // Chevron is not quite vertically centred in its box; fix:
+          transform: translateY(1px);
+        }
       }
     }
   }
@@ -113,6 +126,14 @@ $hovered-method-bg: darken($secondary-bg-color, 5);
       justify-items: center;
       align-items: center;
       padding: 2px 8px;
+
+      color: $pytch-colour-main-blue;
+      border: 1px solid $pytch-colour-main-blue;
+
+      &:hover {
+        background-color: $pytch-colour-main-blue;
+        color: $pytch-colour-main-yellow;
+      }
 
       > *:first-child {
         margin-right: 0.5rem;

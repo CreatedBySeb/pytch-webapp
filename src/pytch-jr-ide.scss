@@ -551,6 +551,7 @@
 
     &.add-script {
       @include background-color-as-button($scratch-hat-block-background);
+      color: $scratch-hat-block-text-colour;
     }
     &.add-sprite,
     &.add-sprite-asset {
@@ -618,7 +619,7 @@
     .content {
       flex-grow: 1;
       margin-left: 0.5rem;
-      color: white;
+      color: $scratch-hat-block-text-colour;
     }
 
     .reorder-buttons {
@@ -813,8 +814,9 @@ $key-chooser-width: 54rem;
         border-top-left-radius: 6px;
         border-top-right-radius: $hat-block-TR-radius;
         padding: 0.25rem;
+        padding-left: 0.5rem;
         background-color: $scratch-hat-block-background;
-        color: white;
+        color: $scratch-hat-block-text-colour;
         input {
           display: inline-block;
           height: 1.5rem;
