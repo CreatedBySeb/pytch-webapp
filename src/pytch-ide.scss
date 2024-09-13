@@ -638,6 +638,19 @@ div.spacer-instead-of-resizer {
   }
 }
 
+@mixin as-bootstrap-button($bg, $border) {
+  &.btn,
+  &.btn:focus,
+  &.btn:active,
+  &.btn:focus-visible {
+    @include background-color-as-button($bg);
+    &,
+    &:hover {
+      border: 1px solid $border;
+    }
+  }
+}
+
 .StageControlPseudoButton {
   width: 3em;
   height: 36px;
