@@ -47,9 +47,12 @@ const GreenFlag = () => {
 
   return (
     <div className="tooltipped-elt">
-      <div className="StageControlPseudoButton GreenFlag" onClick={handleClick}>
+      <Button
+        className="StageControlPseudoButton GreenFlag"
+        onClick={handleClick}
+      >
         <FontAwesomeIcon icon="play" />
-      </div>
+      </Button>
       <StaticTooltip visible={tooltipIsVisible}>
         <p>Click the green flag to run the project</p>
       </StaticTooltip>
@@ -63,9 +66,9 @@ export const RedStop = () => {
     focusStage();
   };
   return (
-    <div className="StageControlPseudoButton RedStop" onClick={redStop}>
+    <Button className="StageControlPseudoButton RedStop" onClick={redStop}>
       <FontAwesomeIcon icon="stop" />
-    </div>
+    </Button>
   );
 };
 
