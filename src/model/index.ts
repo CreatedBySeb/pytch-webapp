@@ -44,6 +44,7 @@ import {
   standalonePlayDemoState,
 } from "./standalone-play-demo";
 import { useStoreActions, useStoreState } from "../store";
+import { devices, Devices } from "./devices";
 
 export interface IPytchAppModel {
   navigationRequestQueue: NavigationRequestQueue;
@@ -63,6 +64,7 @@ export interface IPytchAppModel {
   clipArtGallery: IClipArtGallery;
   googleDriveImportExport: GoogleDriveIntegration;
   standalonePlayDemoState: StandalonePlayDemoState;
+  devices: Devices;
 }
 
 export type PytchAppModelActions = Actions<IPytchAppModel>;
@@ -85,6 +87,7 @@ export const pytchAppModel: IPytchAppModel = {
   clipArtGallery,
   googleDriveImportExport: googleDriveIntegration,
   standalonePlayDemoState,
+  devices,
 };
 
 export function useFlowState<ResultT>(

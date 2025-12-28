@@ -2,6 +2,7 @@ import React, { useId, useRef } from "react";
 import { useStoreState } from "../../store";
 import { useJrEditActions, useJrEditState } from "./hooks";
 import { InfoPanelTabKey as TabKey } from "../../model/junior/edit-state";
+import { deviceManager } from "../../skulpt-connection/device-manager";
 import { Tabs, TabWithTypedKey } from "../TabWithTypedKey";
 import { ErrorReportList } from "./ErrorReportList";
 
@@ -46,18 +47,31 @@ const Errors = () => {
 };
 
 const Devices = () => {
-  if (!("usb" in navigator)) {
+  if (!deviceManager.supported) {
     return <div className="DevicesPane">
       <p className="info-pane-placeholder">
-        Unfortunately, devices are not supported in your browser. See INSERT_LINK for more information.
+        Unfortunately, devices are not supported in your browser.
+        See INSERT_LINK for more information.
       </p>
     </div>;
   }
 
+  const pair = () => deviceManager.pairDevice();
+  const devices = useStoreState((state) => state.devices.devices);
+
   return <div className="DevicesPane">
-    <p className="info-pane-placeholder">
-      Let's get ready to micro:bit!
-    </p>
+    <ul>
+      {
+        devices.map((d) => {
+          return <li key={d.serialNumber}>
+            micro:bit V{d.revision[0]} ({d.serialNumber})
+          </li>;
+        })
+      }
+      <li>
+        <Button onClick={pair}>Add a device</Button>
+      </li>
+    </ul>
   </div>;
 };
 
