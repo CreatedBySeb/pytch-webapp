@@ -6,12 +6,12 @@
         {
           "kind": "text",
           "forProgramKind": "per-method",
-          "markdown": "The IDE is divided into sections.  You can use `Tab` and `Shift + Tab` to move between them.  The sections are:\n\n* Activity bar\n* Activity content (if shown)\n* Code, costumes/backdrops, sounds pane\n* Output and errors pane (if shown)\n* Project controls\n* Project stage\n* Stage and sprites pane\n\nSome of these sections contain more than one tab-stop.  For example, a show/hide button or an \"add\" button."
+          "markdown": "The IDE is divided into sections.  You can use `Tab` and `Shift + Tab` to move between them.  The sections are:\n\n* Activity bar\n* Activity content (if shown)\n* Code, costumes/backdrops, sounds pane\n* Output, errors and devices pane (if shown)\n* Project controls\n* Project stage\n* Stage and sprites pane\n\nSome of these sections contain more than one tab-stop.  For example, a show/hide button or an \"add\" button."
         },
         {
           "kind": "text",
           "forProgramKind": "flat",
-          "markdown": "The IDE is divided into sections.  You can use `Tab` and `Shift + Tab` to move between them.  The sections are:\n\n* Activity bar\n* Activity content (if shown)\n* Code editor\n* Output and errors pane (if shown)\n* Project controls\n* Project stage\n* Images and sounds pane\n\nSome of these sections contain more than one tab-stop.  For example, a show/hide button or an \"add\" button."
+          "markdown": "The IDE is divided into sections.  You can use `Tab` and `Shift + Tab` to move between them.  The sections are:\n\n* Activity bar\n* Activity content (if shown)\n* Code editor\n* Output, errors and devices pane (if shown)\n* Project controls\n* Project stage\n* Images and sounds pane\n\nSome of these sections contain more than one tab-stop.  For example, a show/hide button or an \"add\" button."
         },
         {
           "kind": "item",
@@ -124,7 +124,7 @@
       "entries": [
         {
           "kind": "text",
-          "markdown": "Some areas of the IDE are made up of *tabbed content*, where you choose which content to display from a small set of options.  For example, the *Information* pane has *Output* and *Error* tabs."
+          "markdown": "Some areas of the IDE are made up of *tabbed content*, where you choose which content to display from a small set of options.  For example, the *Information* pane has *Output*, *Errors* and *Devices* tabs."
         },
         {
           "kind": "item",

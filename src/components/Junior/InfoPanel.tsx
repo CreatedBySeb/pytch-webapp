@@ -45,6 +45,22 @@ const Errors = () => {
   return <div className="ErrorsPane">{content}</div>;
 };
 
+const Devices = () => {
+  if (!("usb" in navigator)) {
+    return <div className="DevicesPane">
+      <p className="info-pane-placeholder">
+        Unfortunately, devices are not supported in your browser. See INSERT_LINK for more information.
+      </p>
+    </div>;
+  }
+
+  return <div className="DevicesPane">
+    <p className="info-pane-placeholder">
+      Let's get ready to micro:bit!
+    </p>
+  </div>;
+};
+
 type InfoDisclosureProps = { tabContentId: string };
 const InfoDisclosure: React.FC<InfoDisclosureProps> = ({ tabContentId }) => {
   const toggleStateAction = useJrEditActions((a) => a.toggleInfoPanelState);
@@ -57,12 +73,12 @@ const InfoDisclosure: React.FC<InfoDisclosureProps> = ({ tabContentId }) => {
         size="sm"
         className="disclosure-button expand-button m-1"
         onClick={toggleState}
-        aria-label="Show output and errors"
+        aria-label="Show output, errors and devices"
         aria-expanded={false}
         aria-controls={tabContentId}
       >
         <FontAwesomeIcon className="me-2" icon="angle-right" />
-        Output and errors
+        Output, errors and devices
       </Button>
     </div>
   );
@@ -84,7 +100,7 @@ export const InfoPanel = () => {
     { isCollapsed }
   );
 
-  const ariaLabel = "Output and errors";
+  const ariaLabel = "Output, errors and devices";
 
   const tabPanelClasses = classNames(
     "Junior-InfoPanel",
@@ -119,6 +135,9 @@ export const InfoPanel = () => {
         <Tab eventKey="errors" title="Errors">
           <Errors />
         </Tab>
+        <Tab eventKey="devices" title="Devices">
+          <Devices />
+        </Tab>
       </Tabs>
       {isCollapsed ? (
         <InfoDisclosure tabContentId={tabContentId} />
@@ -127,7 +146,7 @@ export const InfoPanel = () => {
           variant="outline-secondary"
           className="disclosure-button collapse-button"
           onClick={toggleState}
-          aria-label="Hide output and errors"
+          aria-label="Hide output, errors and devices"
           aria-expanded={true}
           aria-controls={tabContentId}
         >

@@ -17,7 +17,7 @@ import {
 import { scrollTopFromPageKey } from "./jr-tutorial";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
-export type InfoPanelTabKey = "output" | "errors";
+export type InfoPanelTabKey = "output" | "errors" | "devices";
 
 export type InfoPanelState = "collapsed" | "expanded";
 

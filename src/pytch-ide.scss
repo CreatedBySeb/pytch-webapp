@@ -331,7 +331,8 @@ $speech-bubble-max-height: 180px;
 
 .AssetCardPane,
 .StandardOutputPane,
-.ErrorsPane {
+.ErrorsPane,
+.DevicesPane {
   flex-grow: 1;
   flex-shrink: 1;
   overflow-y: auto;
