@@ -57,29 +57,35 @@ const Devices = () => {
   }
 
   const pair = () => deviceManager.pairDevice();
+  const activeDevice = useStoreState((state) => state.devices.active);
   const devices = useStoreState((state) => state.devices.devices);
 
   return <div className="DevicesPane">
     <ul>
       {
         devices.map((d) => {
-          let status: string;
+          const active = d.serialNumber === activeDevice;
+          const disabled = active || d.status !== MicroBitStatus.READY;
+          let status = (active) ? "[Active] " : "";
 
           switch (d.status) {
             case MicroBitStatus.ERRORED:
-              status = "Error";
+              status += "[Error]";
               break;
             case MicroBitStatus.PENDING:
             case MicroBitStatus.CONNECTED:
-              status = "Connecting";
+              status += "[Connecting]";
               break;
             case MicroBitStatus.READY:
-              status = "Connected";
+              status += "[Connected]";
               break;
           }
 
           return <li key={d.serialNumber}>
-            micro:bit V{d.revision[0]} [{status}] ({d.serialNumber})
+            micro:bit V{d.revision[0]} {status} ({d.serialNumber})
+            <Button variant="outline-primary" disabled={disabled}>
+              Make Active
+            </Button>
           </li>;
         })
       }

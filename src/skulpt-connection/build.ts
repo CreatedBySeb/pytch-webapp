@@ -1,6 +1,7 @@
 import { liveSourceMap } from "./code-editor";
 import { PytchProgramOps } from "../model/pytch-program";
 import { assetServer } from "./asset-server";
+import { deviceManager } from "./device-manager";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
@@ -65,6 +66,7 @@ export const build = async (
   try {
     ensureSoundManager();
     Sk.pytch.async_load_image = (name: string) => assetServer.loadImage(name);
+    Sk.pytch.get_active_device = () => deviceManager.getActive();
 
     const flattenedProgram = PytchProgramOps.flatCodeText(
       project.program,

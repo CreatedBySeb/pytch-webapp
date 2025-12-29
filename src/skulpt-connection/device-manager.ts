@@ -61,9 +61,13 @@ function parseDeviceInfo(response: string[]): DeviceInfo {
 }
 
 export enum MicroBitStatus {
+  /** The micro:bit is in an error state and cannot be used currently */
   ERRORED = -1,
+  /** The micro:bit is available but has not been connected to yet */
   PENDING,
+  /** The micro:bit has been connected over DAPLink, but isn't ready for use */
   CONNECTED,
+  /** The micro:bit is connected and succeeded handshake, so is ready for use */
   READY,
 }
 
@@ -190,6 +194,8 @@ export class MicroBitDevice {
           console.log(`Handshake succeeded (attempt ${i})`);
         });
 
+      // FIXME: there's a delay between the device passing and the promise
+      //   resolving due to this delay mechanism, so we may need something else
       await sleep(HANDSHAKE_DELAY);
 
       // @ts-expect-error -- TypeScript cannot tell that the status can be
@@ -329,6 +335,7 @@ export class MicroBitDevice {
 class DeviceManger {
   public readonly supported = ("usb" in navigator);
 
+  private activeDevice: string | null = null;
   private devices: Map<string, MicroBitDevice> = new Map();
 
   constructor() {
@@ -362,6 +369,22 @@ class DeviceManger {
   }
 
   /**
+   * Gets the nominated active device, which is used in running projects
+   * @returns The currently active device, or null if there isn't one
+   */
+  public getActive(): MicroBitDevice | null {
+    if (this.activeDevice === null) return this.activeDevice;
+
+    const device = this.devices.get(this.activeDevice);
+
+    if (!device) {
+      throw new Error(`Active device '${this.activeDevice}' does not exist`);
+    }
+
+    return device;
+  }
+
+  /**
    * Attempts to pair a new device using WebUSB
    *
    * Transient user activation is required for USB#requestDevice, so this must
@@ -389,6 +412,19 @@ class DeviceManger {
     return true;
   }
 
+  /**
+   * Sets a connected device as the active one for projects
+   * @param serial The serial number of the desired device, or null to unset
+   */
+  public setActive(serial: string | null): void {
+    if (serial !== null && !this.devices.has(serial)) {
+      throw new Error(`Cannot make unknown device '${serial}' active`);
+    }
+
+    this.activeDevice = serial;
+    store.getActions().devices.setActive(serial);
+  }
+
   private deviceConnected(device: USBDevice): void {
     if (!device.serialNumber) {
       console.error(
@@ -401,12 +437,25 @@ class DeviceManger {
     const microbit = new MicroBitDevice(device as IdentifiableUSBDevice);
     this.devices.set(device.serialNumber, microbit);
     store.getActions().devices.setDevices(Array.from(this.devices.values()));
-    microbit.connect();
+
+    microbit.connect()
+      .then(() => {
+        if (this.activeDevice === null) {
+          this.setActive(device.serialNumber);
+          console.log("No active device selected, making device active");
+        }
+      });
   }
 
   private deviceDisconnected(device: USBDevice): void {
     if (device.serialNumber && this.devices.has(device.serialNumber)) {
       console.log("Device disconnected: " + device.serialNumber);
+
+      if (this.activeDevice === device.serialNumber) {
+        this.setActive(null);
+        console.log("Active device disconnected, setting active to null");
+      }
+
       this.devices.delete(device.serialNumber);
       store.getActions().devices.setDevices(Array.from(this.devices.values()));
     }
