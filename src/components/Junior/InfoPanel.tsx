@@ -2,7 +2,7 @@ import React, { useId, useRef } from "react";
 import { useStoreState } from "../../store";
 import { useJrEditActions, useJrEditState } from "./hooks";
 import { InfoPanelTabKey as TabKey } from "../../model/junior/edit-state";
-import { deviceManager } from "../../skulpt-connection/device-manager";
+import { deviceManager, MicroBitStatus } from "../../skulpt-connection/device-manager";
 import { Tabs, TabWithTypedKey } from "../TabWithTypedKey";
 import { ErrorReportList } from "./ErrorReportList";
 
@@ -63,8 +63,23 @@ const Devices = () => {
     <ul>
       {
         devices.map((d) => {
+          let status: string;
+
+          switch (d.status) {
+            case MicroBitStatus.ERRORED:
+              status = "Error";
+              break;
+            case MicroBitStatus.PENDING:
+            case MicroBitStatus.CONNECTED:
+              status = "Connecting";
+              break;
+            case MicroBitStatus.READY:
+              status = "Connected";
+              break;
+          }
+
           return <li key={d.serialNumber}>
-            micro:bit V{d.revision[0]} ({d.serialNumber})
+            micro:bit V{d.revision[0]} [{status}] ({d.serialNumber})
           </li>;
         })
       }

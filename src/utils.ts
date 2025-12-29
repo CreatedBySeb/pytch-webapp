@@ -355,3 +355,34 @@ export function mDataAttrIntValue(elt: HTMLElement, attrName: string) {
   }
   return mIntValue;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+/**
+ * Exposes setTimeout via a sleep-style Promise interface
+ *
+ * Note: setTimeout doesn't guarantee an exact delay, but a minimum delay, so
+ * this limitation extends to this function
+ *
+ * @param delay The time to sleep in ms
+ * @returns A Promise which resolves after the time
+ */
+export function sleep(delay: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, delay));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+/**
+ * Converts a '.' delimited version string to an array of the version numbers
+ * @param input A version string, e.g. 1.2.3 or 2.1
+ */
+export function parseVersion(input: string): number[] {
+  const parts = input.split(".").map((part) => Number(part));
+
+  if (parts.some((part) => isNaN(part))) {
+    throw new TypeError(`String '${input}' includes non-numeric parts`);
+  }
+
+  return parts;
+}

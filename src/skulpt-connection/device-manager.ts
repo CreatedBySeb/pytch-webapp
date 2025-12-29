@@ -1,12 +1,83 @@
 import { DAPLink, DAPProtocol, WebUSB } from "dapjs";
 import store from "../store";
+import { parseVersion, sleep } from "../utils";
 
+type CommandErrorHandler = (error: MicroBitError) => unknown;
+type CommandSuccessHandler = (result: string[]) => unknown;
 type IdentifiableUSBDevice = USBDevice & { serialNumber: string };
+type InflightCommand = [CommandSuccessHandler, CommandErrorHandler];
+type QueuedCommand = [string, CommandSuccessHandler, CommandErrorHandler];
 type USBListener = (this: USB, event: USBConnectionEvent) => unknown;
 
 // The DAPProtocol enum is not importable, so this is a readable alternative
 const DAP_PROTOCOL_SWD: DAPProtocol = 1;
+const HANDSHAKE_ATTEMPTS = 5;
+const HANDSHAKE_DELAY = 2000;
 const NEW_LINE = "\n";
+const SERIAL_WARM_DELAY = 1500;
+
+/** Information reported by a device in response to the 'hello' command */
+interface DeviceInfo {
+  /** The name of the device, unique for a type of device, e.g. 'microbit' */
+  name: string;
+  /** The reported version of the hardware */
+  hardwareVersion: number[];
+  /** The reported version of the 'bridge' software/firmware */
+  softwareVersion: number[];
+}
+
+function parseDeviceInfo(response: string[]): DeviceInfo {
+  if (response.length < 3) {
+    throw new TypeError(
+      `Response has incorrect number of fields (has: ${response.length}, expected: 3)`
+    );
+  }
+
+  const [name, rawHwVer, rawSwVer] = response;
+  let hardwareVersion: number[];
+  let softwareVersion: number[];
+
+  try {
+    hardwareVersion = parseVersion(rawHwVer);
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new TypeError(
+        `Response has invalid hardware version '${rawHwVer}'`
+      );
+    } else throw e;
+  }
+
+  try {
+    softwareVersion = parseVersion(rawSwVer);
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new TypeError(
+        `Response has invalid hardware version '${rawSwVer}'`
+      );
+    } else throw e;
+  }
+
+  return { name, hardwareVersion, softwareVersion };
+}
+
+export enum MicroBitStatus {
+  ERRORED = -1,
+  PENDING,
+  CONNECTED,
+  READY,
+}
+
+export class MicroBitError extends Error {
+  public readonly name = "MicroBitError";
+  public readonly reason: string | undefined;
+  public readonly type: string;
+
+  constructor(type: string, reason?: string | undefined) {
+    super(`${type}: ${reason ?? "(no reason available)"}`);
+    this.type = type;
+    this.reason = reason;
+  }
+}
 
 export class MicroBitDevice {
   public static readonly BAUD_RATE = 115200;
@@ -45,9 +116,26 @@ export class MicroBitDevice {
     return this.device.serialNumber;
   }
 
+  public get status(): MicroBitStatus {
+    return this._status;
+  }
+
+  private set status(value: MicroBitStatus) {
+    this._status = value;
+    // Whenever we change status we refresh the devices list to cause a
+    // re-render of UI components
+    const { devices } = store.getState().devices;
+    store.getActions().devices.setDevices([...devices]);
+  }
+
+  private _status: MicroBitStatus = MicroBitStatus.PENDING;
   private buffer: string = "";
   private dap: DAPLink;
   private device: IdentifiableUSBDevice;
+  private flushing: boolean = false;
+  private inflight: InflightCommand[] = [];
+  private info: DeviceInfo | undefined;
+  private queue: QueuedCommand[] = [];
 
   constructor(device: IdentifiableUSBDevice) {
     this.device = device;
@@ -78,7 +166,46 @@ export class MicroBitDevice {
 
     this.dap.on(DAPLink.EVENT_SERIAL_DATA, (data) => this.handleData(data));
     this.dap.startSerialRead(MicroBitDevice.SERIAL_DELAY);
+    this.status = MicroBitStatus.CONNECTED;
     console.log("Successfully connected to the micro:bit");
+
+    // Adding a 1.5s wait helps avoid serial I/O problems after connection
+    await sleep(SERIAL_WARM_DELAY);
+
+    for (let i = 1; i <= HANDSHAKE_ATTEMPTS; i++) {
+      // While the connection may be unstable it is necessary to clear queues
+      // for each attempt
+      this.reset();
+
+      this.send("hello")
+        .then((result) => {
+          try {
+            this.info = parseDeviceInfo(result);
+          } catch (e) {
+            console.error(`Handshake returned invalid response (attempt ${i})`);
+            throw e;
+          }
+
+          this.status = MicroBitStatus.READY;
+          console.log(`Handshake succeeded (attempt ${i})`);
+        });
+
+      await sleep(HANDSHAKE_DELAY);
+
+      // @ts-expect-error -- TypeScript cannot tell that the status can be
+      //   affected externally by the Promise above
+      if (this.status === MicroBitStatus.READY) break;
+
+      console.log(
+        `Handshake did not succeed within ${HANDSHAKE_DELAY}ms (attempt ${i})`
+      );
+    }
+
+    // @ts-expect-error -- TypeScript cannot tell that the status can be
+    //   affected externally by the Promise above
+    if (this.status !== MicroBitStatus.READY) {
+      console.error("Failed to handshake with the micro:bit within 5 attempts");
+    }
   }
 
   /**
@@ -100,6 +227,48 @@ export class MicroBitDevice {
     console.log("Cleanly disconnected from the micro:bit");
   }
 
+  public reset(): void {
+    this.inflight = [];
+    this.queue = [];
+    this.buffer = "";
+  }
+
+  /**
+   * Queues a command to be sent to the micro:bit
+   * @param command The command to send to the micro:bit
+   * @param args An array of stringified args for the command
+   * @returns The stringified return values of the command
+   * @throws {MicroBitError} If the command failed, with the type and reason
+   */
+  public send(command: string, args: string[] = []): Promise<string[]> {
+    const payload = [command, ...args].join(MicroBitDevice.SEPARATOR)
+      + NEW_LINE;
+
+    const promise = new Promise(
+      (resolve: CommandSuccessHandler, reject: CommandErrorHandler) => {
+        const length = this.queue.push([payload, resolve, reject]);
+        console.log(
+          `Queued '${payload.trim()}', queue length is now ${length}`
+        );
+      }
+    );
+
+    // Only allow hello commands to trigger a flush if the device isn't marked
+    // as ready. It is theoretically possible for another command to sneak in,
+    // but other guardrails limit this and it shouldn't have a big impact.
+    if (this.status === MicroBitStatus.READY || command === "hello") {
+      this.flushQueue();
+    }
+
+    return promise;
+  }
+
+  /**
+   * Handles a new data chunk received from the micro:bit via serial, which make
+   * up events and command results
+   *
+   * @param data A string read from the serial interface, may be incomplete
+   */
   private handleData(data: string) {
     this.buffer += data;
     let message: string;
@@ -108,6 +277,51 @@ export class MicroBitDevice {
       [message, this.buffer] = this.buffer.split(NEW_LINE, 2);
       const [event, ...args] = message.split(MicroBitDevice.SEPARATOR);
       console.log(`Received event '${event}' with args: ${args}`);
+
+      if (event === "ok" || event === "err") {
+        const handlers = this.inflight.shift();
+
+        if (!handlers) {
+          console.error(
+            `Received '${event}' without inflight command: ${message}`
+          );
+          continue;
+        }
+
+        const [resolve, reject] = handlers;
+
+        if (event === "ok") resolve(args);
+        else {
+          const error = new MicroBitError(args[0], args[1]);
+          reject(error);
+        }
+      } // TODO: Implement other events
+    }
+  }
+
+  /**
+   * Flushes queued commands to the serial interface if a flush isn't already in
+   * progress, and adds the handlers to the inflight array
+   */
+  private async flushQueue(): Promise<void> {
+    if (this.flushing) return;
+    this.flushing = true;
+    console.log("Started flushing command queue");
+
+    try {
+      let command: QueuedCommand | undefined
+
+      while ((command = this.queue.shift()) !== undefined) {
+        const [payload, ...handlers] = command;
+        this.inflight.push(handlers); // Q: Should it be the other way around?
+        await this.dap.serialWrite(payload);
+        console.log(`Flushed '${payload.trim()}' to serial port`);
+      }
+    } catch (e) {
+      console.error("Encountered an error while flushing queue");
+      throw e;
+    } finally {
+      this.flushing = false;
     }
   }
 }
