@@ -1,14 +1,23 @@
+import { DAPLink, DAPProtocol, WebUSB } from "dapjs";
 import store from "../store";
 
 type IdentifiableUSBDevice = USBDevice & { serialNumber: string };
 type USBListener = (this: USB, event: USBConnectionEvent) => unknown;
 
+// The DAPProtocol enum is not importable, so this is a readable alternative
+const DAP_PROTOCOL_SWD: DAPProtocol = 1;
+const NEW_LINE = "\n";
+
 export class MicroBitDevice {
   public static readonly BAUD_RATE = 115200;
+
   public static readonly FILTER: USBDeviceFilter = {
     vendorId: 0x0d28,
     productId: 0x0204,
   };
+
+  public static readonly SEPARATOR = "|";
+  public static readonly SERIAL_DELAY = 1;
 
   public get revision(): [number, number] {
     const prefix = this.serialNumber.slice(0, 4);
@@ -36,10 +45,70 @@ export class MicroBitDevice {
     return this.device.serialNumber;
   }
 
+  private buffer: string = "";
+  private dap: DAPLink;
   private device: IdentifiableUSBDevice;
 
   constructor(device: IdentifiableUSBDevice) {
     this.device = device;
+
+    const transport = new WebUSB(device);
+    this.dap = new DAPLink(transport, DAP_PROTOCOL_SWD);
+  }
+
+  /**
+   * Attempt to connect to the micro:bit via DAPLink
+   */
+  public async connect(): Promise<void> {
+    try {
+      await this.dap.connect();
+    } catch (e) {
+      console.error("Failed to connect via DAPLink to micro:bit");
+      throw e;
+    }
+
+    try {
+      this.dap.setSerialBaudrate(MicroBitDevice.BAUD_RATE);
+    } catch (e) {
+      console.error(
+        "Failed to set serial baud rate to " + MicroBitDevice.BAUD_RATE
+      );
+      throw e;
+    }
+
+    this.dap.on(DAPLink.EVENT_SERIAL_DATA, (data) => this.handleData(data));
+    this.dap.startSerialRead(MicroBitDevice.SERIAL_DELAY);
+    console.log("Successfully connected to the micro:bit");
+  }
+
+  /**
+   * Cleanly disconnect from the micro:bit, which is important to avoid leaving
+   * it in a bad state where it cannot be re-connected to via DAPLink
+   */
+  public async disconnect(): Promise<void> {
+    if (!this.dap.connected) return;
+
+    this.dap.stopSerialRead();
+
+    try {
+      await this.dap.disconnect();
+    } catch (e) {
+      console.error("Failed to disconnect from micro:bit");
+      throw e;
+    }
+
+    console.log("Cleanly disconnected from the micro:bit");
+  }
+
+  private handleData(data: string) {
+    this.buffer += data;
+    let message: string;
+
+    while (this.buffer.includes(NEW_LINE)) {
+      [message, this.buffer] = this.buffer.split(NEW_LINE, 2);
+      const [event, ...args] = message.split(MicroBitDevice.SEPARATOR);
+      console.log(`Received event '${event}' with args: ${args}`);
+    }
   }
 }
 
@@ -68,6 +137,8 @@ class DeviceManger {
     window.addEventListener("beforeunload", () => {
       navigator.usb.removeEventListener("connect", connectionListener);
       navigator.usb.removeEventListener("disconnect", disconnectionListener);
+
+      this.devices.forEach((d) => d.disconnect());
     });
 
     navigator.usb.getDevices()
@@ -96,6 +167,7 @@ class DeviceManger {
         return false;
       }
 
+      console.error("Failed to pair micro:bit for unknown reason");
       throw e;
     }
 
@@ -115,6 +187,7 @@ class DeviceManger {
     const microbit = new MicroBitDevice(device as IdentifiableUSBDevice);
     this.devices.set(device.serialNumber, microbit);
     store.getActions().devices.setDevices(Array.from(this.devices.values()));
+    microbit.connect();
   }
 
   private deviceDisconnected(device: USBDevice): void {

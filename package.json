@@ -11,6 +11,7 @@
     "@types/diff": "^5.0.3",
     "bootstrap": "^5.3.8",
     "cypress-real-events": "^1.14.0",
+    "dapjs": "^2.3.0",
     "date-fns": "^4.1.0",
     "dexie": "^4.2.1",
     "diff": "^5.1.0",
