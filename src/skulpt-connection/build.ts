@@ -68,6 +68,8 @@ export const build = async (
     Sk.pytch.async_load_image = (name: string) => assetServer.loadImage(name);
     Sk.pytch.get_active_device = () => deviceManager.getActive();
 
+    deviceManager.getActive()?.reset();
+
     const flattenedProgram = PytchProgramOps.flatCodeText(
       project.program,
       project.assets

@@ -234,6 +234,9 @@ export class MicroBitDevice {
     console.log("Cleanly disconnected from the micro:bit");
   }
 
+  /**
+   * Reset the state of the micro:bit, important for each fresh run of a project
+   */
   public reset(): void {
     this.inflight = [];
     this.queue = [];
