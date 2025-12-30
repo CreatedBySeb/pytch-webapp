@@ -211,6 +211,7 @@ export class MicroBitDevice {
     //   affected externally by the Promise above
     if (this.status !== MicroBitStatus.READY) {
       console.error("Failed to handshake with the micro:bit within 5 attempts");
+      this.status = MicroBitStatus.ERRORED;
     }
   }
 
@@ -440,7 +441,8 @@ class DeviceManger {
 
     microbit.connect()
       .then(() => {
-        if (this.activeDevice === null) {
+        if (microbit.status === MicroBitStatus.READY
+          && this.activeDevice === null) {
           this.setActive(device.serialNumber);
           console.log("No active device selected, making device active");
         }
