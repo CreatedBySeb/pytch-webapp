@@ -11,10 +11,12 @@ type USBListener = (this: USB, event: USBConnectionEvent) => unknown;
 
 // The DAPProtocol enum is not importable, so this is a readable alternative
 const DAP_PROTOCOL_SWD: DAPProtocol = 1;
+const DIGITAL_PIN_LEVELS = [0, 1];
 const HANDSHAKE_ATTEMPTS = 5;
 const HANDSHAKE_DELAY = 2000;
 const NEW_LINE = "\n";
 const SERIAL_WARM_DELAY = 1500;
+const SOUND_LEVELS = ["loud", "quiet"];
 
 /** Information reported by a device in response to the 'hello' command */
 interface DeviceInfo {
@@ -136,6 +138,7 @@ export class MicroBitDevice {
   private buffer: string = "";
   private dap: DAPLink;
   private device: IdentifiableUSBDevice;
+  private events: string[] = [];
   private flushing: boolean = false;
   private inflight: InflightCommand[] = [];
   private info: DeviceInfo | undefined;
@@ -235,11 +238,21 @@ export class MicroBitDevice {
   }
 
   /**
+   * Retrieves the received events for processing, resetting the event queue
+   */
+  public getEvents(): string[] {
+    const events = this.events;
+    this.events = [];
+    return events;
+  }
+
+  /**
    * Reset the state of the micro:bit, important for each fresh run of a project
    */
   public reset(): void {
     this.inflight = [];
     this.queue = [];
+    this.events = [];
     this.buffer = "";
   }
 
@@ -288,24 +301,74 @@ export class MicroBitDevice {
       const [event, ...args] = message.split(MicroBitDevice.SEPARATOR);
       console.log(`Received event '${event}' with args: ${args}`);
 
-      if (event === "ok" || event === "err") {
-        const handlers = this.inflight.shift();
+      let handled: boolean = false;
 
-        if (!handlers) {
-          console.error(
-            `Received '${event}' without inflight command: ${message}`
-          );
-          continue;
+      switch (event) {
+        case "err":
+        case "ok": {
+          const handlers = this.inflight.shift();
+
+          if (!handlers) {
+            console.error(
+              `Received '${event}' without inflight command: ${message}`
+            );
+            handled = true; // Custom failure handling for these events
+            break;
+          }
+
+          const [resolve, reject] = handlers;
+
+          if (event === "ok") resolve(args);
+          else {
+            const error = new MicroBitError(args[0], args[1]);
+            reject(error);
+          }
+
+          handled = true;
+          break;
         }
 
-        const [resolve, reject] = handlers;
+        case "button": {
+          if (args[0]) {
+            this.events.push([event, args[0]].join(":"));
+            handled = true;
+          }
 
-        if (event === "ok") resolve(args);
-        else {
-          const error = new MicroBitError(args[0], args[1]);
-          reject(error);
+          break;
         }
-      } // TODO: Implement other events
+
+        case "gesture": {
+          if (args[0]) {
+            this.events.push([event, args[0]].join(":"));
+            handled = true;
+          }
+
+          break;
+        }
+
+        case "pin": {
+          if (DIGITAL_PIN_LEVELS.includes(Number(args[1]))) {
+            const level = (args[1] === "1") ? "high" : "low";
+            this.events.push(`pin_${args[0]}:${level}`);
+            handled = true;
+          }
+
+          break;
+        }
+
+        case "sound": {
+          if (SOUND_LEVELS.includes(args[0])) {
+            this.events.push([event, args[0]].join(":"));
+            handled = true;
+          }
+
+          break;
+        }
+      }
+
+      if (!handled) {
+        console.warn(`Received malformed event '${event}': ${args}`);
+      }
     }
   }
 
