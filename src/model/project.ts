@@ -124,6 +124,15 @@ export interface ILoadSaveStatus {
   saveState: SyncRequestState;
 }
 
+/**
+ * A module-level import in a Python program, i.e. 'import mod' or 'import
+ * mod.sub as mod', represented as an object
+ */
+export interface IModuleImport {
+  as?: string | undefined;
+  module: string;
+}
+
 // Used elsewhere but maybe those places needed review too?
 export enum SyncState {
   SyncNotStarted,
@@ -322,6 +331,7 @@ export interface IActiveProject {
   buildSeqnum: number;
 
   haveProject: Computed<IActiveProject, boolean>;
+  moduleImports: Computed<IActiveProject, IModuleImport[]>;
 
   initialiseContent: SAction<StoredProjectContent>;
   setAssets: SAction<Array<AssetPresentation>>;
@@ -385,6 +395,7 @@ export interface IActiveProject {
   _setCodeText: SAction<string>;
   setCodeText: SThunk<string>;
   setCodeTextAndBuild: ASThunk<ISetCodeTextAndBuildPayload>;
+  addModuleImport: SThunk<IModuleImport>;
   requestSyncToStorage: ASThunk<void>;
   noteCodeChange: SAction;
   noteCodeSaved: SAction;
@@ -547,6 +558,26 @@ export const activeProject: IActiveProject = {
   }),
 
   haveProject: computed((state) => state.project.id !== -1),
+
+  moduleImports: computed((state) => {
+    const program = state.project.program;
+
+    if (program.kind === "per-method") {
+      return [];
+    }
+
+    return program.text
+      .split("\n")
+      .filter((line) => line.startsWith("import"))
+      .map((line) => {
+        const parts = line
+          .trim()
+          .slice(7) // Strip 'import' from the start
+          .split(" as "); // Convert 'a as b' to ['a', 'b']
+
+        return { module: parts[0], as: parts[1] };
+      });
+  }),
 
   initialiseContent: action((state, content) => {
     state.project = content;
@@ -818,6 +849,31 @@ export const activeProject: IActiveProject = {
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
     await actions.build(payload.focusDestination);
+  }),
+
+  addModuleImport: thunk((actions, { as, module }, helpers) => {
+    let statement = "import " + module;
+
+    if (as) {
+      statement += " as " + as;
+    }
+
+    const project = helpers.getState().project;
+    failIfDummy(project, "addModuleImport");
+
+    const program = ensureKind("addModuleImport()", project.program, "flat");
+
+    const lines = program.text.split("\n");
+    const endOfImports = lines
+      .findIndex((l) => !l.startsWith("import") && !l.startsWith("from"));
+
+    if (endOfImports < 0) {
+      lines.push(statement);
+    } else {
+      lines.splice(endOfImports, 0, statement);
+    }
+
+    actions.setCodeText(lines.join("\n"));
   }),
 
   syncDummyProject: action((state) => {

@@ -1,10 +1,13 @@
-import React from "react";
-import { Badge, Button, ButtonGroup, Spinner } from "react-bootstrap";
+import React, { useMemo } from "react";
+import { Alert, Badge, Button, ButtonGroup, Spinner } from "react-bootstrap";
 import { deviceManager, MicroBitDevice, MicroBitStatus } from "../../skulpt-connection/device-manager";
-import { useStoreState } from "../../store";
+import { useStoreActions, useStoreState } from "../../store";
 import { AddSomethingSingleButton } from "./AddSomethingButton";
+import { IModuleImport } from "../../model/project";
 
 type DeviceItemProps = { device: MicroBitDevice };
+
+const MICROBIT_IMPORT: IModuleImport = { as: "microbit", module: "pytch.microbit" };
 
 const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
   const activeDevice = useStoreState((state) => state.devices.active);
@@ -72,10 +75,45 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
 };
 
 export const DevicesList = () => {
-  const pair = () => deviceManager.pairDevice();
+  const activeDevice = useStoreState((state) => state.devices.active);
   const devices = useStoreState((state) => state.devices.devices);
+  const program  = useStoreState((state) => state.activeProject.project.program);
+  const imports = useStoreState((state) => state.activeProject.moduleImports);
+
+  const addImport = useStoreActions((actions) => actions.activeProject.addModuleImport);
+  const pair = () => deviceManager.pairDevice();
+
+  const hasImport = useMemo(() => {
+    if (program.kind === "per-method") return true;
+    return imports.find(({ module }) => module === "pytch.microbit") !== undefined;
+  }, [imports]);
 
   return <>
+    { activeDevice && !hasImport && (
+      <Alert variant="warning">
+        <span>
+          You have a micro:bit connected, but have not yet imported
+          the <code>pytch.microbit</code> module, so you cannot access it from
+          your program
+        </span>
+        <Button variant="outline-primary" onClick={() => addImport(MICROBIT_IMPORT)}>Add import</Button>
+      </Alert>
+    ) }
+    { hasImport && !activeDevice && (
+      <Alert variant="warning">
+        <span>
+          You have imported the <code>pytch.microbit</code>, but have no micro:bit
+          device active. Make sure your device is connected and has been set as
+          active below, or click 'Add a device' to connect a new micro:bit
+        </span>
+      </Alert>
+    ) }
+    { !hasImport && !activeDevice && (
+      <Alert variant="secondary">
+        There is no micro:bit device active, make sure your device is connected
+        and click 'Add a device' to connect a new micro:bit
+      </Alert>
+    ) }
     <ul>
       {
         devices.map((d) => <DeviceItem key={d.serialNumber} device={d} />)

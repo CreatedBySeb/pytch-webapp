@@ -432,6 +432,18 @@ $speech-bubble-max-height: 180px;
       }
     }
   }
+
+  .alert {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+    margin: 2rem 3rem;
+
+    > button {
+      flex-shrink: 0;
+    }
+  }
 }
 
 @mixin as-bootstrap-button($bg, $border) {
