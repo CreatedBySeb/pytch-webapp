@@ -1,8 +1,9 @@
-import React, { useId, useRef } from "react";
+import React, { useId, useMemo, useRef } from "react";
+import { useHasImport } from "../hooks/code-text";
 import { useStoreState } from "../../store";
 import { useJrEditActions, useJrEditState } from "./hooks";
 import { InfoPanelTabKey as TabKey } from "../../model/junior/edit-state";
-import { deviceManager, MicroBitStatus } from "../../skulpt-connection/device-manager";
+import { deviceManager } from "../../skulpt-connection/device-manager";
 import { Tabs, TabWithTypedKey } from "../TabWithTypedKey";
 import { DevicesList } from "./DevicesList";
 import { ErrorReportList } from "./ErrorReportList";
@@ -119,6 +120,23 @@ export const InfoPanel = () => {
     }
   };
 
+  const activeDevice = useStoreState((state) => state.devices.active);
+  const hasMicroBitImport = useHasImport("pytch.microbit");
+
+  const devicesTitle = useMemo(() => {
+    const hasDevice = activeDevice !== null;
+
+    // It's only ever an issue if the two don't match
+    if (hasDevice !== hasMicroBitImport) {
+      return <span>
+        Devices <FontAwesomeIcon icon="triangle-exclamation" />
+      </span>
+    } else {
+      return "Devices";
+    }
+  }, [activeDevice, hasMicroBitImport])
+
+
   const Tab = TabWithTypedKey<TabKey>;
   return (
     <section className={classes} aria-label={ariaLabel} ref={maybeFocusButton}>
@@ -135,7 +153,7 @@ export const InfoPanel = () => {
         <Tab eventKey="errors" title="Errors">
           <Errors />
         </Tab>
-        <Tab eventKey="devices" title="Devices">
+        <Tab eventKey="devices" title={devicesTitle}>
           <Devices />
         </Tab>
       </Tabs>

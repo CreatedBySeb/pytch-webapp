@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { PytchProgram } from "../../model/pytch-program";
 import { useStoreState } from "../../store";
 
@@ -32,4 +33,14 @@ export function useFlatCodeText(debugLabel: string) {
       state.activeProject.project.program
     );
   });
+}
+
+export function useHasImport(expected: string) {
+  const programKind = useStoreState((state) => state.activeProject.project.program.kind);
+  const imports = useStoreState((state) => state.activeProject.moduleImports);
+
+  return useMemo(() => {
+    if (programKind === "per-method") return true;
+    return imports.find(({ module }) => module === expected) !== undefined;
+  }, [imports, programKind]);
 }

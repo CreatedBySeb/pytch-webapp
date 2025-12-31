@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Alert, Badge, Button, ButtonGroup, Spinner } from "react-bootstrap";
 import { deviceManager, MicroBitDevice, MicroBitStatus } from "../../skulpt-connection/device-manager";
+import { useHasImport } from "../hooks/code-text";
 import { useStoreActions, useStoreState } from "../../store";
 import { AddSomethingSingleButton } from "./AddSomethingButton";
 import { IModuleImport } from "../../model/project";
@@ -77,16 +78,11 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
 export const DevicesList = () => {
   const activeDevice = useStoreState((state) => state.devices.active);
   const devices = useStoreState((state) => state.devices.devices);
-  const program  = useStoreState((state) => state.activeProject.project.program);
-  const imports = useStoreState((state) => state.activeProject.moduleImports);
+  const hasImport = useHasImport("pytch.microbit");
 
   const addImport = useStoreActions((actions) => actions.activeProject.addModuleImport);
   const pair = () => deviceManager.pairDevice();
 
-  const hasImport = useMemo(() => {
-    if (program.kind === "per-method") return true;
-    return imports.find(({ module }) => module === "pytch.microbit") !== undefined;
-  }, [imports]);
 
   return <>
     { activeDevice && !hasImport && (
