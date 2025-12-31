@@ -619,6 +619,9 @@
     &.add-stage-asset {
       @include background-color-as-button($stage-card-background);
     }
+    &.add-device {
+      @include background-color-as-button($pytch-colour-devices);
+    }
 
     color: white;
     border-radius: 0.75rem;

@@ -37,6 +37,9 @@ $chapter-final-content-height: 4rem;
   &.add-stage-asset {
     background-color: $stage-card-background;
   }
+  &.add-device {
+    @include background-color-as-button($pytch-colour-devices);
+  }
 }
 
 .ScriptDiff {

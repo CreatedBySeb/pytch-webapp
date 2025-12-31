@@ -7,7 +7,8 @@ export type AddSomethingButtonWhat =
   | "sprite"
   | "script"
   | "flat-asset"
-  | `${ActorKind}-asset`;
+  | `${ActorKind}-asset`
+  | "device";
 
 export type AddSomethingButtonProps = {
   what: AddSomethingButtonWhat;

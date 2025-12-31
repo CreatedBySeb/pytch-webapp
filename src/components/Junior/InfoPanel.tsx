@@ -4,6 +4,7 @@ import { useJrEditActions, useJrEditState } from "./hooks";
 import { InfoPanelTabKey as TabKey } from "../../model/junior/edit-state";
 import { deviceManager, MicroBitStatus } from "../../skulpt-connection/device-manager";
 import { Tabs, TabWithTypedKey } from "../TabWithTypedKey";
+import { DevicesList } from "./DevicesList";
 import { ErrorReportList } from "./ErrorReportList";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,53 +48,17 @@ const Errors = () => {
 };
 
 const Devices = () => {
-  if (!deviceManager.supported) {
-    return <div className="DevicesPane">
+  const content =
+    (!deviceManager.supported) ? (
       <p className="info-pane-placeholder">
         Unfortunately, devices are not supported in your browser.
         See INSERT_LINK for more information.
       </p>
-    </div>;
-  }
+    ) : (
+      <DevicesList />
+    );
 
-  const pair = () => deviceManager.pairDevice();
-  const activeDevice = useStoreState((state) => state.devices.active);
-  const devices = useStoreState((state) => state.devices.devices);
-
-  return <div className="DevicesPane">
-    <ul>
-      {
-        devices.map((d) => {
-          const active = d.serialNumber === activeDevice;
-          const disabled = active || d.status !== MicroBitStatus.READY;
-          let status = (active) ? "[Active] " : "";
-
-          switch (d.status) {
-            case MicroBitStatus.ERRORED:
-              status += "[Error]";
-              break;
-            case MicroBitStatus.PENDING:
-            case MicroBitStatus.CONNECTED:
-              status += "[Connecting]";
-              break;
-            case MicroBitStatus.READY:
-              status += "[Connected]";
-              break;
-          }
-
-          return <li key={d.serialNumber}>
-            micro:bit V{d.revision[0]} {status} ({d.serialNumber})
-            <Button variant="outline-primary" disabled={disabled}>
-              Make Active
-            </Button>
-          </li>;
-        })
-      }
-      <li>
-        <Button onClick={pair}>Add a device</Button>
-      </li>
-    </ul>
-  </div>;
+  return <div className="DevicesPane">{content}</div>;
 };
 
 type InfoDisclosureProps = { tabContentId: string };

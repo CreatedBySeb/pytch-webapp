@@ -412,15 +412,24 @@ $speech-bubble-max-height: 180px;
 }
 
 .DevicesPane {
-  margin: 2rem 3rem;
-
   ul {
     list-style: none;
-    margin: 0;
+    margin: 2rem 3rem 0;
     padding: 0;
 
     li {
+      align-items: center;
+      display: flex;
+      gap: 0.25rem;
       margin-bottom: 1rem;
+
+      code {
+        line-height: 1em;
+      }
+
+      .btn-group {
+        margin-left: auto;
+      }
     }
   }
 }
