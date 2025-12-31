@@ -902,5 +902,137 @@
             "flat": "Give the only instance of the Stage class `stage_cls`.\n\n```\n# Say which backdrop the stage\n# is showing:\nthe_sky = Sky.the_only()\nprint(the_sky.costume_name)\n```",
             "per-method": "Give the only instance of the `Stage` class.\n\n```\n# Say which backdrop the stage\n# is showing:\nthe_sky = Stage.the_only()\nprint(the_sky.costume_name)\n```"
         }
+    },
+
+    {
+        "kind": "heading",
+        "sectionSlug": "microbit",
+        "heading": "micro:bit",
+        "help": {
+            "flat": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected.\n\nTo use the micro:bit, you must have the line `import pytch.microbit as microbit` at the top of your program, just after the `import pytch` line",
+            "per-method": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected"
+        }
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_button_pressed(`button`)",
+        "eventDescriptor": { "kind": "microbit", "event": "button:a" },
+        "scratch": "when (a v) button pressed",
+        "help": "Ask Pytch to run the below code whenever the player presses the `button` button on the micro:bit.\n\nThe buttons are: `'a'`, `'b'` and `'logo'`"
+    },
+    {
+        "kind": "block",
+        "python": "microbit.buttons.`button`",
+        "scratch": "<(a v) button pressed?>",
+        "help": "Report whether the `button` button is pressed on the micro:bit.\n\nThe buttons are: `a`, `b` and `logo`.\n\nThere is also a special `any` property which reports whether any of the buttons are pressed"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_gesture_detected(`gesture`)",
+        "eventDescriptor": { "kind": "microbit", "event": "gesture:shake" },
+        "scratch": "when (shake v):: microbit",
+        "help": "Ask Pytch to run the below code whenever the micro:bit detects the `gesture` gesture.\n\nThe gestures are: `'up'`, `'down'`, `'left'`, `'right'`, `'face up'`, `'face down'`, `'shake'`, `'freefall'`, `'3g'`, `'6g'`, and `'8g'`"
+    },
+    {
+        "kind": "block",
+        "python": "microbit.show_image(`image`)",
+        "scratch": "display ( v)",
+        "help": "Show the `image` image on the micro:bit's display.\n\nYou can easily create an image using the `microbit.Image` class, for example:\n\n```\nimage = microbit.Image(\n  [0,9,0,9,0],\n  [9,0,9,0,9],\n  [9,0,0,0,9],\n  [0,9,0,9,0],\n  [0,0,9,0,0],\n)\n```\n\ncreates a heart shape, where each number is a brightness values between `0` and `9`.\n\nYou can also use micro:bit image strings directly, for example `09090:90909:90009:09090:00900` creates the same heart, or built-in images, for example `'HEART'`"
+    },
+    {
+        "kind": "block",
+        "python": "microbit.show_text(`text`)",
+        "scratch": "display text [Hello!]",
+        "help": "Show the text `text` on the micro:bit's display, one letter at a time.\n\nYou can also specify `wait=True` to wait for the message to be fully displayed before continuing, or `loop=True` to continuously loop through the text"
+    },
+    {
+        "kind": "block",
+        "python": "microbit.clear_display()",
+        "scratch": "clear display",
+        "help": "Clears the micro:bit's display by setting all pixels to be off (0 brightness)"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.scroll_text(`text`)",
+        "help": "Scroll the text `text` across the micro:bit's display smoothly.\n\nYou can also specify `wait=True` to wait for the message to be fully displayed before continuing, or `loop=True` to continuously loop through the text"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.set_pixel(`x`, `y`)",
+        "help": "Sets an individual pixel at (`x`, `y`) on the micro:bit's display, where (`0`, `0`) is the top left pixel.\n\nYou can specify the exact brightness level to use by setting `brightness`, for example `brightness=5` for half brightness, or `brightness=0` to turn it off"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.light_level",
+        "help": "Report the level of light falling on the micro:bit's display, between 0 and 255"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_gesture_detected(`gesture`)",
+        "eventDescriptor": { "kind": "microbit", "event": "gesture:left" },
+        "scratch": "when tilted (left v)",
+        "help": "Ask Pytch to run the below code whenever the micro:bit detects the `gesture` gesture.\n\nThe gestures are: `'up'`, `'down'`, `'left'`, `'right'`, `'face up'`, `'face down'`, `'shake'`, `'freefall'`, `'3g'`, `'6g'`, and `'8g'`"
+    },
+    {
+        "kind": "block",
+        "python": "microbit.gesture",
+        "scratch": "<tilted (left v)?>",
+        "help": "Report what gesture is detected by the micro:bit.\n\nThe gestures are: `'up'`, `'down'`, `'left'`, `'right'`, `'face up'`, `'face down'`, `'shake'`, `'freefall'`, `'3g'`, `'6g'`, and `'8g'`"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.acceleration.`axis`",
+        "help": "Report what the acceleration of the micro:bit is along the `axis` axis.\n\nThe axes are: `x`, `y` and 'z'.\n\nThere is also a special `magnitude` property which computes the magnitude of acceleration across all axes"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_pin_high(`pin`)",
+        "eventDescriptor": { "kind": "microbit", "event": "pin_high:0" },
+        "scratch": "when pin (0 v) connected",
+        "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a high voltage/is connected.\n\nThe pins are: `0`, `1` and `2`"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_pin_low(`pin`)",
+        "eventDescriptor": { "kind": "microbit", "event": "pin_low:0" },
+        "scratch": "when pin (0 v) disconnected:: microbit hat",
+        "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a low voltage/is disconnected.\n\nThe pins are: `0`, `1` and `2`"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.pins.`pin`",
+        "help": "Report the value of the digital signal to pin `pin` on the micro:bit.\n\nThe pins are: `0`, `1` and `2`"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.write_digital(`pin`, `value`)",
+        "help": "Sets the digital output of pin `pin` on the micro:bit to `value`.\n\nThe pins are: `0`, `1` and `2`, and the allowed values are `0` and `1`"
+    },
+    {
+        "kind": "block",
+        "python": "@microbit.when_sound_level_changes(`level`)",
+        "eventDescriptor": { "kind": "microbit", "event": "sound:loud" },
+        "scratch": "when (loud v) sound:: microbit hat",
+        "help": "Ask Pytch to run the below code whenever the micro:bit's microphone reports `level` sound.\n\nThe levels are: `'loud'` and `'quiet'`"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.sound",
+        "help": "Report the level of sound heard by the micro:bit's microphone, between 0 and 255"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.play_music(`song`)",
+        "help": "Plays music through the micro:bit's speaker, written in micro:bit music notation.\n\nYou can also play built-in songs, for example `'ODE'` plays the Ode to Joy\n\nYou can also specify `wait=True` to wait for the message to be fully displayed before continuing, or `loop=True` to continuously loop through the text"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.stop_music()",
+        "help": "Stops any music currently playing through the micro:bit's speaker"
+    },
+    {
+        "kind": "pure-python",
+        "python": "microbit.temperature",
+        "help": "Report the temperature around the micro:bit in celsius"
     }
 ]

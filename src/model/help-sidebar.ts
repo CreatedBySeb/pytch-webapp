@@ -30,6 +30,7 @@ export type HeadingElementDescriptor = HelpElementDescriptorCommon & {
   kind: "heading";
   sectionSlug: string;
   heading: string;
+  help?: HelpContentFromContext;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -399,6 +400,7 @@ const makeHelpElementDescriptor = (raw: any): HelpElementDescriptor => {
 export type HelpSectionContent = {
   sectionSlug: string;
   sectionHeading: string;
+  help: HelpContentFromContext | undefined;
   entries: Array<HelpElementDescriptor>;
 };
 
@@ -409,6 +411,7 @@ const groupHelpIntoSections = (rawHelpData: any): HelpContent => {
   let currentSection: HelpSectionContent = {
     sectionSlug: "will-be-discarded",
     sectionHeading: "Will be discarded",
+    help: undefined,
     entries: [],
   };
 
@@ -416,10 +419,15 @@ const groupHelpIntoSections = (rawHelpData: any): HelpContent => {
 
   for (const datum of rawHelpData) {
     if (datum.kind === "heading") {
+      const help = (datum.help)
+        ? makeHelpContentLut(datum.help, kBothActorKinds)
+        : undefined;
+
       sections.push(currentSection);
       currentSection = {
         sectionSlug: datum.sectionSlug,
         sectionHeading: datum.heading,
+        help: help,
         entries: [],
       };
     } else {

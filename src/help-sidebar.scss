@@ -14,6 +14,7 @@ $block-category-backgrounds: (
   "variables": #ff8c1a,
   "lists": #ff661a,
   "instances": $pytch-colour-main-blue,
+  "microbit": $pytch-colour-devices,
 );
 
 @each $cat, $bg in $block-category-backgrounds {
@@ -175,11 +176,6 @@ $block-category-backgrounds: (
 
   .pytch-method {
     margin-top: 0.5rem;
-    background-color: $secondary-bg-color;
-
-    &:hover {
-      background-color: $hover-secondary-bg-color;
-    }
 
     h2 code {
       /* Counteract border */
@@ -189,15 +185,7 @@ $block-category-backgrounds: (
       }
     }
 
-    h2 code span.meta-var,
-    .help-text p code {
-      font-style: italic;
-      color: $pytch-colour-main-blue-darkened;
-    }
-
     .help-text {
-      padding: 6px;
-      padding-top: 8px;
       border-top: 1px solid #aaa;
     }
 
@@ -243,6 +231,25 @@ $block-category-backgrounds: (
 
     svg.scratchblocks {
       margin: 0px;
+    }
+  }
+
+  .pytch-method, .section-help {
+    background-color: $secondary-bg-color;
+
+    &:hover {
+      background-color: $hover-secondary-bg-color;
+    }
+
+    h2 code span.meta-var,
+    .help-text p code {
+      font-style: italic;
+      color: $pytch-colour-main-blue-darkened;
+    }
+
+    .help-text {
+      padding: 6px;
+      padding-top: 8px;
     }
   }
 

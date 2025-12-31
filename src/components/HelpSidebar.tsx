@@ -373,6 +373,7 @@ function sectionHasNoEntries(
 const HelpSidebarSection: React.FC<HelpSidebarSectionProps> = ({
   sectionSlug,
   sectionHeading,
+  help,
   entries,
   workContext,
 }) => {
@@ -391,6 +392,7 @@ const HelpSidebarSection: React.FC<HelpSidebarSectionProps> = ({
   ) : (
     renderedEntries
   );
+  const helpElements = help && helpElementsFromProps({ help, workContext });
 
   const categoryClass = `category-${sectionSlug}`;
   const className = classNames("HelpSidebarSection", categoryClass);
@@ -402,6 +404,9 @@ const HelpSidebarSection: React.FC<HelpSidebarSectionProps> = ({
           <span className="content">{sectionHeading}</span>
         </h1>
       </HelpNodeSummary>
+      { helpElements && (
+        <div className="section-help"><HelpText help={helpElements} /></div>
+      ) }
       {content}
     </details>
   );
@@ -441,6 +446,7 @@ const HelpSidebarInnerContent: React.FC<HelpSidebarInnerContentProps> = ({
               key={section.sectionSlug}
               sectionSlug={section.sectionSlug}
               sectionHeading={section.sectionHeading}
+              help={section.help}
               entries={section.entries}
               workContext={workContext}
             ></HelpSidebarSection>
