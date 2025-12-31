@@ -220,9 +220,10 @@ export class MicroBitDevice {
 
   /**
    * Cleanly disconnect from the micro:bit, which is important to avoid leaving
-   * it in a bad state where it cannot be re-connected to via DAPLink
+   * it in a bad state where it cannot be re-connected to via DAPLink. Should
+   * only be called by the DeviceManager class.
    */
-  public async disconnect(): Promise<void> {
+  public async disconnect(forget?: boolean): Promise<void> {
     if (!this.dap.connected) return;
 
     this.dap.stopSerialRead();
@@ -230,8 +231,24 @@ export class MicroBitDevice {
     try {
       await this.dap.disconnect();
     } catch (e) {
-      console.error("Failed to disconnect from micro:bit");
+      console.error("Failed to disconnect from micro:bit DAP");
       throw e;
+    }
+
+    try {
+      await this.device.close();
+    } catch (e) {
+      console.error("Failed to disconnect from micro:bit USB")
+      throw e;
+    }
+
+    if (forget) {
+      try {
+        await this.device.forget();
+      } catch (e) {
+        console.error("Failed to forget the micro:bit")
+        throw e;
+      }
     }
 
     console.log("Cleanly disconnected from the micro:bit");
@@ -436,6 +453,25 @@ class DeviceManger {
   }
 
   /**
+   * Cleanly disconnect a device, designed for a user-initiated request so the
+   * device can be used with another program without closing Pytch.
+   * @param serial The serial number of the device to disconnect
+   * @param forget Forgets the access grant so the device will not auto-connect
+   *  in the future
+   */
+  public async disconnect(serial: string, forget?: boolean): Promise<void> {
+    const device = this.devices.get(serial);
+
+    if (!device) {
+      throw new Error(`Cannot disconnect unknown device '${serial}'`);
+    }
+
+    await device.disconnect(forget);
+    this.deviceDisconnected(device);
+  }
+
+
+  /**
    * Gets the nominated active device, which is used in running projects
    * @returns The currently active device, or null if there isn't one
    */
@@ -515,7 +551,7 @@ class DeviceManger {
       });
   }
 
-  private deviceDisconnected(device: USBDevice): void {
+  private deviceDisconnected(device: USBDevice | MicroBitDevice): void {
     if (device.serialNumber && this.devices.has(device.serialNumber)) {
       console.log("Device disconnected: " + device.serialNumber);
 

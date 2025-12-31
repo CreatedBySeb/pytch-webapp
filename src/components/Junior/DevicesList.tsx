@@ -58,8 +58,14 @@ export const DevicesList = () => {
             }
 
             <ButtonGroup aria-label="Device controls">
-              <Button variant="outline-primary" disabled={disabled}>
+              <Button variant="outline-primary" disabled={disabled} onClick={() => deviceManager.setActive(d.serialNumber)}>
                 Set Active
+              </Button>
+              <Button variant="outline-danger" onClick={() => deviceManager.disconnect(d.serialNumber)}>
+                Disconnect
+              </Button>
+              <Button variant="outline-danger" onClick={() => deviceManager.disconnect(d.serialNumber, true)}>
+                Forget
               </Button>
             </ButtonGroup>
           </li>;
