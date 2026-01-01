@@ -182,7 +182,7 @@ export class MicroBitDevice {
     for (let i = 1; i <= HANDSHAKE_ATTEMPTS; i++) {
       // While the connection may be unstable it is necessary to clear queues
       // for each attempt
-      this.reset();
+      await this.reset();
 
       this.send("hello")
         .then((result) => {
@@ -266,7 +266,12 @@ export class MicroBitDevice {
   /**
    * Reset the state of the micro:bit, important for each fresh run of a project
    */
-  public reset(): void {
+  public async reset(): Promise<void> {
+    // No point trying to send reset unless we are successfully connected
+    if (this.status === MicroBitStatus.READY) {
+      await this.send("reset");
+    }
+
     this.inflight = [];
     this.queue = [];
     this.events = [];

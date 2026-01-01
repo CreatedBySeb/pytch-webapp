@@ -9,6 +9,7 @@ import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
 import { useRunFlow } from "../model";
+import { deviceManager } from "../skulpt-connection/device-manager";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -62,6 +63,13 @@ const GreenFlag = () => {
 export const RedStop = () => {
   const redStop = () => {
     Sk.pytch.current_live_project.on_red_stop_clicked();
+
+    deviceManager.getActive()?.reset()
+      .catch((e) => {
+        console.error("Failed to reset micro:bit on red stop");
+        throw e;
+      });
+
     focusStage();
   };
   return (
