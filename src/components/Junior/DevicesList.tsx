@@ -1,5 +1,9 @@
 import React from "react";
-import { Alert, Badge, Button, ButtonGroup, Spinner } from "react-bootstrap";
+import Alert from "react-bootstrap/Alert";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Spinner from "react-bootstrap/Spinner";
 import { deviceManager, MicroBitDevice, MicroBitStatus } from "../../skulpt-connection/device-manager";
 import { useHasImport } from "../hooks/code-text";
 import { useStoreActions, useStoreState } from "../../store";
