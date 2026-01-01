@@ -663,6 +663,11 @@
   border-top-right-radius: 50% 100%;
 }
 
+.UpsertHandlerModal li.kind-microbit .bump,
+.HatBlock.kind-microbit .bump {
+  background-color: $pytch-colour-devices;
+}
+
 .HatBlock {
   cursor: grab;
   .body {
@@ -695,6 +700,14 @@
         border-radius: 4px;
         font-size: 0.875rem;
       }
+    }
+  }
+
+  &.kind-microbit .body {
+    background-color: $pytch-colour-devices;
+
+    .dropdown .dropdown-toggle {
+      @include background-color-as-button($pytch-colour-devices);
     }
   }
 

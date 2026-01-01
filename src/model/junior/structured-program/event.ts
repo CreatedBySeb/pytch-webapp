@@ -7,7 +7,12 @@ export type EventDescriptor =
   | { kind: "key-pressed"; keyName: string }
   | { kind: "message-received"; message: string }
   | { kind: "start-as-clone" }
-  | { kind: "clicked" };
+  | { kind: "clicked" }
+  | { kind: "microbit:button"; button: string }
+  | { kind: "microbit:gesture"; gesture: string }
+  | { kind: "microbit:pin_high"; pin: number }
+  | { kind: "microbit:pin_low"; pin: number }
+  | { kind: "microbit:sound"; level: string };
 
 export type EventDescriptorKind = EventDescriptor["kind"];
 
@@ -22,6 +27,11 @@ export class EventDescriptorKindOps {
         return 0;
       case "key-pressed":
       case "message-received":
+      case "microbit:button":
+      case "microbit:gesture":
+      case "microbit:pin_high":
+      case "microbit:pin_low":
+      case "microbit:sound":
         return 1;
       default:
         return assertNever(kind);
@@ -42,6 +52,15 @@ export class EventDescriptorKindOps {
         return "key";
       case "message-received":
         return "message";
+      case "microbit:button":
+        return "button";
+      case "microbit:gesture":
+        return "gesture";
+      case "microbit:pin_high":
+      case "microbit:pin_low":
+        return "pin";
+      case "microbit:sound":
+        return "level";
       default:
         return assertNever(kind);
     }
@@ -59,8 +78,36 @@ export class EventDescriptorKindOps {
         return "key pressed";
       case "message-received":
         return "message received";
+      case "microbit:button":
+        return "micro:bit button pressed";
+      case "microbit:gesture":
+        return "micro:bit gesture detected";
+      case "microbit:pin_high":
+        return "micro:bit pin is high";
+      case "microbit:pin_low":
+        return "micro:bit pin is low";
+      case "microbit:sound":
+        return "micro:bit sound level changes";
       default:
         return assertNever(kind);
+    }
+  }
+
+  /**
+   * Return an additional class name for the kind of event, to distinguish
+   * events coming from other sources (e.g. micro:bit)
+   */
+  static className(kind: EventDescriptorKind): string | undefined {
+    switch (kind) {
+      case "microbit:button":
+      case "microbit:gesture":
+      case "microbit:pin_high":
+      case "microbit:pin_low":
+      case "microbit:sound":
+        return "kind-microbit";
+
+      default:
+        return undefined;
     }
   }
 }
@@ -85,6 +132,16 @@ export class EventDescriptorOps {
       case "message-received":
         // TODO: What if event.message has a " character?
         return `@pytch.when_I_receive("${event.message}")`;
+      case "microbit:button":
+        return `@microbit.when_button_pressed("${event.button}")`;
+      case "microbit:gesture":
+        return `@microbit.when_gesture_detected("${event.gesture}")`;
+      case "microbit:pin_high":
+        return `@microbit.when_pin_is_high(${event.pin})`;
+      case "microbit:pin_low":
+        return `@microbit.when_pin_is_low(${event.pin})`;
+      case "microbit:sound":
+        return `@microbit.when_sound_level_changes("${event.level}")`;
       default:
         return assertNever(event);
     }
@@ -105,6 +162,16 @@ export class EventDescriptorOps {
           return await hexSHA256(event.keyName);
         case "message-received":
           return await hexSHA256(event.message);
+        // TODO: These are all enums, so do we need a hash?
+        case "microbit:button":
+          return event.button;
+        case "microbit:gesture":
+          return event.gesture;
+        case "microbit:pin_high":
+        case "microbit:pin_low":
+          return event.pin;
+        case "microbit:sound":
+          return event.level;
         default:
           return assertNever(event);
       }

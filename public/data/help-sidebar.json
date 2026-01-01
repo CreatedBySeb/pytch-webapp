@@ -916,7 +916,7 @@
     {
         "kind": "block",
         "python": "@microbit.when_button_pressed(`button`)",
-        "eventDescriptor": { "kind": "microbit", "event": "button:a" },
+        "eventDescriptor": { "kind": "microbit:button", "button": "a" },
         "scratch": "when (a v) button pressed",
         "help": "Ask Pytch to run the below code whenever the player presses the `button` button on the micro:bit.\n\nThe buttons are: `'a'`, `'b'` and `'logo'`"
     },
@@ -929,7 +929,7 @@
     {
         "kind": "block",
         "python": "@microbit.when_gesture_detected(`gesture`)",
-        "eventDescriptor": { "kind": "microbit", "event": "gesture:shake" },
+        "eventDescriptor": { "kind": "microbit:gesture", "gesture": "shake" },
         "scratch": "when (shake v):: microbit",
         "help": "Ask Pytch to run the below code whenever the micro:bit detects the `gesture` gesture.\n\nThe gestures are: `'up'`, `'down'`, `'left'`, `'right'`, `'face up'`, `'face down'`, `'shake'`, `'freefall'`, `'3g'`, `'6g'`, and `'8g'`"
     },
@@ -969,7 +969,7 @@
     {
         "kind": "block",
         "python": "@microbit.when_gesture_detected(`gesture`)",
-        "eventDescriptor": { "kind": "microbit", "event": "gesture:left" },
+        "eventDescriptor": { "kind": "microbit:gesture", "gesture": "left" },
         "scratch": "when tilted (left v)",
         "help": "Ask Pytch to run the below code whenever the micro:bit detects the `gesture` gesture.\n\nThe gestures are: `'up'`, `'down'`, `'left'`, `'right'`, `'face up'`, `'face down'`, `'shake'`, `'freefall'`, `'3g'`, `'6g'`, and `'8g'`"
     },
@@ -987,14 +987,14 @@
     {
         "kind": "block",
         "python": "@microbit.when_pin_high(`pin`)",
-        "eventDescriptor": { "kind": "microbit", "event": "pin_high:0" },
+        "eventDescriptor": { "kind": "microbit:pin_high", "pin": 0 },
         "scratch": "when pin (0 v) connected",
         "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a high voltage/is connected.\n\nThe pins are: `0`, `1` and `2`"
     },
     {
         "kind": "block",
         "python": "@microbit.when_pin_low(`pin`)",
-        "eventDescriptor": { "kind": "microbit", "event": "pin_low:0" },
+        "eventDescriptor": { "kind": "microbit:pin_low", "pin": 0 },
         "scratch": "when pin (0 v) disconnected:: microbit hat",
         "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a low voltage/is disconnected.\n\nThe pins are: `0`, `1` and `2`"
     },
@@ -1011,7 +1011,7 @@
     {
         "kind": "block",
         "python": "@microbit.when_sound_level_changes(`level`)",
-        "eventDescriptor": { "kind": "microbit", "event": "sound:loud" },
+        "eventDescriptor": { "kind": "microbit:sound", "level": "loud" },
         "scratch": "when (loud v) sound:: microbit hat",
         "help": "Ask Pytch to run the below code whenever the micro:bit's microphone reports `level` sound.\n\nThe levels are: `'loud'` and `'quiet'`"
     },

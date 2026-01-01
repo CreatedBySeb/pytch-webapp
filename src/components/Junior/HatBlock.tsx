@@ -9,6 +9,7 @@ import {
   ActorKind,
   ActorKindOps,
   EventDescriptor,
+  EventDescriptorKindOps,
   HandlerUpsertionOperation,
   Uuid,
 } from "../../model/junior/structured-program";
@@ -97,6 +98,21 @@ const HatBlockContent: React.FC<HatBlockContentProps> = ({
         })();
         return <span>when I receive {argContent}</span>;
       }
+      case "microbit:button": {
+        return `[micro:bit] when '${event.button}' button pressed`;
+      }
+      case "microbit:gesture": {
+        return `[micro:bit] when '${event.gesture}' gesture detected`;
+      }
+      case "microbit:pin_high": {
+        return `[micro:bit] when pin '${event.pin}' is high`;
+      }
+      case "microbit:pin_low": {
+        return `[micro:bit] when pin '${event.pin}' is low`;
+      }
+      case "microbit:sound": {
+        return `[micro:bit] when sound level changes to '${event.level}'`;
+      }
       default:
         return assertNever(event);
     }
@@ -166,9 +182,11 @@ export const HatBlock: React.FC<HatBlockProps> = ({
       onDispose: focusContext.onDisposeDeleteScript,
     });
 
+  const kindClassName = EventDescriptorKindOps.className(event.kind);
+
   return (
     <div
-      className="HatBlock"
+      className={(kindClassName) ? ("HatBlock " + kindClassName) : "HatBlock"}
       onDoubleClick={onChangeHatBlock}
       data-event-handler-kind={event.kind}
     >

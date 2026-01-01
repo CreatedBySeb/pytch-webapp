@@ -89,7 +89,12 @@ export const flattenProgram = (
 ): FlattenResults => {
   // TODO: What's the right way to handle "extensions"?  As another
   // property of a StructuredProgram?
-  let lines = ["import pytch", "import random", "import math"];
+  let lines = [
+    "import pytch",
+    "import pytch.microbit as microbit",
+    "import random",
+    "import math",
+  ];
 
   let mapEntries: Array<SourceMapEntry> = [];
 
