@@ -891,6 +891,7 @@ $key-chooser-width: 54rem;
         padding-left: 0.5rem;
         background-color: $scratch-hat-block-background;
         color: $scratch-hat-block-text-colour;
+
         input {
           display: inline-block;
           height: 1.5rem;
@@ -899,6 +900,10 @@ $key-chooser-width: 54rem;
           padding: 0px 0.125rem;
           font-family: $monospace-fonts;
         }
+      }
+
+      &.kind-microbit .content {
+        background-color: $pytch-colour-devices;
       }
     }
     li.chosen {
@@ -923,30 +928,45 @@ $key-chooser-width: 54rem;
     }
   }
 
+  select, .KeyEditor {
+    margin: 0rem 0.25rem;
+  }
+
+  select {
+    border: none;
+    font-size: 1em;
+    padding: 0rem 2rem 0rem 0.25rem;
+    width: auto;
+  }
+
   .KeyEditor {
     display: inline-block;
     position: relative;
-    margin: 0rem 0.25rem;
 
     span.key-button {
-      display: inline-block;
-      padding: 0rem 0.25rem;
       min-width: 2rem;
+      padding: 0rem 0.25rem;
       text-align: center;
-      border-radius: 6px;
 
-      background-color: $secondary;
-      color: white;
-      &:hover {
-        background-color: $primary;
-      }
-      position: relative;
       span.key-display-name {
         margin-left: 0.25rem;
       }
+
       span.dropdown-indicator {
         margin-left: 1rem;
       }
+    }
+  }
+
+  select, .KeyEditor span.key-button {
+    background-color: $secondary;
+    border-radius: 6px;
+    color: white;
+    display: inline-block;
+    position: relative;
+
+    &:hover {
+      background-color: $primary;
     }
   }
 }

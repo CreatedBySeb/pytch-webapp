@@ -10,8 +10,8 @@ export type EventDescriptor =
   | { kind: "clicked" }
   | { kind: "microbit:button"; button: string }
   | { kind: "microbit:gesture"; gesture: string }
-  | { kind: "microbit:pin_high"; pin: number }
-  | { kind: "microbit:pin_low"; pin: number }
+  | { kind: "microbit:pin_high"; pin: string }
+  | { kind: "microbit:pin_low"; pin: string }
   | { kind: "microbit:sound"; level: string };
 
 export type EventDescriptorKind = EventDescriptor["kind"];

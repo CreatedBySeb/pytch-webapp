@@ -31,6 +31,7 @@ import {
 } from "../../../model/junior/grouped-focus";
 import { FocusGroupContainer } from "../../FocusGroupContainer";
 import { keyInLayoutLocator } from "../../../model/junior/keyboard-layout";
+import { useStoreState } from "../../../store";
 
 // TODO: Is this unduly restrictive?  I think we should end up with a
 // valid Python string literal if we forbid the backslash character, the
@@ -41,11 +42,13 @@ const InvalidMessageCharactersRegExp = new RegExp("[^ _a-zA-Z0-9-]", "g");
 
 type EventKindOptionProps = React.PropsWithChildren<{
   chosenKind: EventDescriptorKind;
+  className?: string | undefined;
   kind: EventDescriptorKind;
   onDoubleClick: () => void;
 }>;
 const EventKindOption: React.FC<EventKindOptionProps> = ({
   chosenKind,
+  className,
   kind,
   onDoubleClick,
   children,
@@ -58,7 +61,7 @@ const EventKindOption: React.FC<EventKindOptionProps> = ({
   const chosen = chosenKind === kind;
   const classes = classNames("EventKindOption", kFocusGroupItemClassName, {
     chosen,
-  });
+  }, className);
 
   const onClick: MouseEventHandler<HTMLElement> = (ev) => {
     setChosenKind(kind);
@@ -116,15 +119,25 @@ const KeyEditor: React.FC<KeyEditorProps> = ({
 export const UpsertHandlerModal = () => {
   const focusContext = useFocusContext("per-method");
   const prevMode = useRef<HandlerUpsertionMode | null>(null);
+  const activeDevice = useStoreState((state) => state.devices.active);
 
   const { fsmState, isSubmittable } = useJrEditState(
     (s) => s.upsertHatBlockFlow
   );
   const [showEmptyMessageError, setShowEmptyMessageError] = useState(false);
 
-  const { setMode, setKeyIfChosen, setMessageIfChosen } = useJrEditActions(
+  const {
+    setMode,
+    setKeyIfChosen,
+    setMessageIfChosen,
+    setMicroBitButtonIfChosen,
+    setMicroBitGestureIfChosen,
+    setMicroBitPinIfChosen,
+    setMicroBitSoundIfChosen,
+  } = useJrEditActions(
     (a) => a.upsertHatBlockFlow
   );
+
   const setChosenKind = useJrEditActions(
     (a) => a.upsertHatBlockFlow.setChosenKind
   );
@@ -132,8 +145,15 @@ export const UpsertHandlerModal = () => {
   const ulRef = React.useRef<HTMLUListElement>(null);
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-    const { mode, chosenKind, keyIfChosen, messageIfChosen, actorKind } =
-      activeFsmState.runState;
+    const {
+      mode,
+      chosenKind,
+      keyIfChosen,
+      messageIfChosen,
+      microBitPinIfChosen,
+      actorKind,
+    } = activeFsmState.runState;
+
     const settle = settleFunctions(isSubmittable, activeFsmState);
 
     const maybeAttemptUpsert = () => {
@@ -184,6 +204,23 @@ export const UpsertHandlerModal = () => {
       );
     }
 
+    const handleMicroBitButtonChange = (evt: ChangeEvent<HTMLSelectElement>) => {
+      setMicroBitButtonIfChosen(evt.target.value);
+    };
+
+    const handleMicroBitGestureChange = (evt: ChangeEvent<HTMLSelectElement>) => {
+      setMicroBitGestureIfChosen(evt.target.value);
+    };
+
+    const handleMicroBitPinChange = (evt: ChangeEvent<HTMLSelectElement>) => {
+      setMicroBitPinIfChosen(evt.target.value);
+    };
+
+    const handleMicroBitSoundChange = (evt: ChangeEvent<HTMLSelectElement>) => {
+      setMicroBitSoundIfChosen(evt.target.value);
+    };
+
+
     const actorNounPhrase = ActorKindOps.names(actorKind).whenClickedNounPhrase;
 
     const messageInputClasses = classNames({
@@ -204,6 +241,112 @@ export const UpsertHandlerModal = () => {
         <div className="content">when I start as a clone</div>
       </EventKindOption>
     );
+
+    const microBitHatBlockOptions = [
+      <EventKindOption
+        {...ekoProps}
+        key="button"
+        kind="microbit:button"
+        className="kind-microbit"
+      >
+        <div className="content">
+          [micro:bit] when
+          <Form.Select
+            aria-label="micro:bit button selection"
+            onChange={handleMicroBitButtonChange}
+          >
+            <option value="a">a</option>
+            <option value="b">b</option>
+            <option value="logo">logo</option>
+          </Form.Select>
+          button pressed
+        </div>
+      </EventKindOption>,
+      <EventKindOption
+        {...ekoProps}
+        key="gesture"
+        kind="microbit:gesture"
+        className="kind-microbit"
+      >
+        <div className="content">
+          [micro:bit] when
+          <Form.Select
+            aria-label="micro:bit gesture selection"
+            onChange={handleMicroBitGestureChange}
+          >
+            <option value="up">up</option>
+            <option value="down">down</option>
+            <option value="left">left</option>
+            <option value="right">right</option>
+            <option value="face up">face up</option>
+            <option value="face down">face down</option>
+            <option value="shake">shake</option>
+            <option value="freefall">freefall</option>
+            <option value="3g">3g</option>
+            <option value="6g">6g</option>
+            <option value="8g">8g</option>
+          </Form.Select>
+          gesture detected
+        </div>
+      </EventKindOption>,
+      <EventKindOption
+        {...ekoProps}
+        key="pin_high"
+        kind="microbit:pin_high"
+        className="kind-microbit"
+      >
+        <div className="content">
+          [micro:bit] when pin
+          <Form.Select
+            aria-label="micro:bit pin selection"
+            value={microBitPinIfChosen}
+            onChange={handleMicroBitPinChange}
+          >
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </Form.Select>
+          is high
+        </div>
+      </EventKindOption>,
+      <EventKindOption
+        {...ekoProps}
+        key="pin_low"
+        kind="microbit:pin_low"
+        className="kind-microbit"
+      >
+        <div className="content">
+          [micro:bit] when pin
+          <Form.Select
+            aria-label="micro:bit pin selection"
+            value={microBitPinIfChosen}
+            onChange={handleMicroBitPinChange}
+          >
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </Form.Select>
+          is high
+        </div>
+      </EventKindOption>,
+      <EventKindOption
+        {...ekoProps}
+        key="sound"
+        kind="microbit:sound"
+        className="kind-microbit"
+      >
+        <div className="content">
+          [micro:bit] when sound level changes to
+          <Form.Select
+            aria-label="micro:bit sound level selection"
+            onChange={handleMicroBitSoundChange}
+          >
+            <option value="loud">loud</option>
+            <option value="quiet">quiet</option>
+          </Form.Select>
+        </div>
+      </EventKindOption>,
+    ];
 
     const keyPressedOptionDivRefCb = (elt: HTMLDivElement | null) => {
       if (prevMode.current === "choosing-key" && elt != null) {
@@ -297,6 +440,7 @@ export const UpsertHandlerModal = () => {
                 <li className={emptyMessageHintClasses}>
                   Please provide a message.
                 </li>
+                { activeDevice !== null && microBitHatBlockOptions }
               </ul>
             </FocusGroupContainer>
           </Form>

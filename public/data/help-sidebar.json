@@ -909,8 +909,8 @@
         "sectionSlug": "microbit",
         "heading": "micro:bit",
         "help": {
-            "flat": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected.\n\nTo use the micro:bit, you must have the line `import pytch.microbit as microbit` at the top of your program, just after the `import pytch` line",
-            "per-method": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected"
+            "flat": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected. There will be a warning sign in the tab if something isn't working\n\nTo use the micro:bit, you must have the line `import pytch.microbit as microbit` at the top of your program, just after the `import pytch` line",
+            "per-method": "To connect a micro:bit, use the 'Devices' pane next to 'Output' and 'Errors' to add your device once it is connected. There will be a warning sign in the tab if something isn't working.\n\nmicro:bit hat blocks will only appear in the 'Add script' modal if a micro:bit is connected and active"
         }
     },
     {
@@ -987,14 +987,14 @@
     {
         "kind": "block",
         "python": "@microbit.when_pin_high(`pin`)",
-        "eventDescriptor": { "kind": "microbit:pin_high", "pin": 0 },
+        "eventDescriptor": { "kind": "microbit:pin_high", "pin": "0" },
         "scratch": "when pin (0 v) connected",
         "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a high voltage/is connected.\n\nThe pins are: `0`, `1` and `2`"
     },
     {
         "kind": "block",
         "python": "@microbit.when_pin_low(`pin`)",
-        "eventDescriptor": { "kind": "microbit:pin_low", "pin": 0 },
+        "eventDescriptor": { "kind": "microbit:pin_low", "pin": "0" },
         "scratch": "when pin (0 v) disconnected:: microbit hat",
         "help": "Ask Pytch to run the below code whenever the wire connected to the `pin` pin on the micro:bit has a low voltage/is disconnected.\n\nThe pins are: `0`, `1` and `2`"
     },
