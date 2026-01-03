@@ -20,6 +20,7 @@ envVarMap.populate([
   ["VITE_GOOGLE_APP_ID", import.meta.env.VITE_GOOGLE_APP_ID],
   ["VITE_GOOGLE_CLIENT_ID", import.meta.env.VITE_GOOGLE_CLIENT_ID],
   ["VITE_MEDIALIB_BASE", import.meta.env.VITE_MEDIALIB_BASE],
+  ["VITE_MICROBIT_BASE", import.meta.env.VITE_MICROBIT_BASE],
   ["VITE_SKULPT_BASE", import.meta.env.VITE_SKULPT_BASE],
   ["VITE_TUTORIALS_BASE", import.meta.env.VITE_TUTORIALS_BASE],
   ["VITE_LESSON_SPECIMENS_BASE", import.meta.env.VITE_LESSON_SPECIMENS_BASE],

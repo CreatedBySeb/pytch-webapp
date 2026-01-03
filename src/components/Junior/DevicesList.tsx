@@ -70,10 +70,12 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
   const activeDevice = useStoreState((state) => state.devices.active);
   const active = device.serialNumber === activeDevice;
   const disabled = active || device.status !== MicroBitStatus.READY;
+  const flashing = device.status === MicroBitStatus.FLASHING;
 
   const setActive = () => deviceManager.setActive(device.serialNumber);
   const disconnect = () => deviceManager.disconnect(device.serialNumber);
   const forget = () => deviceManager.disconnect(device.serialNumber, true);
+  const flash = () => device.flash();
 
   let connecting = false;
   let status: string;
@@ -93,6 +95,12 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
       case MicroBitStatus.CONNECTED:
         connecting = true;
         status = "Connecting";
+        statusStyle = "secondary";
+        break;
+
+      case MicroBitStatus.FLASHING:
+        connecting = true;
+        status = "Flashing";
         statusStyle = "secondary";
         break;
 
@@ -121,10 +129,13 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
       <Button variant="outline-primary" disabled={disabled} onClick={setActive}>
         Set Active
       </Button>
-      <Button variant="outline-danger" onClick={disconnect}>
+      <Button variant="outline-warning" disabled={flashing} onClick={flash}>
+        Flash
+      </Button>
+      <Button variant="outline-danger" disabled={flashing} onClick={disconnect}>
         Disconnect
       </Button>
-      <Button variant="outline-danger" onClick={forget}>
+      <Button variant="outline-danger" disabled={flashing} onClick={forget}>
         Forget
       </Button>
     </ButtonGroup>

@@ -38,6 +38,10 @@ make them available to the browser.
   This is currently outside the normal deployment structure, to allow
   independent development and updates.
 
+``VITE_MICROBIT_BASE``
+  Initial portion of URL from which micro:bit hex files will be
+  fetched.
+
 ``VITE_DEPLOY_BASE_URL``
   "Root URL" of the **site** deployment.  The **webapp** is only one
   part of the site.  For example, the documentation lives within the

@@ -1,4 +1,5 @@
 import { DAPLink, DAPProtocol, WebUSB } from "dapjs";
+import { envVarOrFail } from "../env-utils";
 import store from "../store";
 import { parseVersion, sleep } from "../utils";
 
@@ -71,6 +72,8 @@ export enum MicroBitStatus {
   CONNECTED,
   /** The micro:bit is connected and succeeded handshake, so is ready for use */
   READY,
+  /** The micro:bit is currently being flashed over DAPLink and shouldn't be used */
+  FLASHING,
 }
 
 export class MicroBitError extends Error {
@@ -151,9 +154,11 @@ export class MicroBitDevice {
   private inflight: InflightCommand[] = [];
   private info: DeviceInfo | undefined;
   private queue: QueuedCommand[] = [];
+  private serialHandler: (data: string) => void;
 
   constructor(device: IdentifiableUSBDevice) {
     this.device = device;
+    this.serialHandler = (data: string) => this.handleData(data);
 
     const transport = new WebUSB(device);
     this.dap = new DAPLink(transport, DAP_PROTOCOL_SWD);
@@ -181,7 +186,9 @@ export class MicroBitDevice {
       throw e;
     }
 
-    this.dap.on(DAPLink.EVENT_SERIAL_DATA, (data) => this.handleData(data));
+    // Ensure listener is removed first to avoid any duplicates
+    this.dap.removeListener(DAPLink.EVENT_SERIAL_DATA, this.serialHandler);
+    this.dap.on(DAPLink.EVENT_SERIAL_DATA, this.serialHandler);
     this.dap.startSerialRead(MicroBitDevice.SERIAL_DELAY);
     this.status = MicroBitStatus.CONNECTED;
     console.log("Successfully connected to the micro:bit");
@@ -262,6 +269,55 @@ export class MicroBitDevice {
     }
 
     console.log("Cleanly disconnected from the micro:bit");
+  }
+
+  /**
+   * Flash the micro:bit with the latest firmware
+   */
+  public async flash(): Promise<void> {
+    console.log("Starting to flash micro:bit " + this.serialNumber);
+
+    if (this.revision[0] !== 2) {
+      throw Error("Only V2 micro:bits can be flashed directly");
+    }
+
+    const hexURL = envVarOrFail("VITE_MICROBIT_BASE")
+      + "/pytch-microbit-v2.hex";
+
+    const response = await fetch(hexURL);
+
+    if (!response.ok) {
+      throw Error("Failed to retrieve HEX file to flash micro:bit");
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    this.status = MicroBitStatus.FLASHING;
+    const wasActive = deviceManager.getActive() === this;
+
+    // If this is the active device, we need to deactivate it first
+    if (wasActive) {
+      deviceManager.setActive(null);
+    }
+
+    try {
+      await this.dap.flash(buffer);
+    } catch (e) {
+      this.status = MicroBitStatus.ERRORED;
+      console.error("Failed to flash the micro:bit");
+      throw e;
+    }
+
+    console.log("Successfully flashed micro:bit " + this.serialNumber);
+
+    this.connect()
+      .then(() => {
+        // If this was the active device and nothing is currently active, try to
+        // reactivate if we succeeded re-connecting
+        if (wasActive && !deviceManager.getActive()) {
+          deviceManager.setActive(this.serialNumber);
+        }
+      });
   }
 
   /**
