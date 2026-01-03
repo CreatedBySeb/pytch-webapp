@@ -255,10 +255,9 @@ export class MicroBitDevice {
     const buffer = await response.arrayBuffer();
 
     this.status = MicroBitStatus.FLASHING;
-    const wasActive = deviceManager.getActive() === this;
 
     // If this is the active device, we need to deactivate it first
-    if (wasActive) {
+    if (deviceManager.getActive() === this) {
       deviceManager.setActive(null);
     }
 
@@ -274,10 +273,14 @@ export class MicroBitDevice {
     this.status = MicroBitStatus.CONNECTED;
 
     this.handshake()
-      .then(() => {
-        // If this was the active device and nothing is currently active, try to
-        // reactivate if we succeeded re-connecting
-        if (wasActive && !deviceManager.getActive()) {
+      .then((success) => {
+        if (!success) {
+          return;
+        }
+
+        // If there is no active device, make this device active once we have
+        // succeeded a handshake
+        if (!deviceManager.getActive()) {
           deviceManager.setActive(this.serialNumber);
         }
       });
@@ -453,12 +456,19 @@ export class MicroBitDevice {
    * Attempts a handshake with the micro:bit using the 'hello' command, up to a
    * total of HANDSHAKE_ATTEMPTS times, with a wait of HANDSHAKE_DELAY for each
    * iteration
+   * @returns Whether the handshake succeeded
    */
-  private async handshake(): Promise<void> {
+  private async handshake(): Promise<boolean> {
     // Adding a 1.5s wait helps avoid serial problems after initial connection
     await sleep(SERIAL_WARM_DELAY);
 
     for (let i = 1; i <= HANDSHAKE_ATTEMPTS; i++) {
+      // If we started flashing in the interim, abort without changing status
+      if (this.status === MicroBitStatus.FLASHING) {
+        console.log("Aborting handshake due to flash operation");
+        return false;
+      }
+
       const suffix = ` (attempt ${i})`
 
       // While the connection may be unstable it is necessary to clear queues
@@ -500,6 +510,8 @@ export class MicroBitDevice {
 
       this.status = MicroBitStatus.ERRORED;
     }
+
+    return this.status === MicroBitStatus.READY;
   }
 }
 
@@ -607,8 +619,16 @@ class DeviceManger {
    * @param serial The serial number of the desired device, or null to unset
    */
   public setActive(serial: string | null): void {
-    if (serial !== null && !this.devices.has(serial)) {
-      throw new Error(`Cannot make unknown device '${serial}' active`);
+    if (serial) {
+      const device = this.devices.get(serial);
+
+      if (!device) {
+        throw new Error(`Cannot make unknown device '${serial}' active`);
+      }
+
+      if (device.status !== MicroBitStatus.READY) {
+        throw new Error(`Cannot make unready device '${serial}' active`);
+      }
     }
 
     this.activeDevice = serial;
