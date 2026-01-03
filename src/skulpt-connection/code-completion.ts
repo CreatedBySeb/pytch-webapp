@@ -63,13 +63,22 @@ const kPytchPerMethodExclusions = [
   "when_this_sprite_clicked",
 ];
 
+const kMicrobitPerMethodExclusions = [
+  "when_button_pressed($0)",
+  "when_gesture_detected($0)",
+  "when_pin_is_high($0)",
+  "when_pin_is_low($0)",
+  "when_sound_level_changes($0)",
+]
+
 const withoutPerMethodExclusions = (
-  completions: Array<IAceCompletion>
+  completions: Array<IAceCompletion>,
+  exclusions: Array<string>,
 ): Array<IAceCompletion> => {
   // Assert that all exclusions are in the original input array, to try
   // to catch typos.
   const completionValues = completions.map((c) => c.snippet);
-  const missingExclusions = kPytchPerMethodExclusions.filter(
+  const missingExclusions = exclusions.filter(
     (value) => !completionValues.includes(value)
   );
   if (missingExclusions.length > 0) {
@@ -80,11 +89,14 @@ const withoutPerMethodExclusions = (
   }
 
   return completions.filter(
-    (completion) => !kPytchPerMethodExclusions.includes(completion.snippet)
+    (completion) => !exclusions.includes(completion.snippet)
   );
 };
 
-const completionsFromPyList = (meta: string | null, lst: any) =>
+const completionsFromPyList = (
+  meta: string | null,
+  lst: any,
+): Array<IAceCompletion> =>
   lst.v.map(completionFromPyTuple(meta));
 
 // Invoke the Python function _user_facing_completions() and
@@ -96,6 +108,7 @@ const kCompletions = (() => {
   const pyStr = (s: string) => new Sk.builtin.str(s);
   const sUserFacingCompletions = pyStr("_user_facing_completions");
   const sPytch = pyStr("pytch");
+  const sPytchMicrobit = pyStr("pytch.microbit");
   const sActor = pyStr("Actor");
   const sSprite = pyStr("Sprite");
   const sStage = pyStr("Stage");
@@ -115,7 +128,20 @@ const kCompletions = (() => {
     pyCompletionsByKind.mp$subscript(sPytch)
   );
 
-  const perMethodPytch = withoutPerMethodExclusions(allPytch);
+  const allMicrobit = completionsFromPyList(
+    null,
+    pyCompletionsByKind.mp$subscript(sPytchMicrobit),
+  );
+
+  const perMethodPytch = withoutPerMethodExclusions(
+    allPytch,
+    kPytchPerMethodExclusions,
+  );
+
+  const perMethodMicrobit = withoutPerMethodExclusions(
+    allMicrobit,
+    kMicrobitPerMethodExclusions,
+  );
 
   const actorCompletions = completionsFromPyList(
     "[Spr/Stg]",
@@ -138,7 +164,15 @@ const kCompletions = (() => {
   const sprite = actorCompletions.concat(spriteCompletions).map(withoutMeta);
   const stage = actorCompletions.concat(stageCompletions).map(withoutMeta);
 
-  return { allPytch, perMethodPytch, actor, sprite, stage };
+  return {
+    allPytch,
+    perMethodPytch,
+    allMicrobit,
+    perMethodMicrobit,
+    actor,
+    sprite,
+    stage,
+  };
 })();
 
 export class PytchAceAutoCompleter {
@@ -175,6 +209,15 @@ export class PytchAceAutoCompleter {
             return kCompletions.allPytch;
           case "per-method":
             return kCompletions.perMethodPytch;
+          default:
+            return assertNever(this.context);
+        }
+      } else if (prePrefix.endsWith("microbit.")) {
+        switch (programKind) {
+          case "flat":
+            return kCompletions.allMicrobit;
+          case "per-method":
+            return kCompletions.perMethodMicrobit;
           default:
             return assertNever(this.context);
         }
