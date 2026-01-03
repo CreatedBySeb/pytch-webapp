@@ -99,6 +99,7 @@ export class MicroBitDevice {
 
   public static readonly SEPARATOR = "|";
   public static readonly SERIAL_DELAY = 1;
+  public static readonly TYPE = "micro:bit";
 
   /**
    * A short string to identify the micro:bit, derived from the last 8
@@ -237,11 +238,24 @@ export class MicroBitDevice {
    * Flash the micro:bit with the latest firmware
    */
   public async flash(): Promise<void> {
-    console.log("Starting to flash micro:bit " + this.serialNumber);
+    const pulseChange = store.getActions().activeProject.pulseNotableChange;
 
     if (this.revision[0] !== 2) {
-      throw Error("Only V2 micro:bits can be flashed directly");
+      pulseChange({
+        kind: "device-flash-finished",
+        deviceType: MicroBitDevice.TYPE,
+        error: "Only V2 micro:bits can be flashed directly",
+      });
+
+      return;
     }
+
+    console.log("Starting to flash micro:bit " + this.serialNumber);
+
+    pulseChange({
+      kind: "device-flash-started",
+      deviceType: MicroBitDevice.TYPE,
+    });
 
     const hexURL = envVarOrFail("VITE_MICROBIT_BASE")
       + "/pytch-microbit-v2.hex";
@@ -249,10 +263,33 @@ export class MicroBitDevice {
     const response = await fetch(hexURL);
 
     if (!response.ok) {
-      throw Error("Failed to retrieve HEX file to flash micro:bit");
+      console.error(`Got response ${response.status} for HEX file`);
+
+      pulseChange({
+        kind: "device-flash-finished",
+        deviceType: MicroBitDevice.TYPE,
+        error: "Failed to retrieve HEX file for micro:bit",
+      });
+
+      return;
     }
 
-    const buffer = await response.arrayBuffer();
+    let buffer: ArrayBuffer;
+
+    try {
+      buffer = await response.arrayBuffer();
+    } catch (e) {
+      console.error("Failed to parse ArrayBuffer for HEX file");
+      console.error(e);
+
+      pulseChange({
+        kind: "device-flash-finished",
+        deviceType: MicroBitDevice.TYPE,
+        error: "Failed to retrieve HEX file for micro:bit",
+      });
+
+      return;
+    }
 
     this.status = MicroBitStatus.FLASHING;
 
@@ -266,11 +303,24 @@ export class MicroBitDevice {
     } catch (e) {
       this.status = MicroBitStatus.ERRORED;
       console.error("Failed to flash the micro:bit");
-      throw e;
+      console.error(e);
+
+      pulseChange({
+        kind: "device-flash-finished",
+        deviceType: MicroBitDevice.TYPE,
+        error: "Failed to transfer HEX file to the micro:bit",
+      });
+
+      return;
     }
 
     console.log("Successfully flashed micro:bit " + this.serialNumber);
     this.status = MicroBitStatus.CONNECTED;
+
+    pulseChange({
+      kind: "device-flash-finished",
+      deviceType: MicroBitDevice.TYPE,
+    });
 
     this.handshake()
       .then((success) => {
@@ -633,6 +683,11 @@ class DeviceManger {
 
     this.activeDevice = serial;
     store.getActions().devices.setActive(serial);
+
+    store.getActions().activeProject.pulseNotableChange({
+      kind: "device-activated",
+      deviceType: (serial) ? MicroBitDevice.TYPE : null,
+    });
   }
 
   private deviceConnected(device: USBDevice): void {

@@ -1,5 +1,13 @@
 import { arraysEqFun, assertNever } from "../utils";
 import {
+  DeviceActivated,
+  deviceActivatedDescription,
+  DeviceFlashFinished,
+  deviceFlashFinishedDescription,
+  DeviceFlashStarted,
+  deviceFlashStartedDescription,
+} from "./devices";
+import {
   AssetChanged,
   assetChangedDescription,
   AssetsAdded,
@@ -26,7 +34,10 @@ export type NotableChange =
   | ZipfilesUploaded
   | ProjectRenamed
   | ProjectsDeleted
-  | ProjectDownloadActionCompleted;
+  | ProjectDownloadActionCompleted
+  | DeviceActivated
+  | DeviceFlashFinished
+  | DeviceFlashStarted;
 
 export type NotableChangeKind = NotableChange["kind"];
 
@@ -60,6 +71,12 @@ export function notableChangeDescription(
       return projectsDeletedDescription(change);
     case "project-renamed":
       return projectRenamedDescription(change);
+    case "device-activated":
+      return deviceActivatedDescription(change);
+    case "device-flash-finished":
+      return deviceFlashFinishedDescription(change);
+    case "device-flash-started":
+      return deviceFlashStartedDescription(change);
     default:
       return assertNever(change);
   }
