@@ -13,7 +13,7 @@ type USBListener = (this: USB, event: USBConnectionEvent) => unknown;
 // The DAPProtocol enum is not importable, so this is a readable alternative
 const DAP_PROTOCOL_SWD: DAPProtocol = 1;
 const DIGITAL_PIN_LEVELS = [0, 1];
-const HANDSHAKE_ATTEMPTS = 5;
+const HANDSHAKE_ATTEMPTS = 8;
 const HANDSHAKE_DELAY = 2000;
 const NEW_LINE = "\n";
 const SERIAL_WARM_DELAY = 1500;
@@ -32,7 +32,8 @@ interface DeviceInfo {
 function parseDeviceInfo(response: string[]): DeviceInfo {
   if (response.length < 3) {
     throw new TypeError(
-      `Response has incorrect number of fields (has: ${response.length}, expected: 3)`
+      `Response has incorrect number of fields (has: ${response.length}, `
+        + "expected: 3)"
     );
   }
 
@@ -72,7 +73,7 @@ export enum MicroBitStatus {
   CONNECTED,
   /** The micro:bit is connected and succeeded handshake, so is ready for use */
   READY,
-  /** The micro:bit is currently being flashed over DAPLink and shouldn't be used */
+  /** The micro:bit is being flashed over DAPLink and shouldn't be used */
   FLASHING,
 }
 
@@ -193,46 +194,7 @@ export class MicroBitDevice {
     this.status = MicroBitStatus.CONNECTED;
     console.log("Successfully connected to the micro:bit");
 
-    // Adding a 1.5s wait helps avoid serial I/O problems after connection
-    await sleep(SERIAL_WARM_DELAY);
-
-    for (let i = 1; i <= HANDSHAKE_ATTEMPTS; i++) {
-      // While the connection may be unstable it is necessary to clear queues
-      // for each attempt
-      await this.reset();
-
-      this.send("hello")
-        .then((result) => {
-          try {
-            this.info = parseDeviceInfo(result);
-          } catch (e) {
-            console.error(`Handshake returned invalid response (attempt ${i})`);
-            throw e;
-          }
-
-          this.status = MicroBitStatus.READY;
-          console.log(`Handshake succeeded (attempt ${i})`);
-        });
-
-      // FIXME: there's a delay between the device passing and the promise
-      //   resolving due to this delay mechanism, so we may need something else
-      await sleep(HANDSHAKE_DELAY);
-
-      // @ts-expect-error -- TypeScript cannot tell that the status can be
-      //   affected externally by the Promise above
-      if (this.status === MicroBitStatus.READY) break;
-
-      console.log(
-        `Handshake did not succeed within ${HANDSHAKE_DELAY}ms (attempt ${i})`
-      );
-    }
-
-    // @ts-expect-error -- TypeScript cannot tell that the status can be
-    //   affected externally by the Promise above
-    if (this.status !== MicroBitStatus.READY) {
-      console.error("Failed to handshake with the micro:bit within 5 attempts");
-      this.status = MicroBitStatus.ERRORED;
-    }
+    await this.handshake();
   }
 
   /**
@@ -309,8 +271,9 @@ export class MicroBitDevice {
     }
 
     console.log("Successfully flashed micro:bit " + this.serialNumber);
+    this.status = MicroBitStatus.CONNECTED;
 
-    this.connect()
+    this.handshake()
       .then(() => {
         // If this was the active device and nothing is currently active, try to
         // reactivate if we succeeded re-connecting
@@ -372,6 +335,32 @@ export class MicroBitDevice {
     }
 
     return promise;
+  }
+
+  /**
+   * Flushes queued commands to the serial interface if a flush isn't already in
+   * progress, and adds the handlers to the inflight array
+   */
+  private async flushQueue(): Promise<void> {
+    if (this.flushing) return;
+    this.flushing = true;
+    console.log("Started flushing command queue");
+
+    try {
+      let command: QueuedCommand | undefined
+
+      while ((command = this.queue.shift()) !== undefined) {
+        const [payload, ...handlers] = command;
+        this.inflight.push(handlers); // Q: Should it be the other way around?
+        await this.dap.serialWrite(payload);
+        console.log(`Flushed '${payload.trim()}' to serial port`);
+      }
+    } catch (e) {
+      console.error("Encountered an error while flushing queue");
+      throw e;
+    } finally {
+      this.flushing = false;
+    }
   }
 
   /**
@@ -461,28 +450,55 @@ export class MicroBitDevice {
   }
 
   /**
-   * Flushes queued commands to the serial interface if a flush isn't already in
-   * progress, and adds the handlers to the inflight array
+   * Attempts a handshake with the micro:bit using the 'hello' command, up to a
+   * total of HANDSHAKE_ATTEMPTS times, with a wait of HANDSHAKE_DELAY for each
+   * iteration
    */
-  private async flushQueue(): Promise<void> {
-    if (this.flushing) return;
-    this.flushing = true;
-    console.log("Started flushing command queue");
+  private async handshake(): Promise<void> {
+    // Adding a 1.5s wait helps avoid serial problems after initial connection
+    await sleep(SERIAL_WARM_DELAY);
 
-    try {
-      let command: QueuedCommand | undefined
+    for (let i = 1; i <= HANDSHAKE_ATTEMPTS; i++) {
+      const suffix = ` (attempt ${i})`
 
-      while ((command = this.queue.shift()) !== undefined) {
-        const [payload, ...handlers] = command;
-        this.inflight.push(handlers); // Q: Should it be the other way around?
-        await this.dap.serialWrite(payload);
-        console.log(`Flushed '${payload.trim()}' to serial port`);
+      // While the connection may be unstable it is necessary to clear queues
+      // for each attempt
+      await this.reset();
+
+      const success = await new Promise((resolve) => {
+        this.send("hello")
+          .then((result) => {
+            try {
+              this.info = parseDeviceInfo(result);
+            } catch (e) {
+              console.error("Handshake returned invalid response" + suffix);
+              throw e;
+            }
+
+            this.status = MicroBitStatus.READY
+            console.log("Handshake succeeded" + suffix);
+            resolve(true);
+          });
+
+        sleep(HANDSHAKE_DELAY)
+          .then(() => resolve(false));
+      });
+
+      if (success) {
+        break;
+      } else {
+        console.warn(
+          `Handshake did not succeed within ${HANDSHAKE_DELAY}ms` + suffix
+        );
       }
-    } catch (e) {
-      console.error("Encountered an error while flushing queue");
-      throw e;
-    } finally {
-      this.flushing = false;
+    }
+
+    if (this.status !== MicroBitStatus.READY) {
+      console.error(
+        `Failed to handshake within ${HANDSHAKE_ATTEMPTS} attempts`
+      );
+
+      this.status = MicroBitStatus.ERRORED;
     }
   }
 }
