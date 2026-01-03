@@ -1,7 +1,7 @@
 import { DAPLink, DAPProtocol, WebUSB } from "dapjs";
 import { envVarOrFail } from "../env-utils";
 import store from "../store";
-import { parseVersion, sleep } from "../utils";
+import { compareVersion, parseVersion, sleep } from "../utils";
 
 type CommandErrorHandler = (error: MicroBitError) => unknown;
 type CommandSuccessHandler = (result: string[]) => unknown;
@@ -93,6 +93,7 @@ export class MicroBitError extends Error {
 
 export class MicroBitDevice {
   public static readonly BAUD_RATE = 115200;
+  public static readonly EXPECTED_VERSION: number[] = [0, 1];
 
   public static readonly FILTER: USBDeviceFilter = {
     vendorId: 0x0d28,
@@ -138,6 +139,16 @@ export class MicroBitDevice {
 
   public get status(): MicroBitStatus {
     return this._status;
+  }
+
+  public get updatable(): boolean {
+    if (!this.info) {
+      return false;
+    }
+
+    return compareVersion(
+      this.info.softwareVersion, MicroBitDevice.EXPECTED_VERSION
+    ) < 0;
   }
 
   private set status(value: MicroBitStatus) {

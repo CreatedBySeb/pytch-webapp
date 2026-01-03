@@ -4,14 +4,19 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Spinner from "react-bootstrap/Spinner";
-import { deviceManager, MicroBitDevice, MicroBitStatus } from "../../skulpt-connection/device-manager";
-import { useHasImport } from "../hooks/code-text";
-import { useStoreActions, useStoreState } from "../../store";
-import { AddSomethingSingleButton } from "./AddSomethingButton";
+import {
+  deviceManager, MicroBitDevice, MicroBitStatus
+} from "../../skulpt-connection/device-manager";
 import { IModuleImport } from "../../model/project";
+import { useStoreActions, useStoreState } from "../../store";
+import { useHasImport } from "../hooks/code-text";
+import { AddSomethingSingleButton } from "./AddSomethingButton";
 
 
-const MICROBIT_IMPORT: IModuleImport = { as: "microbit", module: "pytch.microbit" };
+const MICROBIT_IMPORT: IModuleImport = {
+  as: "microbit",
+  module: "pytch.microbit",
+};
 
 const DeviceAlert: React.FC = () => {
   const activeDevice = useStoreState((state) => state.devices.active);
@@ -22,7 +27,9 @@ const DeviceAlert: React.FC = () => {
     return devices.find((d) => d.status === MicroBitStatus.ERRORED);
   }, [devices]);
 
-  const addImport = useStoreActions((actions) => actions.activeProject.addModuleImport);
+  const addImport = useStoreActions((actions) => {
+    return actions.activeProject.addModuleImport;
+  });
 
   if (deviceWithError) {
     return <Alert variant="danger">
@@ -130,6 +137,11 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
         <Badge bg={statusStyle}>{status}</Badge>
       )
     }
+    {
+      (device.updatable) && (
+        <Badge bg="warning">Needs Update</Badge>
+      )
+    }
 
     <ButtonGroup aria-label="Device controls">
       { !unsupported &&
@@ -176,6 +188,10 @@ export const DevicesList = () => {
         devices.map((d) => <DeviceItem key={d.serialNumber} device={d} />)
       }
     </ul>
-    <AddSomethingSingleButton what="device" label="Add a device" onClick={pair} />
+    <AddSomethingSingleButton
+      what="device"
+      label="Add a device"
+      onClick={pair}
+    />
   </>
 }
