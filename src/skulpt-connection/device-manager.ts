@@ -96,6 +96,14 @@ export class MicroBitDevice {
   public static readonly SEPARATOR = "|";
   public static readonly SERIAL_DELAY = 1;
 
+  /**
+   * A short string to identify the micro:bit, derived from the last 8
+   * characters of the serial number
+   */
+  public get identifier(): string {
+    return this.device.serialNumber.slice(-8);
+  }
+
   public get revision(): [number, number] {
     const prefix = this.serialNumber.slice(0, 4);
 
@@ -158,6 +166,7 @@ export class MicroBitDevice {
     try {
       await this.dap.connect();
     } catch (e) {
+      this.status = MicroBitStatus.ERRORED;
       console.error("Failed to connect via DAPLink to micro:bit");
       throw e;
     }
@@ -165,6 +174,7 @@ export class MicroBitDevice {
     try {
       this.dap.setSerialBaudrate(MicroBitDevice.BAUD_RATE);
     } catch (e) {
+      this.status = MicroBitStatus.ERRORED;
       console.error(
         "Failed to set serial baud rate to " + MicroBitDevice.BAUD_RATE
       );
