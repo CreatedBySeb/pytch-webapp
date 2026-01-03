@@ -150,7 +150,7 @@ export class EventDescriptorOps {
   /** Return a fingerprint of the given `event` descriptor, consisting
    * of the event kind and a kind-specific suffic separated by `:`.
    * This suffix is `-` for nullary event-kinds, and the SHA256 of the
-   * event-kind argument (key-name or message) for unary event-kinds. */
+   * event-kind argument for unary event-kinds. */
   static async fingerprint(event: EventDescriptor): Promise<string> {
     const suffix = await (async () => {
       switch (event.kind) {
@@ -162,16 +162,15 @@ export class EventDescriptorOps {
           return await hexSHA256(event.keyName);
         case "message-received":
           return await hexSHA256(event.message);
-        // TODO: These are all enums, so do we need a hash?
         case "microbit:button":
-          return event.button;
+          return await hexSHA256(event.button);
         case "microbit:gesture":
-          return event.gesture;
+          return await hexSHA256(event.gesture);
         case "microbit:pin_high":
         case "microbit:pin_low":
-          return event.pin;
+          return await hexSHA256(event.pin);
         case "microbit:sound":
-          return event.level;
+          return await hexSHA256(event.level);
         default:
           return assertNever(event);
       }
