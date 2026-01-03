@@ -65,8 +65,10 @@ function parseDeviceInfo(response: string[]): DeviceInfo {
 }
 
 export enum MicroBitStatus {
+  /** The micro:bit is not supported by Pytch, currently used for V1 */
+  UNSUPPORTED = -2,
   /** The micro:bit is in an error state and cannot be used currently */
-  ERRORED = -1,
+  ERRORED,
   /** The micro:bit is available but has not been connected to yet */
   PENDING,
   /** The micro:bit has been connected over DAPLink, but isn't ready for use */
@@ -125,9 +127,8 @@ export class MicroBitDevice {
       case "9906":
         return [2, 21];
       default:
-        throw new Error(
-          `Unknown micro:bit revision for serial prefix '${prefix}'`
-        );
+        // Unknown, will mark as UNSUPPORTED
+        return [0, 0];
     }
   }
 
@@ -164,12 +165,21 @@ export class MicroBitDevice {
 
     const transport = new WebUSB(device);
     this.dap = new DAPLink(transport, DAP_PROTOCOL_SWD);
+
+    if (this.revision[0] !== 2) {
+      this.status = MicroBitStatus.UNSUPPORTED;
+    }
   }
 
   /**
    * Attempt to connect to the micro:bit via DAPLink
    */
   public async connect(): Promise<void> {
+    // Don't attempt to connect to unsupported boards
+    if (this.status === MicroBitStatus.UNSUPPORTED) {
+      return;
+    }
+
     try {
       await this.dap.connect();
     } catch (e) {

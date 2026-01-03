@@ -71,6 +71,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
   const active = device.serialNumber === activeDevice;
   const disabled = active || device.status !== MicroBitStatus.READY;
   const flashing = device.status === MicroBitStatus.FLASHING;
+  const unsupported = device.status === MicroBitStatus.UNSUPPORTED;
 
   const setActive = () => deviceManager.setActive(device.serialNumber);
   const disconnect = () => deviceManager.disconnect(device.serialNumber);
@@ -86,6 +87,11 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
     statusStyle = "primary";
   } else {
     switch (device.status) {
+      case MicroBitStatus.UNSUPPORTED:
+        status = "Unsupported";
+        statusStyle = "secondary";
+        break;
+
       case MicroBitStatus.ERRORED:
         status = "Error";
         statusStyle = "danger";
@@ -126,15 +132,32 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
     }
 
     <ButtonGroup aria-label="Device controls">
-      <Button variant="outline-primary" disabled={disabled} onClick={setActive}>
-        Set Active
-      </Button>
-      <Button variant="outline-warning" disabled={flashing} onClick={flash}>
-        Flash
-      </Button>
-      <Button variant="outline-danger" disabled={flashing} onClick={disconnect}>
-        Disconnect
-      </Button>
+      { !unsupported &&
+        <>
+          <Button
+            className=""
+            variant="outline-primary"
+            disabled={disabled}
+            onClick={setActive}
+          >
+            Set Active
+          </Button>
+          <Button
+            variant="outline-warning"
+            disabled={flashing}
+            onClick={flash}
+          >
+            Flash
+          </Button>
+          <Button
+            variant="outline-danger"
+            disabled={flashing}
+            onClick={disconnect}
+          >
+            Disconnect
+          </Button>
+        </>
+      }
       <Button variant="outline-danger" disabled={flashing} onClick={forget}>
         Forget
       </Button>
