@@ -4,10 +4,15 @@ import { PytchProgramKind } from "./pytch-program";
 export type ProjectTemplateKind =
   | "bare-bones"
   | "with-sample-code"
+  | "with-microbit-code"
   | "bare-per-method"
-  | "simple-example-per-method";
+  | "simple-example-per-method"
+  | "simple-microbit-per-method";
 
-export type WhetherExampleTag = "with-example" | "without-example";
+export type WhetherExampleTag =
+  | "with-example"
+  | "with-microbit"
+  | "without-example";
 
 // TODO: Replace above union of literals with this:
 type ProjectTemplateKindAsComponents =
@@ -29,6 +34,10 @@ export function templateKindFromComponents(
       return "with-sample-code";
     case "with-example/per-method":
       return "simple-example-per-method";
+    case "with-microbit/flat":
+      return "with-microbit-code";
+    case "with-microbit/per-method":
+      return "simple-microbit-per-method";
     case "without-example/flat":
       return "bare-bones";
     case "without-example/per-method":

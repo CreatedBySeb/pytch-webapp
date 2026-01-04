@@ -111,6 +111,12 @@ export const CreateProjectModal = () => {
                   label="With example code"
                   setActive={setWhetherExample}
                 />
+                <WhetherExampleOption
+                  thisOption="with-microbit"
+                  activeOption={whetherExample}
+                  label="With micro:bit code"
+                  setActive={setWhetherExample}
+                />
               </div>
             </Form.Group>
             {editingModeContent}

@@ -1,4 +1,5 @@
 import { Action, action, computed, Computed, Thunk, thunk } from "easy-peasy";
+import templateCodeWithMicroBitCode from "../assets/microbit-project.py?raw";
 import templateCodeWithSampleCode from "../assets/skeleton-project.py?raw";
 
 import {
@@ -181,6 +182,16 @@ export const projectCollection: IProjectCollection = {
               { urlBasename: "python-logo.png" },
             ],
           };
+        case "with-microbit-code":
+          return {
+            program: PytchProgramOps.fromPythonCode(
+              templateCodeWithMicroBitCode,
+            ),
+            assets: [
+              { urlBasename: "green-burst.jpg" },
+              { urlBasename: "python-logo.png" },
+            ],
+          };
         case "bare-per-method": {
           const structuredProgram = StructuredProgramOps.newEmpty();
           const stageId = structuredProgram.actors[0].id;
@@ -192,6 +203,26 @@ export const projectCollection: IProjectCollection = {
         }
         case "simple-example-per-method": {
           const structuredProgram = StructuredProgramOps.newSimpleExample();
+          const stageId = structuredProgram.actors[0].id;
+          const spriteId = structuredProgram.actors[1].id;
+          const backgroundName = `${stageId}/solid-white.png`;
+          const costumeName = `${spriteId}/python-logo.png`;
+          return {
+            program: PytchProgramOps.fromStructuredProgram(structuredProgram),
+            assets: [
+              {
+                urlBasename: "solid-white.png",
+                customLocalName: backgroundName,
+              },
+              {
+                urlBasename: "python-logo.png",
+                customLocalName: costumeName,
+              },
+            ],
+          };
+        }
+        case "simple-microbit-per-method": {
+          const structuredProgram = StructuredProgramOps.newMicroBitExample();
           const stageId = structuredProgram.actors[0].id;
           const spriteId = structuredProgram.actors[1].id;
           const backgroundName = `${stageId}/solid-white.png`;

@@ -100,6 +100,41 @@ export class StructuredProgramOps {
   }
 
   /** Create a new `StructuredProgram` containing a Stage and one
+   * Sprite with some micro:bit features. */
+  static newMicroBitExample(): StructuredProgram {
+    let program = StructuredProgramOps.newEmpty();
+
+    StructuredProgramOps.addSprite(program, "Snake");
+    let sprite = program.actors[1];
+
+    StructuredProgramOps.upsertHandler(program, {
+      actorId: sprite.id,
+      action: { kind: "insert" },
+      eventDescriptor: { kind: "green-flag" },
+    });
+    sprite.handlers[0].pythonCode = [
+      'microbit.scroll_text("Hi there!")',
+      'microbit.play_music("BA_DING")',
+    ].join("\n");
+
+    StructuredProgramOps.upsertHandler(program, {
+      actorId: sprite.id,
+      action: { kind: "insert" },
+      eventDescriptor: { kind: "microbit:button", button: "a" },
+    });
+    sprite.handlers[1].pythonCode = "self.change_x(-10)";
+
+    StructuredProgramOps.upsertHandler(program, {
+      actorId: sprite.id,
+      action: { kind: "insert" },
+      eventDescriptor: { kind: "microbit:button", button: "b" },
+    });
+    sprite.handlers[2].pythonCode = "self.change_x(10)";
+
+    return program;
+  }
+
+  /** Create a new `StructuredProgram` containing a Stage and one
    * Sprite having one handler. */
   static newSimpleExample(): StructuredProgram {
     let program = StructuredProgramOps.newEmpty();
