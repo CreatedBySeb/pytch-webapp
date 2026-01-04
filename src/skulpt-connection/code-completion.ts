@@ -110,6 +110,7 @@ const kCompletions = (() => {
   const sPytch = pyStr("pytch");
   const sPytchMicrobit = pyStr("pytch.microbit");
   const sActor = pyStr("Actor");
+  const sDevice = pyStr("Device");
   const sSprite = pyStr("Sprite");
   const sStage = pyStr("Stage");
 
@@ -128,10 +129,16 @@ const kCompletions = (() => {
     pyCompletionsByKind.mp$subscript(sPytch)
   );
 
-  const allMicrobit = completionsFromPyList(
-    null,
-    pyCompletionsByKind.mp$subscript(sPytchMicrobit),
-  );
+  const allMicrobit = [
+    ...completionsFromPyList(
+      null,
+      pyCompletionsByKind.mp$subscript(sPytchMicrobit),
+    ),
+    ...completionsFromPyList(
+      null,
+      pyCompletionsByKind.mp$subscript(sDevice),
+    ),
+  ];
 
   const perMethodPytch = withoutPerMethodExclusions(
     allPytch,
