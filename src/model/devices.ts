@@ -1,6 +1,12 @@
 import { action, Action } from "easy-peasy";
 import { MicroBitDevice } from "../skulpt-connection/device-manager";
 import { NotableChangeDescription } from "./notable-changes";
+import { IModuleImport } from "./project";
+
+export const MICROBIT_IMPORT: IModuleImport = {
+  as: "microbit",
+  module: "pytch.microbit",
+};
 
 export interface Devices {
   active: string | null;

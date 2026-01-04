@@ -35,12 +35,21 @@ export function useFlatCodeText(debugLabel: string) {
   });
 }
 
-export function useHasImport(expected: string) {
-  const programKind = useStoreState((state) => state.activeProject.project.program.kind);
+/**
+ * A memoised hook which checks if the program has a specific import
+ * @param expected The name of the module that is expected to be imported
+ * @returns A boolean for flat programs if the import is included, or null for
+ *  per-method programs as it is not applicable
+ */
+export function useHasImport(expected: string): boolean | null {
+  const programKind = useStoreState(
+    (state) => state.activeProject.project.program.kind,
+  );
+
   const imports = useStoreState((state) => state.activeProject.moduleImports);
 
   return useMemo(() => {
-    if (programKind === "per-method") return true;
+    if (programKind === "per-method") return null;
     return imports.find(({ module }) => module === expected) !== undefined;
   }, [imports, programKind]);
 }

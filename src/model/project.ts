@@ -129,7 +129,9 @@ export interface ILoadSaveStatus {
  * mod.sub as mod', represented as an object
  */
 export interface IModuleImport {
+  /** The import alias if one was used, otherwise undefined */
   as?: string | undefined;
+  /** The name of the module imported */
   module: string;
 }
 
@@ -332,6 +334,7 @@ export interface IActiveProject {
 
   haveProject: Computed<IActiveProject, boolean>;
   moduleImports: Computed<IActiveProject, IModuleImport[]>;
+  usesMicroBit: Computed<IActiveProject, boolean>;
 
   initialiseContent: SAction<StoredProjectContent>;
   setAssets: SAction<Array<AssetPresentation>>;
@@ -576,6 +579,27 @@ export const activeProject: IActiveProject = {
           .split(" as "); // Convert 'a as b' to ['a', 'b']
 
         return { module: parts[0], as: parts[1] };
+      });
+  }),
+
+  usesMicroBit: computed((state) => {
+    const program = state.project.program;
+
+    // For flat programs we can just check for the import
+    if (program.kind === "flat") {
+      return state.moduleImports
+        .some(({ module }) => module === "pytch.microbit");
+    }
+
+    // For per-method programs, we check if any handler is for a micro:bit event
+    // or accesses the `microbit` module
+    return program.program.actors
+      .some((actor) => {
+        return actor.handlers
+          .some((handler) => {
+            return handler.event.kind.startsWith("microbit:")
+              || handler.pythonCode.includes("microbit.");
+          });
       });
   }),
 

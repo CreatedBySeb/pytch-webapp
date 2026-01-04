@@ -4,24 +4,20 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Spinner from "react-bootstrap/Spinner";
+import { MICROBIT_IMPORT } from "../../model/devices";
 import {
   deviceManager, MicroBitDevice, MicroBitStatus
 } from "../../skulpt-connection/device-manager";
-import { IModuleImport } from "../../model/project";
 import { useStoreActions, useStoreState } from "../../store";
-import { useHasImport } from "../hooks/code-text";
+import { useMissingDevice, useMissingMicroBitImport } from "../hooks/devices";
 import { AddSomethingSingleButton } from "./AddSomethingButton";
 
-
-const MICROBIT_IMPORT: IModuleImport = {
-  as: "microbit",
-  module: "pytch.microbit",
-};
 
 const DeviceAlert: React.FC = () => {
   const activeDevice = useStoreState((state) => state.devices.active);
   const devices = useStoreState((state) => state.devices.devices);
-  const hasImport = useHasImport("pytch.microbit");
+  const missingDevice = useMissingDevice();
+  const missingImport = useMissingMicroBitImport();
 
   const deviceWithError = useMemo(() => {
     return devices.find((d) => d.status === MicroBitStatus.ERRORED);
@@ -41,15 +37,16 @@ const DeviceAlert: React.FC = () => {
     </Alert>;
   }
 
-  if (!activeDevice && hasImport) {
+  if (missingDevice) {
     return <Alert variant="warning">
-      <span>
-        You have imported the <code>pytch.microbit</code> module, but have no
-        micro:bit device active. Make sure your device is connected and has been
-        set as active below, or click 'Add a device' to connect a new micro:bit.
-      </span>
+      You are using micro:bit functionality, but have no micro:bit device
+      active. Make sure your device is connected and has been set as active
+      below, or click 'Add a device' to connect a new micro:bit.
     </Alert>;
-  } else if (activeDevice && !hasImport) {
+  } else if (missingImport) {
+    // We have an explicit check for hasImport === false since a per-method
+    // program would have a value of 'undefined', and we only want this alert
+    // for flat programs
     return <Alert variant="warning">
       <span>
         You have a micro:bit connected, but have not yet imported the
