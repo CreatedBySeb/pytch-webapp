@@ -23,6 +23,11 @@ const DeviceAlert: React.FC = () => {
     return devices.find((d) => d.status === MicroBitStatus.ERRORED);
   }, [devices]);
 
+  const onlyUnsupported = useMemo(() => {
+    if (activeDevice || !devices.length) return false;
+    return devices.every((d) => d.status === MicroBitStatus.UNSUPPORTED);
+  }, [activeDevice, devices]);
+
   const addImport = useStoreActions((actions) => {
     return actions.activeProject.addModuleImport;
   });
@@ -35,18 +40,18 @@ const DeviceAlert: React.FC = () => {
         re-connecting it.
       </span>
     </Alert>;
-  }
-
-  if (missingDevice) {
+  } else if (onlyUnsupported) {
+    return <Alert variant="warning">
+      The attached micro:bit is not supported by Pytch. Pytch currently only
+      works with V2 micro:bit devices.
+    </Alert>
+  } else if (missingDevice) {
     return <Alert variant="warning">
       You are using micro:bit functionality, but have no micro:bit device
       active. Make sure your device is connected and has been set as active
       below, or click 'Add a device' to connect a new micro:bit.
     </Alert>;
   } else if (missingImport) {
-    // We have an explicit check for hasImport === false since a per-method
-    // program would have a value of 'undefined', and we only want this alert
-    // for flat programs
     return <Alert variant="warning">
       <span>
         You have a micro:bit connected, but have not yet imported the
