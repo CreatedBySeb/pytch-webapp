@@ -32,8 +32,8 @@ interface DeviceInfo {
 function parseDeviceInfo(response: string[]): DeviceInfo {
   if (response.length < 3) {
     throw new TypeError(
-      `Response has incorrect number of fields (has: ${response.length}, `
-        + "expected: 3)"
+      `Response has incorrect number of fields (has: ${response.length}, ` +
+        "expected: 3)"
     );
   }
 
@@ -146,9 +146,12 @@ export class MicroBitDevice {
       return false;
     }
 
-    return compareVersion(
-      this.info.softwareVersion, MicroBitDevice.EXPECTED_VERSION
-    ) < 0;
+    return (
+      compareVersion(
+        this.info.softwareVersion,
+        MicroBitDevice.EXPECTED_VERSION
+      ) < 0
+    );
   }
 
   private set status(value: MicroBitStatus) {
@@ -209,6 +212,14 @@ export class MicroBitDevice {
       throw e;
     }
 
+    try {
+      this.dap.reset();
+    } catch (e) {
+      this.status = MicroBitStatus.ERRORED;
+      console.error("Failed to reset device via DAPLink");
+      throw e;
+    }
+
     // Ensure listener is removed first to avoid any duplicates
     this.dap.removeListener(DAPLink.EVENT_SERIAL_DATA, this.serialHandler);
     this.dap.on(DAPLink.EVENT_SERIAL_DATA, this.serialHandler);
@@ -239,7 +250,7 @@ export class MicroBitDevice {
     try {
       await this.device.close();
     } catch (e) {
-      console.error("Failed to disconnect from micro:bit USB")
+      console.error("Failed to disconnect from micro:bit USB");
       throw e;
     }
 
@@ -247,7 +258,7 @@ export class MicroBitDevice {
       try {
         await this.device.forget();
       } catch (e) {
-        console.error("Failed to forget the micro:bit")
+        console.error("Failed to forget the micro:bit");
         throw e;
       }
     }
@@ -278,8 +289,8 @@ export class MicroBitDevice {
       deviceType: MicroBitDevice.TYPE,
     });
 
-    const hexURL = envVarOrFail("VITE_MICROBIT_BASE")
-      + "/pytch-microbit-v2.hex";
+    const hexURL =
+      envVarOrFail("VITE_MICROBIT_BASE") + "/pytch-microbit-v2.hex";
 
     const response = await fetch(hexURL);
 
@@ -343,18 +354,17 @@ export class MicroBitDevice {
       deviceType: MicroBitDevice.TYPE,
     });
 
-    this.handshake()
-      .then((success) => {
-        if (!success) {
-          return;
-        }
+    this.handshake().then((success) => {
+      if (!success) {
+        return;
+      }
 
-        // If there is no active device, make this device active once we have
-        // succeeded a handshake
-        if (!deviceManager.getActive()) {
-          deviceManager.setActive(this.serialNumber);
-        }
-      });
+      // If there is no active device, make this device active once we have
+      // succeeded a handshake
+      if (!deviceManager.getActive()) {
+        deviceManager.setActive(this.serialNumber);
+      }
+    });
   }
 
   /**
@@ -389,8 +399,8 @@ export class MicroBitDevice {
    * @throws {MicroBitError} If the command failed, with the type and reason
    */
   public send(command: string, args: string[] = []): Promise<string[]> {
-    const payload = [command, ...args].join(MicroBitDevice.SEPARATOR)
-      + NEW_LINE;
+    const payload =
+      [command, ...args].join(MicroBitDevice.SEPARATOR) + NEW_LINE;
 
     const promise = new Promise(
       (resolve: CommandSuccessHandler, reject: CommandErrorHandler) => {
@@ -421,7 +431,7 @@ export class MicroBitDevice {
     console.log("Started flushing command queue");
 
     try {
-      let command: QueuedCommand | undefined
+      let command: QueuedCommand | undefined;
 
       while ((command = this.queue.shift()) !== undefined) {
         const [payload, ...handlers] = command;
@@ -499,7 +509,7 @@ export class MicroBitDevice {
 
         case "pin": {
           if (DIGITAL_PIN_LEVELS.includes(Number(args[1]))) {
-            const level = (args[1] === "1") ? "high" : "low";
+            const level = args[1] === "1" ? "high" : "low";
             this.events.push(`pin_${args[0]}:${level}`);
             handled = true;
           }
@@ -540,29 +550,27 @@ export class MicroBitDevice {
         return false;
       }
 
-      const suffix = ` (attempt ${i})`
+      const suffix = ` (attempt ${i})`;
 
       // While the connection may be unstable it is necessary to clear queues
       // for each attempt
       await this.reset();
 
       const success = await new Promise((resolve) => {
-        this.send("hello")
-          .then((result) => {
-            try {
-              this.info = parseDeviceInfo(result);
-            } catch (e) {
-              console.error("Handshake returned invalid response" + suffix);
-              throw e;
-            }
+        this.send("hello").then((result) => {
+          try {
+            this.info = parseDeviceInfo(result);
+          } catch (e) {
+            console.error("Handshake returned invalid response" + suffix);
+            throw e;
+          }
 
-            this.status = MicroBitStatus.READY
-            console.log("Handshake succeeded" + suffix);
-            resolve(true);
-          });
+          this.status = MicroBitStatus.READY;
+          console.log("Handshake succeeded" + suffix);
+          resolve(true);
+        });
 
-        sleep(HANDSHAKE_DELAY)
-          .then(() => resolve(false));
+        sleep(HANDSHAKE_DELAY).then(() => resolve(false));
       });
 
       if (success) {
@@ -587,7 +595,7 @@ export class MicroBitDevice {
 }
 
 class DeviceManger {
-  public readonly supported = ("usb" in navigator);
+  public readonly supported = "usb" in navigator;
 
   private activeDevice: string | null = null;
   private devices: Map<string, MicroBitDevice> = new Map();
@@ -616,10 +624,9 @@ class DeviceManger {
       this.devices.forEach((d) => d.disconnect());
     });
 
-    navigator.usb.getDevices()
-      .then((devices) => {
-        devices.forEach((device) => this.deviceConnected(device));
-      });
+    navigator.usb.getDevices().then((devices) => {
+      devices.forEach((device) => this.deviceConnected(device));
+    });
   }
 
   /**
@@ -639,7 +646,6 @@ class DeviceManger {
     await device.disconnect(forget);
     this.deviceDisconnected(device);
   }
-
 
   /**
    * Gets the nominated active device, which is used in running projects
@@ -707,7 +713,7 @@ class DeviceManger {
 
     store.getActions().activeProject.pulseNotableChange({
       kind: "device-activated",
-      deviceType: (serial) ? MicroBitDevice.TYPE : null,
+      deviceType: serial ? MicroBitDevice.TYPE : null,
     });
   }
 
@@ -724,14 +730,15 @@ class DeviceManger {
     this.devices.set(device.serialNumber, microbit);
     store.getActions().devices.setDevices(Array.from(this.devices.values()));
 
-    microbit.connect()
-      .then(() => {
-        if (microbit.status === MicroBitStatus.READY
-          && this.activeDevice === null) {
-          this.setActive(device.serialNumber);
-          console.log("No active device selected, making device active");
-        }
-      });
+    microbit.connect().then(() => {
+      if (
+        microbit.status === MicroBitStatus.READY &&
+        this.activeDevice === null
+      ) {
+        this.setActive(device.serialNumber);
+        console.log("No active device selected, making device active");
+      }
+    });
   }
 
   private deviceDisconnected(device: USBDevice | MicroBitDevice): void {
