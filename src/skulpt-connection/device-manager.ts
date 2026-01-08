@@ -79,6 +79,20 @@ export enum MicroBitStatus {
   FLASHING,
 }
 
+export enum MicroBitErrorReason {
+  /** The USB interface is already in use by another program */
+  BUSY,
+  /**
+   * The DAPLink interface is in a bad state so the board must be reconnected
+   */
+  DAP_STATE,
+  /**
+   * There was no response from the Pytch firmware, indicating it may be missing
+   * or corrupted and needs to be re-flashed
+   */
+  NO_RESPONSE,
+}
+
 export class MicroBitError extends Error {
   public readonly name = "MicroBitError";
   public readonly reason: string | undefined;
@@ -103,6 +117,8 @@ export class MicroBitDevice {
   public static readonly SEPARATOR = "|";
   public static readonly SERIAL_DELAY = 1;
   public static readonly TYPE = "micro:bit";
+
+  public errorReason: MicroBitErrorReason | null = null;
 
   /**
    * A short string to identify the micro:bit, derived from the last 8
@@ -156,6 +172,12 @@ export class MicroBitDevice {
 
   private set status(value: MicroBitStatus) {
     this._status = value;
+
+    // Clear error reason when we are not in an error state
+    if (value !== MicroBitStatus.ERRORED) {
+      this.errorReason = null;
+    }
+
     // Whenever we change status we refresh the devices list to cause a
     // re-render of UI components
     const { devices } = store.getState().devices;
@@ -197,13 +219,26 @@ export class MicroBitDevice {
     try {
       await this.dap.connect();
     } catch (e) {
+      if (e instanceof Error) {
+        if (e.message.includes("Unable to claim interface")) {
+          // This catches WebUSB errors where the interface is already claimed
+          // by another tab/window or program
+          this.errorReason = MicroBitErrorReason.BUSY;
+        } else if (e.message.includes("Bad response for")) {
+          // This catches DAP errors where the response message type doesn't
+          // match the expected type, which is usually an unrecoverable state
+          // without re-connecting the device
+          this.errorReason = MicroBitErrorReason.DAP_STATE;
+        }
+      }
+
       this.status = MicroBitStatus.ERRORED;
       console.error("Failed to connect via DAPLink to micro:bit");
       throw e;
     }
 
     try {
-      this.dap.setSerialBaudrate(MicroBitDevice.BAUD_RATE);
+      await this.dap.setSerialBaudrate(MicroBitDevice.BAUD_RATE);
     } catch (e) {
       this.status = MicroBitStatus.ERRORED;
       console.error(
@@ -213,7 +248,7 @@ export class MicroBitDevice {
     }
 
     try {
-      this.dap.reset();
+      await this.dap.reset();
     } catch (e) {
       this.status = MicroBitStatus.ERRORED;
       console.error("Failed to reset device via DAPLink");
@@ -587,6 +622,7 @@ export class MicroBitDevice {
         `Failed to handshake within ${HANDSHAKE_ATTEMPTS} attempts`
       );
 
+      this.errorReason = MicroBitErrorReason.NO_RESPONSE;
       this.status = MicroBitStatus.ERRORED;
     }
 

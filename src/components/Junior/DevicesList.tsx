@@ -6,7 +6,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Spinner from "react-bootstrap/Spinner";
 import { MICROBIT_IMPORT } from "../../model/devices";
 import {
-  deviceManager, MicroBitDevice, MicroBitStatus
+  deviceManager, MicroBitDevice, MicroBitErrorReason, MicroBitStatus
 } from "../../skulpt-connection/device-manager";
 import { useStoreActions, useStoreState } from "../../store";
 import { useMissingDevice, useMissingMicroBitImport } from "../hooks/devices";
@@ -33,11 +33,32 @@ const DeviceAlert: React.FC = () => {
   });
 
   if (deviceWithError) {
+    let details: string;
+
+    switch (deviceWithError.errorReason) {
+      case MicroBitErrorReason.BUSY:
+        details = "is in use by another tab or application, try closing other" +
+          " tabs that may be using the micro:bit, or try re-connecting it.";
+        break;
+
+      case MicroBitErrorReason.DAP_STATE:
+        details = "is stuck, you will need to re-connect it to your computer.";
+        break;
+
+      case MicroBitErrorReason.NO_RESPONSE:
+        details = "is not responding, try using the 'Flash' button below to " +
+          "update the micro:bit's Pytch software.";
+        break;
+
+      default:
+        details = "appears to be having a problem, try disconnecting it from " +
+          "your computer and re-connecting it.";
+        break;
+    }
+
     return <Alert variant="danger">
       <span>
-        A micro:bit device (<code>{deviceWithError.identifier}</code>) appears
-        to be having a problem, try disconnecting it from your computer and
-        re-connecting it.
+        A micro:bit device (<code>{deviceWithError.identifier}</code>) {details}
       </span>
     </Alert>;
   } else if (onlyUnsupported) {
