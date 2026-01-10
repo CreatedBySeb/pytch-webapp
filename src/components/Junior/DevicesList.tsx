@@ -76,8 +76,8 @@ const DeviceAlert: React.FC = () => {
     return <Alert variant="warning">
       <span>
         You have a micro:bit connected, but have not yet imported the
-        <code>pytch.microbit</code> module, so you cannot access it from your
-        program.
+        {" "}<code>pytch.microbit</code> module, so you cannot access it from
+        your program.
       </span>
       <Button
         variant="outline-primary"
