@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
@@ -203,6 +203,13 @@ const DeviceItem: React.FC<DeviceItemProps> = ({ device }) => {
 export const DevicesList = () => {
   const devices = useStoreState((state) => state.devices.devices);
   const pair = () => deviceManager.pairDevice();
+
+  // Since this component is always loaded when the IDE is, having a zero-
+  // dependencies useEffect causes the scan to trigger only when the IDE is
+  // initially loaded for a project
+  useEffect(() => {
+    deviceManager.scan();
+  }, [])
 
   return <>
     <DeviceAlert />

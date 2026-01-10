@@ -659,10 +659,6 @@ class DeviceManger {
 
       this.devices.forEach((d) => d.disconnect());
     });
-
-    navigator.usb.getDevices().then((devices) => {
-      devices.forEach((device) => this.deviceConnected(device));
-    });
   }
 
   /**
@@ -728,6 +724,14 @@ class DeviceManger {
   }
 
   /**
+   * Scan for connected micro:bit devices to set up
+   */
+  public async scan(): Promise<void> {
+    const devices = await navigator.usb.getDevices()
+    devices.forEach((device) => this.deviceConnected(device));
+  }
+
+  /**
    * Sets a connected device as the active one for projects
    * @param serial The serial number of the desired device, or null to unset
    */
@@ -758,6 +762,11 @@ class DeviceManger {
       console.error(
         "Connected device is missing serial number, and cannot be identified"
       );
+      return;
+    }
+
+    if (this.devices.has(device.serialNumber)) {
+      // Ignore duplicate triggers
       return;
     }
 
