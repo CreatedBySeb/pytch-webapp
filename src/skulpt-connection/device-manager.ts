@@ -317,6 +317,19 @@ export class MicroBitDevice {
       return;
     }
 
+    // Prevent duplicate flash actions
+    if (this.status === MicroBitStatus.FLASHING) {
+      return;
+    }
+
+    const oldStatus = this.status;
+    this.status = MicroBitStatus.FLASHING;
+
+    // If this is the active device, we need to deactivate it first
+    if (deviceManager.getActive() === this) {
+      deviceManager.setActive(null);
+    }
+
     console.log("Starting to flash micro:bit " + this.serialNumber);
 
     pulseChange({
@@ -338,6 +351,7 @@ export class MicroBitDevice {
         error: "Failed to retrieve HEX file for micro:bit",
       });
 
+      this.status = oldStatus;
       return;
     }
 
@@ -355,15 +369,10 @@ export class MicroBitDevice {
         error: "Failed to retrieve HEX file for micro:bit",
       });
 
+      this.status = oldStatus;
       return;
     }
 
-    this.status = MicroBitStatus.FLASHING;
-
-    // If this is the active device, we need to deactivate it first
-    if (deviceManager.getActive() === this) {
-      deviceManager.setActive(null);
-    }
 
     try {
       await this.dap.flash(buffer);
