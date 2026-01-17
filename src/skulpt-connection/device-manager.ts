@@ -202,7 +202,7 @@ export class MicroBitDevice {
     const transport = new WebUSB(device);
     this.dap = new DAPLink(transport, DAP_PROTOCOL_SWD);
 
-    if (this.revision[0] !== 2) {
+    if (this.revision[0] === 1 && this.revision[1] !== 5) {
       this.status = MicroBitStatus.UNSUPPORTED;
     }
   }
@@ -307,16 +307,6 @@ export class MicroBitDevice {
   public async flash(): Promise<void> {
     const pulseChange = store.getActions().activeProject.pulseNotableChange;
 
-    if (this.revision[0] !== 2) {
-      pulseChange({
-        kind: "device-flash-finished",
-        deviceType: MicroBitDevice.TYPE,
-        error: "Only V2 micro:bits can be flashed directly",
-      });
-
-      return;
-    }
-
     // Prevent duplicate flash actions
     if (this.status === MicroBitStatus.FLASHING) {
       return;
@@ -337,9 +327,8 @@ export class MicroBitDevice {
       deviceType: MicroBitDevice.TYPE,
     });
 
-    const hexURL =
-      envVarOrFail("VITE_MICROBIT_BASE") + "/pytch-microbit-v2.hex";
-
+    const hexPath = `/pytch-microbit-v${this.revision[0]}.hex`;
+    const hexURL = envVarOrFail("VITE_MICROBIT_BASE") + hexPath;
     const response = await fetch(hexURL);
 
     if (!response.ok) {

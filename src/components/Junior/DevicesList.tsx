@@ -64,7 +64,7 @@ const DeviceAlert: React.FC = () => {
   } else if (onlyUnsupported) {
     return <Alert variant="warning">
       The attached micro:bit is not supported by Pytch. Pytch currently only
-      works with V2 micro:bit devices.
+      works with V1.5 and V2 micro:bit devices.
     </Alert>
   } else if (missingDevice) {
     return <Alert variant="warning">
