@@ -3,7 +3,7 @@ import { PytchProgramKind } from "../../src/model/pytch-program";
 import { assertNever, promiseAndResolve } from "../../src/utils";
 
 export const kExpNTutorials = 18;
-export const kExpNMediaLibEntries = 52;
+export const kExpNMediaLibEntries = 53;
 
 /** Set up request intercepts for a specimen for use in tests. */
 export function initSpecimenIntercepts() {
@@ -245,6 +245,11 @@ export function assertCopiedText(match: string | ((text: string) => boolean)) {
       return textIsExpected(copiedText);
     })
   );
+}
+
+/** Assert that the webapp is on the front (welcome) page. */
+export function assertOnFrontPage() {
+  cy.get(".welcome-text header .content-text h2").should("have.text", "Pytch");
 }
 
 /** Assert that the webapp is on the IDE for a program of the given

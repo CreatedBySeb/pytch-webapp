@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import NavBanner from "./NavBanner";
+import { NavBanner } from "./NavBanner";
 import { EmptyProps } from "../utils";
 import { useStoreActions } from "../store";
 import { Header } from "./front-page/Header";

@@ -3,6 +3,7 @@ import { LinkedJrTutorialRef } from "../../../src/model/junior/jr-tutorial";
 import { assertInIDE, withDownloadedZipfile } from "../utils";
 import {
   assertActorNames,
+  assertJrTutChapterNumber,
   assertTwoStateSwitchState,
   clickUniqueSelected,
   getActivityBarTab,
@@ -73,30 +74,17 @@ context("Navigation of per-method lesson", () => {
     ).click();
   }
 
-  function assertChapterNumber(expNumber: number) {
-    if (expNumber === 0) {
-      cy.get(".chapter-title").should("be.visible");
-      cy.get(".chapter-title .chapter-number").should("not.exist");
-      return;
-    }
-
-    cy.get(".chapter-title .chapter-number").should(
-      "have.text",
-      `${expNumber} —`
-    );
-  }
-
   it("can move through chapters", () => {
     for (let i = 0; i !== 5; ++i) {
       advanceToNextChapter(i);
       const expChapter = i + 1;
-      assertChapterNumber(expChapter);
+      assertJrTutChapterNumber(expChapter);
     }
 
     // Jump directly back one at a time until chapter 1.
     for (let i = 4; i !== 0; --i) {
       jumpToChapter(i);
-      assertChapterNumber(i);
+      assertJrTutChapterNumber(i);
     }
   });
 
@@ -135,7 +123,7 @@ context("Navigation of per-method lesson", () => {
     settleModalDialog("Make a copy");
 
     cy.title().should("match", /Pytch: Copy of/);
-    assertChapterNumber(3);
+    assertJrTutChapterNumber(3);
     cy.get('.LearnerTask[data-task-index="6"][data-task-kind="current"]');
 
     // help-sidebar, lesson, keynav-help-sidebar
@@ -185,13 +173,13 @@ context("Navigation of per-method lesson", () => {
       for (let i = 0; i !== 5; ++i) {
         advanceToNextChapter(i);
       }
-      assertChapterNumber(5);
+      assertJrTutChapterNumber(5);
 
       cy.pytchSwitchProject("LESSON-LINKED-1");
-      assertChapterNumber(0);
+      assertJrTutChapterNumber(0);
 
       cy.pytchSwitchProject("LESSON-LINKED-0");
-      assertChapterNumber(5);
+      assertJrTutChapterNumber(5);
     });
   });
 
@@ -331,7 +319,7 @@ context("Navigation of per-method lesson", () => {
     assertHelpVisible();
 
     getActivityBarTab("book").click();
-    assertChapterNumber(3);
+    assertJrTutChapterNumber(3);
     assertNoHelp();
 
     getActivityBarTab("circle-question").click();

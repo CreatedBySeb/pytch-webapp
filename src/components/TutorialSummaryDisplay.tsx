@@ -13,7 +13,7 @@ import { useRunFlow } from "../model";
 
 interface TutorialSummaryDisplayProps {
   tutorial: ITutorialSummary;
-  kind?: SingleTutorialDisplayKind;
+  kind: SingleTutorialDisplayKind;
 }
 
 export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
@@ -30,7 +30,6 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
   const runShareTutorial = useRunFlow((f) => f.shareTutorialFlow);
 
   const cardRef = React.useRef<HTMLDivElement>(null);
-  const buttonsRef = React.useRef<HTMLDivElement>(null);
 
   const maybeSlugCreating = useStoreState(
     (state) => state.tutorialCollection.maybeSlugCreating
@@ -43,8 +42,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
 
   useEffect(() => {
     let elt = cardRef.current;
-    const buttonsElt = buttonsRef.current;
-    if (elt == null || buttonsElt == null) return;
+    if (elt == null) return;
 
     if (elt.hasAttribute("data-populated")) return;
     for (const ch of tutorial.contentNodes) {
@@ -54,7 +52,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
   });
 
   const launchTutorial = () => {
-    createProjectFromTutorial(tutorial.slug);
+    createProjectFromTutorial({ slug: tutorial.slug, chapterIndex: 0 });
   };
 
   const launchDemo = () => {
@@ -96,7 +94,7 @@ export const TutorialSummaryDisplay: React.FC<TutorialSummaryDisplayProps> = ({
         </Card.Header>
         <Card.Body ref={cardRef} />
         <Card.Footer>
-          <div className="button-bar" ref={buttonsRef}>
+          <div className="button-bar">
             {showDemoButton && (
               <Button
                 title="Try this project"

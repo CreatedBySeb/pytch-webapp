@@ -169,7 +169,7 @@ context("All/just-tut switch", () => {
     {
       label: "per-method",
       tutorialSlug: "script-by-script-boing",
-      expNEntries: 4,
+      expNEntries: 5,
       preLaunch: () => selectActorAspect("Backdrops"),
     },
     {

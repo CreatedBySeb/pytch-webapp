@@ -3,7 +3,7 @@ import { useStoreActions, useStoreState } from "../store";
 import { EmptyProps, assertNever } from "../utils";
 import { useParams } from "react-router-dom";
 import { IProjectSummary } from "../model/projects";
-import NavBanner from "./NavBanner";
+import { NavBanner } from "./NavBanner";
 import { Button, Card } from "react-bootstrap";
 import { MtimeDisplay } from "./MtimeDisplay";
 import { StartAfreshOption } from "../model/project-from-specimen";

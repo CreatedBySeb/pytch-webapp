@@ -15,17 +15,20 @@ import { IPytchAppModel, PytchAppModelActions } from ".";
 import { PytchProgramOps } from "./pytch-program";
 import {
   assertNever,
-  fetchArrayBuffer,
   fetchMimeTypedArrayBuffer,
   propSetterAction,
 } from "../utils";
-import { urlWithinApp } from "../env-utils";
 import { tutorialResourceParsedJson, tutorialUrl } from "./tutorial";
 import {
   Uuid,
   IEmbodyContext,
   StructuredProgramOps,
 } from "./junior/structured-program";
+import { NavigateOptions } from "react-router-dom";
+import {
+  JrTutorialCheckpointSkeleton,
+  LinkedJrTutorialRef,
+} from "./junior/jr-tutorial";
 
 const kAllowRandomChapterAccessSearchParam =
   "allowRandomChapterAccessInTutorials";
@@ -42,33 +45,41 @@ export interface ITutorialSummary {
   metadata: any;
 }
 
+export type CreateProjectFromTutorialArgs = {
+  slug: string;
+  chapterIndex: number;
+  navigateWithReplace?: boolean;
+};
+
+type SAction<PayloadT = void> = Action<ITutorialCollection, PayloadT>;
+type SThunk<PayloadT = void, ReturnT = void> = Thunk<
+  ITutorialCollection,
+  PayloadT,
+  unknown,
+  IPytchAppModel,
+  ReturnT
+>;
+
 export interface ITutorialCollection {
   syncState: SyncState;
   available: Array<ITutorialSummary>;
   maybeSlugCreating: string | undefined;
   allowRandomChapterAccess: boolean;
 
-  setSyncState: Action<ITutorialCollection, SyncState>;
-  setAvailable: Action<ITutorialCollection, Array<ITutorialSummary>>;
-  setSlugCreating: Action<ITutorialCollection, string>;
-  clearSlugCreating: Action<ITutorialCollection>;
-  setAllowRandomChapterAccess: Action<ITutorialCollection, boolean>;
-  loadSummaries: Thunk<ITutorialCollection>;
+  setSyncState: SAction<SyncState>;
+  setAvailable: SAction<Array<ITutorialSummary>>;
+  setSlugCreating: SAction<string>;
+  clearSlugCreating: SAction;
+  setAllowRandomChapterAccess: SAction<boolean>;
+  loadSummaries: SThunk<void, Promise<void>>;
 
-  createProjectFromTutorial: Thunk<
-    ITutorialCollection,
-    string,
-    void,
-    IPytchAppModel
+  createProjectFromTutorial: SThunk<
+    CreateProjectFromTutorialArgs,
+    Promise<void>
   >;
-  createDemoFromTutorial: Thunk<
-    ITutorialCollection,
-    string,
-    void,
-    IPytchAppModel
-  >;
+  createDemoFromTutorial: SThunk<string, Promise<void>>;
 
-  bootAllowRandomChapterAccessFromQuery: Thunk<ITutorialCollection>;
+  bootAllowRandomChapterAccessFromQuery: SThunk;
 }
 
 type ProjectCreationArgs = {
@@ -76,9 +87,7 @@ type ProjectCreationArgs = {
   options: CreateProjectOptions;
 };
 
-type ProjectCreationArgsFun = (
-  tutorialSlug: string
-) => Promise<ProjectCreationArgs>;
+type ProjectCreationArgsFun = () => Promise<ProjectCreationArgs>;
 
 const createProjectFromTutorial = async (
   actions: Actions<ITutorialCollection>,
@@ -90,6 +99,7 @@ const createProjectFromTutorial = async (
   methods: {
     projectCreationArgs: ProjectCreationArgsFun;
     completionAction: () => void;
+    navigateOptions?: () => NavigateOptions;
   }
 ) => {
   const storeActions = helpers.getStoreActions();
@@ -101,7 +111,7 @@ const createProjectFromTutorial = async (
 
   actions.setSlugCreating(tutorialSlug);
 
-  const createProjectArgs = await methods.projectCreationArgs(tutorialSlug);
+  const createProjectArgs = await methods.projectCreationArgs();
   const project = await createNewProject(
     createProjectArgs.name,
     createProjectArgs.options
@@ -129,7 +139,49 @@ const createProjectFromTutorial = async (
   actions.clearSlugCreating();
   methods.completionAction();
   storeActions.projectCollection.noteDatabaseChange();
-  storeActions.navigationRequestQueue.enqueue({ path: `/ide/${project.id}` });
+  storeActions.navigationRequestQueue.enqueue({
+    path: `/ide/${project.id}`,
+    opts: methods.navigateOptions?.(),
+  });
+};
+
+const jrTutorialCheckpointCreateOptions = async (
+  tutorialSlug: string,
+  chapterIndex: number
+): Promise<CreateProjectOptions> => {
+  const relativeUrl = `${tutorialSlug}/chapter-starts.json`;
+  const checkpointsObj = await tutorialResourceParsedJson(relativeUrl);
+
+  // TODO: Parse with zod to validate structure.
+  const checkpoints = checkpointsObj as Array<JrTutorialCheckpointSkeleton>;
+
+  const checkpoint = checkpoints[chapterIndex];
+  if (checkpoint == null) {
+    throw new Error(
+      `chapter ${chapterIndex} not found in` +
+        ` ${checkpoints.length}-element list of` +
+        ` chapter-starts for tutorial "${tutorialSlug}"`
+    );
+  }
+
+  const skeleton = checkpoint.programSkeleton;
+  const embodyContext = new EmbodyDemoFromTutorial(tutorialSlug);
+  const jrProgram = StructuredProgramOps.fromSkeleton(skeleton, embodyContext);
+  const program = PytchProgramOps.fromStructuredProgram(jrProgram);
+  const assets = await embodyContext.allAddAssetDescriptors();
+
+  const linkedContentRef: LinkedJrTutorialRef = {
+    kind: "jr-tutorial",
+    name: tutorialSlug,
+    interactionState: checkpoint.interactionState,
+  };
+
+  return {
+    summary: `This project is following the tutorial "${tutorialSlug}"`,
+    linkedContentRef,
+    program,
+    assets,
+  };
 };
 
 export const tutorialCollection: ITutorialCollection = {
@@ -162,9 +214,11 @@ export const tutorialCollection: ITutorialCollection = {
     actions.setSyncState(SyncState.Syncd);
   }),
 
-  createProjectFromTutorial: thunk(async (actions, tutorialSlug, helpers) => {
+  createProjectFromTutorial: thunk(async (actions, args, helpers) => {
+    const tutorialSlug = args.slug;
+    const navigateWithReplace = args.navigateWithReplace ?? false;
     await createProjectFromTutorial(actions, tutorialSlug, helpers, {
-      projectCreationArgs: async (tutorialSlug: string) => {
+      projectCreationArgs: async () => {
         const content = await tutorialContent(tutorialSlug);
 
         // TODO: Can this be tidied up?
@@ -176,7 +230,13 @@ export const tutorialCollection: ITutorialCollection = {
         // mechanism.
         const options: CreateProjectOptions = await (async () => {
           switch (content.programKind) {
-            case "flat":
+            case "flat": {
+              if (args.chapterIndex !== 0) {
+                throw new Error(
+                  'cannot create project for "flat" tutorial other than at start'
+                );
+              }
+
               return {
                 summary: `This project is following the tutorial "${tutorialSlug}"`,
                 trackedTutorialRef: {
@@ -185,37 +245,12 @@ export const tutorialCollection: ITutorialCollection = {
                 },
                 program: PytchProgramOps.fromPythonCode(content.initialCode),
               };
+            }
             case "per-method": {
-              const program = PytchProgramOps.newEmpty("per-method");
-
-              // This is clunky; see also other comment above, in the
-              // function `createProjectFromTutorial()`.
-              //
-              // We currently assume that all "per-method" tutorials
-              // should start empty except for a stage with a
-              // solid-white background.  One day this might not always
-              // be true.
-              const stageId = program.program.actors[0].id;
-              const stageImageUrl = urlWithinApp("/assets/solid-white.png");
-              const data = await fetchArrayBuffer(stageImageUrl);
-              const assets: Array<AddAssetDescriptor> = [
-                {
-                  name: `${stageId}/solid-white.png`,
-                  mimeType: "image/png",
-                  data,
-                },
-              ];
-
-              return {
-                summary: `This project is following the tutorial "${tutorialSlug}"`,
-                linkedContentRef: {
-                  kind: "jr-tutorial" as const,
-                  name: tutorialSlug,
-                  interactionState: { chapterIndex: 0, nTasksDone: 0 },
-                },
-                program,
-                assets,
-              };
+              return jrTutorialCheckpointCreateOptions(
+                tutorialSlug,
+                args.chapterIndex
+              );
             }
             default:
               return assertNever(content.programKind);
@@ -230,12 +265,13 @@ export const tutorialCollection: ITutorialCollection = {
       completionAction: () => {
         helpers.getStoreActions().ideLayout.dismissButtonTour();
       },
+      navigateOptions: () => ({ replace: navigateWithReplace }),
     });
   }),
 
   createDemoFromTutorial: thunk(async (actions, tutorialSlug, helpers) => {
     await createProjectFromTutorial(actions, tutorialSlug, helpers, {
-      projectCreationArgs: async (tutorialSlug: string) => {
+      projectCreationArgs: async () => {
         const content = await tutorialContent(tutorialSlug);
         const summary = `This project is a demo of the tutorial "${tutorialSlug}"`;
         const options: CreateProjectOptions = await (async () => {

@@ -75,6 +75,10 @@ import {
   KeyboardShortcutsHelpContent,
   keyboardShortcutsHelpContent,
 } from "./keyboard-shortcuts-help";
+import {
+  StartTutorialAtCheckpointFlow,
+  startTutorialAtCheckpointFlow,
+} from "./user-interactions/start-tutorial-at-checkpoint";
 
 export interface IStageDisplaySize {
   width: number;
@@ -292,6 +296,7 @@ export interface IUserConfirmations {
   deleteManyProjectsFlow: DeleteManyProjectsFlow;
 
   createProjectFlow: CreateProjectFlow;
+  startTutorialAtCheckpointFlow: StartTutorialAtCheckpointFlow;
   addAssetsFlow: AddAssetsFlow;
   addClipArtFlow: AddClipArtFlow;
   renameAssetFlow: RenameAssetFlow;
@@ -316,6 +321,7 @@ export const userConfirmations: IUserConfirmations = {
   deleteManyProjectsFlow,
 
   createProjectFlow,
+  startTutorialAtCheckpointFlow,
   addAssetsFlow,
   addClipArtFlow,
   renameAssetFlow,

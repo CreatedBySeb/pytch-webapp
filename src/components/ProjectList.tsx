@@ -7,7 +7,7 @@ import { IDisplayedProjectSummary, LoadingStatus } from "../model/projects";
 import { useStoreState, useStoreActions } from "../store";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
-import NavBanner from "./NavBanner";
+import { NavBanner } from "./NavBanner";
 import Card from "react-bootstrap/Card";
 import { pathWithinApp } from "../env-utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

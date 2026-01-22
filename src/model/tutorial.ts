@@ -26,11 +26,23 @@ export const tutorialUrl = (relativeUrl: string) => {
   return [tutorialsDataRoot, relativeUrl].join("/");
 };
 
+const fetchTutorialResourceOrThrow = async (relativeUrl: string) => {
+  const url = tutorialUrl(relativeUrl);
+
+  const response = await fetch(url);
+  if (!response.ok)
+    throw new Error(
+      `failed to fetch tutorial resource "${relativeUrl}":` +
+        ` "${response.statusText}"`
+    );
+
+  return response;
+};
+
 export const tutorialResourceText = async (
   relativeUrl: string
 ): Promise<string> => {
-  const url = tutorialUrl(relativeUrl);
-  const response = await fetch(url);
+  const response = await fetchTutorialResourceOrThrow(relativeUrl);
   return await response.text();
 };
 
@@ -39,8 +51,7 @@ type PromiseOfAny = Promise<any>;
 export const tutorialResourceParsedJson = async (
   relativeUrl: string
 ): PromiseOfAny => {
-  const url = tutorialUrl(relativeUrl);
-  const response = await fetch(url);
+  const response = await fetchTutorialResourceOrThrow(relativeUrl);
   return await response.json();
 };
 

@@ -1,10 +1,13 @@
 import React from "react";
-import { FallbackProps } from "react-error-boundary";
 import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
 import Button from "react-bootstrap/Button";
 import { envVarOrDefault } from "../env-utils";
 
-export function ExceptionDisplay(props: FallbackProps): React.JSX.Element {
+// Accept props of broader type than "FallbackProps" to allow use in
+// other contexts.
+type ExceptionDisplayProps = { error: { message: string } };
+
+export const ExceptionDisplay: React.FC<ExceptionDisplayProps> = (props) => {
   const { error } = props;
 
   // Use <a> in the below, rather than <LinkWithinApp>, to ensure true
@@ -31,4 +34,4 @@ export function ExceptionDisplay(props: FallbackProps): React.JSX.Element {
       </div>
     </DivSettingWindowTitle>
   );
-}
+};

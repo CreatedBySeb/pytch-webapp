@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import NavBanner from "./NavBanner";
+import { NavBanner } from "./NavBanner";
 import { useStoreActions, useStoreState } from "../store";
 import { SyncState } from "../model/project";
 import { TutorialSummaryDisplay } from "./TutorialSummaryDisplay";

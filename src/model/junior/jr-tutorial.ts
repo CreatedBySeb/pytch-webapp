@@ -6,6 +6,7 @@ import {
 } from "../../utils";
 import { patchImageSrcURLs, tutorialResourceText } from "../tutorial";
 import { EventDescriptor } from "./structured-program";
+import { NoIdsStructuredProject } from "./structured-program/skeleton";
 import * as z from "zod/mini";
 
 // Use full word "Identifier" so as not to make people think it's a
@@ -126,6 +127,17 @@ export type JrTutorialPersistentInteractionState = z.infer<
   typeof zJrTutorialPersistentInteractionState
 >;
 
+/** A skeleton of a "checkpoint" of a user's progress through a
+ * tutorial.  The use-case is allowing a user to start a tutorial as of
+ * the start of a particular chapter.  A new project can be embodied
+ * from this skeleton and recorded as being linked to the relevant
+ * tutorial at the correct chapter and with the correct number of tasks
+ * done. */
+export type JrTutorialCheckpointSkeleton = {
+  programSkeleton: NoIdsStructuredProject;
+  interactionState: JrTutorialPersistentInteractionState;
+};
+
 /** The state of the learner's interaction with a particular task of the
  * lesson.  There is no slot here for "has the learner marked this task
  * as done?" because that information is represented by the `nTasksDone`
@@ -167,6 +179,7 @@ export type LinkedJrTutorial = {
 export async function dereferenceLinkedJrTutorial(
   ref: LinkedJrTutorialRef
 ): Promise<LinkedJrTutorial> {
+  // TODO: What happens if a tutorial is deleted?
   const content = await jrTutorialContentFromName(ref.name);
 
   const taskStates: Array<JrTutorialTaskInteractionState> = [];

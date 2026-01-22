@@ -6,7 +6,7 @@ import {
 } from "../model/tutorials";
 import { useStoreActions, useStoreState } from "../store";
 import Button from "react-bootstrap/Button";
-import NavBanner from "./NavBanner";
+import { NavBanner } from "./NavBanner";
 import { TutorialSummaryDisplay } from "./TutorialSummaryDisplay";
 import { useParams } from "react-router-dom";
 import { Link } from "./LinkWithinApp";
@@ -104,7 +104,7 @@ export const SingleTutorial: React.FC<SingleTutorialProps> = ({ kind }) => {
           <Link to="/tutorials/">
             <Button variant="outline-primary">See all tutorials</Button>
           </Link>
-        </p>{" "}
+        </p>
       </div>
     </>
   );

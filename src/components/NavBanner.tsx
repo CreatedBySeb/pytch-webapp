@@ -11,7 +11,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import pytchLogo from "../images/pytch.png";
 import { ExternalLinkIndicator } from "./decorations";
 
-const NavBanner = () => {
+export const NavBanner = () => {
   const [menuIsExpanded, setMenuIsExpanded] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -50,14 +50,14 @@ const NavBanner = () => {
 
   return (
     <div className="NavBar">
-      <div className={"NavBarContent"}>
+      <div className="NavBarContent">
         <div className="title-and-version">
           <Link to="/">
             <img
               className="home-link"
               src={pytchLogo}
-              alt={"Pytch Logo"}
-              height={"70"}
+              alt="Pytch Logo"
+              height="70"
             />
           </Link>
         </div>
@@ -101,4 +101,22 @@ const NavBanner = () => {
   );
 };
 
-export default NavBanner;
+/** The `InertNavBanner` can be used when we want something across the
+ * top, but where the user should not be able to navigate anywhere.
+ * Used in the "start tutorial at chapter" pseudo-modal flow. */
+export const InertNavBanner = () => {
+  return (
+    <div className="NavBar inert">
+      <div className="NavBarContent">
+        <div className="title-and-version" style={{ margin: "auto" }}>
+          <img
+            className="home-link"
+            src={pytchLogo}
+            alt="Pytch Logo"
+            height="70"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};

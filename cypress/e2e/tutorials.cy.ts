@@ -27,6 +27,8 @@ context("Interact with a tutorial", () => {
     cy.pytchProjectFollowingTutorial();
   });
 
+  // This only works when the progress trail display does not include
+  // the ⋯ markers for elided chapter nodes.
   const assertActiveChapterIndex = (expActiveIndex: number) => {
     cy.get(".ProgressTrail .progress-node-background.isActive").should(
       "have.length",

@@ -8,7 +8,7 @@ import { deIndent } from "../../common/utils";
 
 import { IconName } from "@fortawesome/fontawesome-common-types";
 import { AceControllerMap } from "../../../src/skulpt-connection/code-editor";
-import { launchProjectInListDropdownAction } from "../utils";
+import { assertInIDE, launchProjectInListDropdownAction } from "../utils";
 import { Actions } from "easy-peasy";
 import { IActiveProject } from "../../../src/model/project";
 import { assertNever, range } from "../../../src/utils";
@@ -746,3 +746,21 @@ export const assertTwoStateSwitchState = (
   const expStateStr = expState.toString();
   cy.get(selector).should("have.attr", "aria-checked", expStateStr);
 };
+
+/** Assert that a "per-method" tutorial is being displayed, showing the
+ * chapter with the given `expChapterNumber`. */
+export function assertJrTutChapterNumber(expChapterNumber: number) {
+  assertInIDE("per-method");
+
+  cy.get(".Junior-LessonContent-HeaderBar .chapter-title").as("title");
+
+  if (expChapterNumber === 0) {
+    cy.get("@title").should("be.visible");
+    cy.get("@title").find(".chapter-number").should("not.exist");
+    return;
+  }
+
+  cy.get("@title")
+    .find(".chapter-number")
+    .should("have.text", `${expChapterNumber} —`);
+}

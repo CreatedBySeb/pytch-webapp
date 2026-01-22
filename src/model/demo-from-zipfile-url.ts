@@ -7,15 +7,10 @@ import {
 } from "../storage/zipfile";
 import { delaySeconds } from "../utils";
 
-type DemoFromZipfileProposingState = {
-  state: "proposing";
-  projectDescriptor: StandaloneProjectDescriptor;
-};
-
 type DemoFromZipfileURLState =
   | { state: "booting" }
   | { state: "fetching" }
-  | DemoFromZipfileProposingState
+  | { state: "proposing"; projectDescriptor: StandaloneProjectDescriptor }
   | { state: "creating"; projectDescriptor: StandaloneProjectDescriptor }
   | { state: "error"; message: string }
   | { state: "idle" };
