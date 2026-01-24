@@ -867,7 +867,7 @@ $key-chooser-width: 54rem;
 ////////////////////////////////////////////////////////////////////////
 
 .UpsertHandlerModal {
-  ul {
+  .EventKindOptions {
     &:focus {
       outline: none;
     }

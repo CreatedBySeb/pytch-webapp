@@ -5,9 +5,12 @@ import React, {
   useRef,
   useState,
 } from "react";
+import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
 import {
   ActorKindOps,
   EventDescriptorKind,
@@ -141,8 +144,6 @@ export const UpsertHandlerModal = () => {
   const setChosenKind = useJrEditActions(
     (a) => a.upsertHatBlockFlow.setChosenKind
   );
-
-  const ulRef = React.useRef<HTMLUListElement>(null);
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
     const {
@@ -386,63 +387,95 @@ export const UpsertHandlerModal = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <FocusGroupContainer
-              className={kFocusGroupContainerClassName}
-              groupedFocusKey={`UpsertHandlerModal/${actorKind}`}
-              opts={{
-                onFocusFromKeyboard: setChosenFromFocused,
-                onFocusFromPendingRequest: setChosenFromFocused,
-              }}
-            >
-              <ul tabIndex={-1} onKeyDown={handleKeyDown} ref={ulRef}>
-                <EventKindOption {...ekoProps} kind="green-flag">
-                  <div className="content">when green flag clicked</div>
-                </EventKindOption>
-                <EventKindOption {...ekoProps} kind="clicked">
-                  <div className="content">when {actorNounPhrase} clicked</div>
-                </EventKindOption>
-                {mCloneHatBlockOption}
-                <EventKindOption {...ekoProps} kind="key-pressed">
-                  <div className="content" ref={keyPressedOptionDivRefCb}>
-                    when{" "}
-                    <KeyEditor
-                      isTabStop={chosenKind === "key-pressed"}
-                      displayName={keyIfChosen.displayName}
-                      onEditClick={handleEditKeyClick}
-                    />{" "}
-                    key pressed
-                  </div>
-                </EventKindOption>
-                <EventKindOption
-                  chosenKind={chosenKind}
-                  kind="message-received"
-                  onDoubleClick={maybeAttemptUpsert}
+            <Tabs>
+              <Tab eventKey="pytch" title="Pytch">
+                <FocusGroupContainer
+                  className={kFocusGroupContainerClassName}
+                  groupedFocusKey={`UpsertHandlerModal/${actorKind}/pytch`}
+                  opts={{
+                    onFocusFromKeyboard: setChosenFromFocused,
+                    onFocusFromPendingRequest: setChosenFromFocused,
+                  }}
                 >
-                  <div className="content">
-                    when I receive “
-                    <Form.Control
-                      tabIndex={chosenKind === "message-received" ? 0 : -1}
-                      className={messageInputClasses}
-                      type="text"
-                      placeholder="message"
-                      readOnly={chosenKind !== "message-received"}
-                      value={messageIfChosen}
-                      onChange={handleMessageChange}
-                      // Only select the double-clicked-on word; don't
-                      // choose (as if clicking "OK") that hat-block:
-                      onDoubleClick={(event) => event.stopPropagation()}
-                      onFocus={focusGroupNavigationSuppression.onFocus}
-                      onBlur={focusGroupNavigationSuppression.onBlur}
-                    ></Form.Control>
-                    ”
-                  </div>
-                </EventKindOption>
-                <li className={emptyMessageHintClasses}>
-                  Please provide a message.
-                </li>
-                { activeDevice !== null && microBitHatBlockOptions }
-              </ul>
-            </FocusGroupContainer>
+                  <ul
+                    className="EventKindOptions"
+                    tabIndex={-1}
+                    onKeyDown={handleKeyDown}
+                  >
+                    <EventKindOption {...ekoProps} kind="green-flag">
+                      <div className="content">when green flag clicked</div>
+                    </EventKindOption>
+                    <EventKindOption {...ekoProps} kind="clicked">
+                      <div className="content">when {actorNounPhrase} clicked</div>
+                    </EventKindOption>
+                    {mCloneHatBlockOption}
+                    <EventKindOption {...ekoProps} kind="key-pressed">
+                      <div className="content" ref={keyPressedOptionDivRefCb}>
+                        when{" "}
+                        <KeyEditor
+                          isTabStop={chosenKind === "key-pressed"}
+                          displayName={keyIfChosen.displayName}
+                          onEditClick={handleEditKeyClick}
+                        />{" "}
+                        key pressed
+                      </div>
+                    </EventKindOption>
+                    <EventKindOption
+                      chosenKind={chosenKind}
+                      kind="message-received"
+                      onDoubleClick={maybeAttemptUpsert}
+                    >
+                      <div className="content">
+                        when I receive “
+                        <Form.Control
+                          tabIndex={chosenKind === "message-received" ? 0 : -1}
+                          className={messageInputClasses}
+                          type="text"
+                          placeholder="message"
+                          readOnly={chosenKind !== "message-received"}
+                          value={messageIfChosen}
+                          onChange={handleMessageChange}
+                          // Only select the double-clicked-on word; don't
+                          // choose (as if clicking "OK") that hat-block:
+                          onDoubleClick={(event) => event.stopPropagation()}
+                          onFocus={focusGroupNavigationSuppression.onFocus}
+                          onBlur={focusGroupNavigationSuppression.onBlur}
+                        ></Form.Control>
+                        ”
+                      </div>
+                    </EventKindOption>
+                    <li className={emptyMessageHintClasses}>
+                      Please provide a message.
+                    </li>
+                  </ul>
+                </FocusGroupContainer>
+              </Tab>
+              <Tab eventKey="microbit" title="micro:bit">
+                <FocusGroupContainer
+                  className={kFocusGroupContainerClassName}
+                  groupedFocusKey={`UpsertHandlerModal/${actorKind}/microbit`}
+                  opts={{
+                    onFocusFromKeyboard: setChosenFromFocused,
+                    onFocusFromPendingRequest: setChosenFromFocused,
+                  }}
+                >
+                  <ul
+                    className="EventKindOptions"
+                    tabIndex={-1}
+                    onKeyDown={handleKeyDown}
+                  >
+                    { !activeDevice && (
+                      <Alert variant="warning">
+                        There is no micro:bit device connected. micro:bit events
+                        will not fire until you add a device in the 'Devices'
+                        pane.
+                      </Alert>
+                    ) }
+                    { microBitHatBlockOptions }
+                  </ul>
+                </FocusGroupContainer>
+              </Tab>
+            </Tabs>
           </Form>
         </Modal.Body>
         <Modal.Footer>
