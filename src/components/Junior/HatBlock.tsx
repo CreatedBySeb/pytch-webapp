@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import Dropdown from "react-bootstrap/Dropdown";
 
+import microBitIcon from "../../images/microbit.svg";
 import { useStoreActions } from "../../store";
 
 import {
@@ -99,26 +100,36 @@ const HatBlockContent: React.FC<HatBlockContentProps> = ({
         return <span>when I receive {argContent}</span>;
       }
       case "microbit:button": {
-        return `[micro:bit] when '${event.button}' button pressed`;
+        return `when '${event.button}' button pressed`;
       }
       case "microbit:gesture": {
-        return `[micro:bit] when '${event.gesture}' gesture detected`;
+        return `when '${event.gesture}' gesture detected`;
       }
       case "microbit:pin_high": {
-        return `[micro:bit] when pin '${event.pin}' is high`;
+        return `when pin '${event.pin}' is high`;
       }
       case "microbit:pin_low": {
-        return `[micro:bit] when pin '${event.pin}' is low`;
+        return `when pin '${event.pin}' is low`;
       }
       case "microbit:sound": {
-        return `[micro:bit] when sound level changes to '${event.level}'`;
+        return `when sound level changes to '${event.level}'`;
       }
       default:
         return assertNever(event);
     }
   })();
 
-  return <span className="content">{text}</span>;
+  return <span className="content">
+    { event.kind.startsWith("microbit:") && (
+      <img
+        className="kind-icon"
+        alt="micro:bit"
+        src={microBitIcon}
+        title="micro:bit"
+      />
+    ) }
+    {text}
+  </span>;
 };
 
 type HatBlockProps = {

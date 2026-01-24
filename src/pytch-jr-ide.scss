@@ -668,6 +668,12 @@
   background-color: $pytch-colour-devices;
 }
 
+.UpsertHandlerModal li .kind-icon,
+.HatBlock .kind-icon {
+  height: 2.5em;
+  margin-right: 0.5rem;
+}
+
 .HatBlock {
   cursor: grab;
   .body {

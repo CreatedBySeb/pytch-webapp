@@ -14,6 +14,8 @@ export type EventDescriptor =
   | { kind: "microbit:pin_low"; pin: string }
   | { kind: "microbit:sound"; level: string };
 
+export type EventDescriptorIcon = { alt: string; src: string; };
+
 export type EventDescriptorKind = EventDescriptor["kind"];
 
 export class EventDescriptorKindOps {

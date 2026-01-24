@@ -11,6 +11,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
+import microBitIcon from "../../../images/microbit.svg";
 import {
   ActorKindOps,
   EventDescriptorKind,
@@ -243,6 +244,15 @@ export const UpsertHandlerModal = () => {
       </EventKindOption>
     );
 
+    const microBitImg = (
+      <img
+        className="kind-icon"
+        alt="micro:bit"
+        src={microBitIcon}
+        title="micro:bit"
+      />
+    );
+
     const microBitHatBlockOptions = [
       <EventKindOption
         {...ekoProps}
@@ -251,7 +261,8 @@ export const UpsertHandlerModal = () => {
         className="kind-microbit"
       >
         <div className="content">
-          [micro:bit] when
+          {microBitImg}
+          when
           <Form.Select
             aria-label="micro:bit button selection"
             onChange={handleMicroBitButtonChange}
@@ -270,7 +281,8 @@ export const UpsertHandlerModal = () => {
         className="kind-microbit"
       >
         <div className="content">
-          [micro:bit] when
+          {microBitImg}
+          when
           <Form.Select
             aria-label="micro:bit gesture selection"
             onChange={handleMicroBitGestureChange}
@@ -297,7 +309,8 @@ export const UpsertHandlerModal = () => {
         className="kind-microbit"
       >
         <div className="content">
-          [micro:bit] when pin
+          {microBitImg}
+          when pin
           <Form.Select
             aria-label="micro:bit pin selection"
             value={microBitPinIfChosen}
@@ -317,7 +330,8 @@ export const UpsertHandlerModal = () => {
         className="kind-microbit"
       >
         <div className="content">
-          [micro:bit] when pin
+          {microBitImg}
+          when pin
           <Form.Select
             aria-label="micro:bit pin selection"
             value={microBitPinIfChosen}
@@ -337,7 +351,8 @@ export const UpsertHandlerModal = () => {
         className="kind-microbit"
       >
         <div className="content">
-          [micro:bit] when sound level changes to
+          {microBitImg}
+          when sound level changes to
           <Form.Select
             aria-label="micro:bit sound level selection"
             onChange={handleMicroBitSoundChange}
