@@ -362,7 +362,6 @@ export class MicroBitDevice {
       return;
     }
 
-
     try {
       await this.dap.flash(buffer);
     } catch (e) {
@@ -488,10 +487,11 @@ export class MicroBitDevice {
    */
   private handleData(data: string) {
     this.buffer += data;
-    let message: string;
 
     while (this.buffer.includes(NEW_LINE)) {
-      [message, this.buffer] = this.buffer.split(NEW_LINE, 2);
+      const [message, ...remainder] = this.buffer.split(NEW_LINE);
+      this.buffer = remainder.join(NEW_LINE);
+
       const [event, ...args] = message.split(MicroBitDevice.SEPARATOR);
       console.log(`Received event '${event}' with args: ${args}`);
 
@@ -725,7 +725,7 @@ class DeviceManger {
    * Scan for connected micro:bit devices to set up
    */
   public async scan(): Promise<void> {
-    const devices = await navigator.usb.getDevices()
+    const devices = await navigator.usb.getDevices();
     devices.forEach((device) => this.deviceConnected(device));
   }
 
