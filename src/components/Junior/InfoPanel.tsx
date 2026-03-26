@@ -53,7 +53,8 @@ const Devices = () => {
     (!deviceManager.supported) ? (
       <p className="info-pane-placeholder">
         Unfortunately, devices are not supported in your browser.
-        See INSERT_LINK for more information.
+        See <a href="/doc/microbit/user/index.html">the Pytch docs</a> for more
+        information.
       </p>
     ) : (
       <DevicesList />
