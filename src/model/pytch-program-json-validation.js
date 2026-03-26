@@ -38,6 +38,41 @@ const schema22 = {
         key: { type: "object", properties: { message: { type: "string" } } },
       },
     },
+    "EventDescriptor-microbit-button": {
+      type: "object",
+      properties: {
+        kind: { const: "microbit:button" },
+        key: { type: "object", properties: { button: { type: "string" } } },
+      },
+    },
+    "EventDescriptor-microbit-gesture": {
+      type: "object",
+      properties: {
+        kind: { const: "microbit:gesture" },
+        key: { type: "object", properties: { gesture: { type: "string" } } },
+      },
+    },
+    "EventDescriptor-microbit-pin_high": {
+      type: "object",
+      properties: {
+        kind: { const: "microbit:pin_high" },
+        key: { type: "object", properties: { pin: { type: "string" } } },
+      },
+    },
+    "EventDescriptor-microbit-pin_low": {
+      type: "object",
+      properties: {
+        kind: { const: "microbit:pin_low" },
+        key: { type: "object", properties: { pin: { type: "string" } } },
+      },
+    },
+    "EventDescriptor-microbit-sound": {
+      type: "object",
+      properties: {
+        kind: { const: "microbit:sound" },
+        key: { type: "object", properties: { level: { type: "string" } } },
+      },
+    },
     EventDescriptor: {
       type: "object",
       oneOf: [
@@ -46,6 +81,11 @@ const schema22 = {
         { $ref: "#/$defs/EventDescriptor-message-received" },
         { $ref: "#/$defs/EventDescriptor-start-as-clone" },
         { $ref: "#/$defs/EventDescriptor-clicked" },
+        { $ref: "#/$defs/EventDescriptor-microbit-button" },
+        { $ref: "#/$defs/EventDescriptor-microbit-gesture" },
+        { $ref: "#/$defs/EventDescriptor-microbit-pin_high" },
+        { $ref: "#/$defs/EventDescriptor-microbit-pin_low" },
+        { $ref: "#/$defs/EventDescriptor-microbit-sound" },
       ],
     },
     EventHandler: {
@@ -117,6 +157,11 @@ const schema27 = {
     { $ref: "#/$defs/EventDescriptor-message-received" },
     { $ref: "#/$defs/EventDescriptor-start-as-clone" },
     { $ref: "#/$defs/EventDescriptor-clicked" },
+    { $ref: "#/$defs/EventDescriptor-microbit-button" },
+    { $ref: "#/$defs/EventDescriptor-microbit-gesture" },
+    { $ref: "#/$defs/EventDescriptor-microbit-pin_high" },
+    { $ref: "#/$defs/EventDescriptor-microbit-pin_low" },
+    { $ref: "#/$defs/EventDescriptor-microbit-sound" },
   ],
 };
 const schema28 = {
@@ -142,6 +187,41 @@ const schema31 = {
   properties: { kind: { const: "start-as-clone" } },
 };
 const schema32 = { type: "object", properties: { kind: { const: "clicked" } } };
+const schema33 = {
+  type: "object",
+  properties: {
+    kind: { const: "microbit:button" },
+    key: { type: "object", properties: { button: { type: "string" } } },
+  },
+};
+const schema34 = {
+  type: "object",
+  properties: {
+    kind: { const: "microbit:gesture" },
+    key: { type: "object", properties: { gesture: { type: "string" } } },
+  },
+};
+const schema35 = {
+  type: "object",
+  properties: {
+    kind: { const: "microbit:pin_high" },
+    key: { type: "object", properties: { pin: { type: "string" } } },
+  },
+};
+const schema36 = {
+  type: "object",
+  properties: {
+    kind: { const: "microbit:pin_low" },
+    key: { type: "object", properties: { pin: { type: "string" } } },
+  },
+};
+const schema37 = {
+  type: "object",
+  properties: {
+    kind: { const: "microbit:sound" },
+    key: { type: "object", properties: { level: { type: "string" } } },
+  },
+};
 function validate24(
   data,
   { instancePath = "", parentData, parentDataProperty, rootData = data } = {}
@@ -494,12 +574,529 @@ function validate24(
             valid0 = true;
             passing0 = 4;
           }
+          const _errs30 = errors;
+          const _errs31 = errors;
+          if (errors === _errs31) {
+            if (data && typeof data == "object" && !Array.isArray(data)) {
+              if (data.kind !== undefined) {
+                const _errs33 = errors;
+                if ("microbit:button" !== data.kind) {
+                  const err14 = {
+                    instancePath: instancePath + "/kind",
+                    schemaPath:
+                      "#/$defs/EventDescriptor-microbit-button/properties/kind/const",
+                    keyword: "const",
+                    params: { allowedValue: "microbit:button" },
+                    message: "must be equal to constant",
+                  };
+                  if (vErrors === null) {
+                    vErrors = [err14];
+                  } else {
+                    vErrors.push(err14);
+                  }
+                  errors++;
+                }
+                var valid14 = _errs33 === errors;
+              } else {
+                var valid14 = true;
+              }
+              if (valid14) {
+                if (data.key !== undefined) {
+                  let data10 = data.key;
+                  const _errs34 = errors;
+                  if (errors === _errs34) {
+                    if (
+                      data10 &&
+                      typeof data10 == "object" &&
+                      !Array.isArray(data10)
+                    ) {
+                      if (data10.button !== undefined) {
+                        if (typeof data10.button !== "string") {
+                          const err15 = {
+                            instancePath: instancePath + "/key/button",
+                            schemaPath:
+                              "#/$defs/EventDescriptor-microbit-button/properties/key/properties/button/type",
+                            keyword: "type",
+                            params: { type: "string" },
+                            message: "must be string",
+                          };
+                          if (vErrors === null) {
+                            vErrors = [err15];
+                          } else {
+                            vErrors.push(err15);
+                          }
+                          errors++;
+                        }
+                      }
+                    } else {
+                      const err16 = {
+                        instancePath: instancePath + "/key",
+                        schemaPath:
+                          "#/$defs/EventDescriptor-microbit-button/properties/key/type",
+                        keyword: "type",
+                        params: { type: "object" },
+                        message: "must be object",
+                      };
+                      if (vErrors === null) {
+                        vErrors = [err16];
+                      } else {
+                        vErrors.push(err16);
+                      }
+                      errors++;
+                    }
+                  }
+                  var valid14 = _errs34 === errors;
+                } else {
+                  var valid14 = true;
+                }
+              }
+            } else {
+              const err17 = {
+                instancePath,
+                schemaPath: "#/$defs/EventDescriptor-microbit-button/type",
+                keyword: "type",
+                params: { type: "object" },
+                message: "must be object",
+              };
+              if (vErrors === null) {
+                vErrors = [err17];
+              } else {
+                vErrors.push(err17);
+              }
+              errors++;
+            }
+          }
+          var _valid0 = _errs30 === errors;
+          if (_valid0 && valid0) {
+            valid0 = false;
+            passing0 = [passing0, 5];
+          } else {
+            if (_valid0) {
+              valid0 = true;
+              passing0 = 5;
+            }
+            const _errs38 = errors;
+            const _errs39 = errors;
+            if (errors === _errs39) {
+              if (data && typeof data == "object" && !Array.isArray(data)) {
+                if (data.kind !== undefined) {
+                  const _errs41 = errors;
+                  if ("microbit:gesture" !== data.kind) {
+                    const err18 = {
+                      instancePath: instancePath + "/kind",
+                      schemaPath:
+                        "#/$defs/EventDescriptor-microbit-gesture/properties/kind/const",
+                      keyword: "const",
+                      params: { allowedValue: "microbit:gesture" },
+                      message: "must be equal to constant",
+                    };
+                    if (vErrors === null) {
+                      vErrors = [err18];
+                    } else {
+                      vErrors.push(err18);
+                    }
+                    errors++;
+                  }
+                  var valid17 = _errs41 === errors;
+                } else {
+                  var valid17 = true;
+                }
+                if (valid17) {
+                  if (data.key !== undefined) {
+                    let data13 = data.key;
+                    const _errs42 = errors;
+                    if (errors === _errs42) {
+                      if (
+                        data13 &&
+                        typeof data13 == "object" &&
+                        !Array.isArray(data13)
+                      ) {
+                        if (data13.gesture !== undefined) {
+                          if (typeof data13.gesture !== "string") {
+                            const err19 = {
+                              instancePath: instancePath + "/key/gesture",
+                              schemaPath:
+                                "#/$defs/EventDescriptor-microbit-gesture/properties/key/properties/gesture/type",
+                              keyword: "type",
+                              params: { type: "string" },
+                              message: "must be string",
+                            };
+                            if (vErrors === null) {
+                              vErrors = [err19];
+                            } else {
+                              vErrors.push(err19);
+                            }
+                            errors++;
+                          }
+                        }
+                      } else {
+                        const err20 = {
+                          instancePath: instancePath + "/key",
+                          schemaPath:
+                            "#/$defs/EventDescriptor-microbit-gesture/properties/key/type",
+                          keyword: "type",
+                          params: { type: "object" },
+                          message: "must be object",
+                        };
+                        if (vErrors === null) {
+                          vErrors = [err20];
+                        } else {
+                          vErrors.push(err20);
+                        }
+                        errors++;
+                      }
+                    }
+                    var valid17 = _errs42 === errors;
+                  } else {
+                    var valid17 = true;
+                  }
+                }
+              } else {
+                const err21 = {
+                  instancePath,
+                  schemaPath: "#/$defs/EventDescriptor-microbit-gesture/type",
+                  keyword: "type",
+                  params: { type: "object" },
+                  message: "must be object",
+                };
+                if (vErrors === null) {
+                  vErrors = [err21];
+                } else {
+                  vErrors.push(err21);
+                }
+                errors++;
+              }
+            }
+            var _valid0 = _errs38 === errors;
+            if (_valid0 && valid0) {
+              valid0 = false;
+              passing0 = [passing0, 6];
+            } else {
+              if (_valid0) {
+                valid0 = true;
+                passing0 = 6;
+              }
+              const _errs46 = errors;
+              const _errs47 = errors;
+              if (errors === _errs47) {
+                if (data && typeof data == "object" && !Array.isArray(data)) {
+                  if (data.kind !== undefined) {
+                    const _errs49 = errors;
+                    if ("microbit:pin_high" !== data.kind) {
+                      const err22 = {
+                        instancePath: instancePath + "/kind",
+                        schemaPath:
+                          "#/$defs/EventDescriptor-microbit-pin_high/properties/kind/const",
+                        keyword: "const",
+                        params: { allowedValue: "microbit:pin_high" },
+                        message: "must be equal to constant",
+                      };
+                      if (vErrors === null) {
+                        vErrors = [err22];
+                      } else {
+                        vErrors.push(err22);
+                      }
+                      errors++;
+                    }
+                    var valid20 = _errs49 === errors;
+                  } else {
+                    var valid20 = true;
+                  }
+                  if (valid20) {
+                    if (data.key !== undefined) {
+                      let data16 = data.key;
+                      const _errs50 = errors;
+                      if (errors === _errs50) {
+                        if (
+                          data16 &&
+                          typeof data16 == "object" &&
+                          !Array.isArray(data16)
+                        ) {
+                          if (data16.pin !== undefined) {
+                            if (typeof data16.pin !== "string") {
+                              const err23 = {
+                                instancePath: instancePath + "/key/pin",
+                                schemaPath:
+                                  "#/$defs/EventDescriptor-microbit-pin_high/properties/key/properties/pin/type",
+                                keyword: "type",
+                                params: { type: "string" },
+                                message: "must be string",
+                              };
+                              if (vErrors === null) {
+                                vErrors = [err23];
+                              } else {
+                                vErrors.push(err23);
+                              }
+                              errors++;
+                            }
+                          }
+                        } else {
+                          const err24 = {
+                            instancePath: instancePath + "/key",
+                            schemaPath:
+                              "#/$defs/EventDescriptor-microbit-pin_high/properties/key/type",
+                            keyword: "type",
+                            params: { type: "object" },
+                            message: "must be object",
+                          };
+                          if (vErrors === null) {
+                            vErrors = [err24];
+                          } else {
+                            vErrors.push(err24);
+                          }
+                          errors++;
+                        }
+                      }
+                      var valid20 = _errs50 === errors;
+                    } else {
+                      var valid20 = true;
+                    }
+                  }
+                } else {
+                  const err25 = {
+                    instancePath,
+                    schemaPath:
+                      "#/$defs/EventDescriptor-microbit-pin_high/type",
+                    keyword: "type",
+                    params: { type: "object" },
+                    message: "must be object",
+                  };
+                  if (vErrors === null) {
+                    vErrors = [err25];
+                  } else {
+                    vErrors.push(err25);
+                  }
+                  errors++;
+                }
+              }
+              var _valid0 = _errs46 === errors;
+              if (_valid0 && valid0) {
+                valid0 = false;
+                passing0 = [passing0, 7];
+              } else {
+                if (_valid0) {
+                  valid0 = true;
+                  passing0 = 7;
+                }
+                const _errs54 = errors;
+                const _errs55 = errors;
+                if (errors === _errs55) {
+                  if (data && typeof data == "object" && !Array.isArray(data)) {
+                    if (data.kind !== undefined) {
+                      const _errs57 = errors;
+                      if ("microbit:pin_low" !== data.kind) {
+                        const err26 = {
+                          instancePath: instancePath + "/kind",
+                          schemaPath:
+                            "#/$defs/EventDescriptor-microbit-pin_low/properties/kind/const",
+                          keyword: "const",
+                          params: { allowedValue: "microbit:pin_low" },
+                          message: "must be equal to constant",
+                        };
+                        if (vErrors === null) {
+                          vErrors = [err26];
+                        } else {
+                          vErrors.push(err26);
+                        }
+                        errors++;
+                      }
+                      var valid23 = _errs57 === errors;
+                    } else {
+                      var valid23 = true;
+                    }
+                    if (valid23) {
+                      if (data.key !== undefined) {
+                        let data19 = data.key;
+                        const _errs58 = errors;
+                        if (errors === _errs58) {
+                          if (
+                            data19 &&
+                            typeof data19 == "object" &&
+                            !Array.isArray(data19)
+                          ) {
+                            if (data19.pin !== undefined) {
+                              if (typeof data19.pin !== "string") {
+                                const err27 = {
+                                  instancePath: instancePath + "/key/pin",
+                                  schemaPath:
+                                    "#/$defs/EventDescriptor-microbit-pin_low/properties/key/properties/pin/type",
+                                  keyword: "type",
+                                  params: { type: "string" },
+                                  message: "must be string",
+                                };
+                                if (vErrors === null) {
+                                  vErrors = [err27];
+                                } else {
+                                  vErrors.push(err27);
+                                }
+                                errors++;
+                              }
+                            }
+                          } else {
+                            const err28 = {
+                              instancePath: instancePath + "/key",
+                              schemaPath:
+                                "#/$defs/EventDescriptor-microbit-pin_low/properties/key/type",
+                              keyword: "type",
+                              params: { type: "object" },
+                              message: "must be object",
+                            };
+                            if (vErrors === null) {
+                              vErrors = [err28];
+                            } else {
+                              vErrors.push(err28);
+                            }
+                            errors++;
+                          }
+                        }
+                        var valid23 = _errs58 === errors;
+                      } else {
+                        var valid23 = true;
+                      }
+                    }
+                  } else {
+                    const err29 = {
+                      instancePath,
+                      schemaPath:
+                        "#/$defs/EventDescriptor-microbit-pin_low/type",
+                      keyword: "type",
+                      params: { type: "object" },
+                      message: "must be object",
+                    };
+                    if (vErrors === null) {
+                      vErrors = [err29];
+                    } else {
+                      vErrors.push(err29);
+                    }
+                    errors++;
+                  }
+                }
+                var _valid0 = _errs54 === errors;
+                if (_valid0 && valid0) {
+                  valid0 = false;
+                  passing0 = [passing0, 8];
+                } else {
+                  if (_valid0) {
+                    valid0 = true;
+                    passing0 = 8;
+                  }
+                  const _errs62 = errors;
+                  const _errs63 = errors;
+                  if (errors === _errs63) {
+                    if (
+                      data &&
+                      typeof data == "object" &&
+                      !Array.isArray(data)
+                    ) {
+                      if (data.kind !== undefined) {
+                        const _errs65 = errors;
+                        if ("microbit:sound" !== data.kind) {
+                          const err30 = {
+                            instancePath: instancePath + "/kind",
+                            schemaPath:
+                              "#/$defs/EventDescriptor-microbit-sound/properties/kind/const",
+                            keyword: "const",
+                            params: { allowedValue: "microbit:sound" },
+                            message: "must be equal to constant",
+                          };
+                          if (vErrors === null) {
+                            vErrors = [err30];
+                          } else {
+                            vErrors.push(err30);
+                          }
+                          errors++;
+                        }
+                        var valid26 = _errs65 === errors;
+                      } else {
+                        var valid26 = true;
+                      }
+                      if (valid26) {
+                        if (data.key !== undefined) {
+                          let data22 = data.key;
+                          const _errs66 = errors;
+                          if (errors === _errs66) {
+                            if (
+                              data22 &&
+                              typeof data22 == "object" &&
+                              !Array.isArray(data22)
+                            ) {
+                              if (data22.level !== undefined) {
+                                if (typeof data22.level !== "string") {
+                                  const err31 = {
+                                    instancePath: instancePath + "/key/level",
+                                    schemaPath:
+                                      "#/$defs/EventDescriptor-microbit-sound/properties/key/properties/level/type",
+                                    keyword: "type",
+                                    params: { type: "string" },
+                                    message: "must be string",
+                                  };
+                                  if (vErrors === null) {
+                                    vErrors = [err31];
+                                  } else {
+                                    vErrors.push(err31);
+                                  }
+                                  errors++;
+                                }
+                              }
+                            } else {
+                              const err32 = {
+                                instancePath: instancePath + "/key",
+                                schemaPath:
+                                  "#/$defs/EventDescriptor-microbit-sound/properties/key/type",
+                                keyword: "type",
+                                params: { type: "object" },
+                                message: "must be object",
+                              };
+                              if (vErrors === null) {
+                                vErrors = [err32];
+                              } else {
+                                vErrors.push(err32);
+                              }
+                              errors++;
+                            }
+                          }
+                          var valid26 = _errs66 === errors;
+                        } else {
+                          var valid26 = true;
+                        }
+                      }
+                    } else {
+                      const err33 = {
+                        instancePath,
+                        schemaPath:
+                          "#/$defs/EventDescriptor-microbit-sound/type",
+                        keyword: "type",
+                        params: { type: "object" },
+                        message: "must be object",
+                      };
+                      if (vErrors === null) {
+                        vErrors = [err33];
+                      } else {
+                        vErrors.push(err33);
+                      }
+                      errors++;
+                    }
+                  }
+                  var _valid0 = _errs62 === errors;
+                  if (_valid0 && valid0) {
+                    valid0 = false;
+                    passing0 = [passing0, 9];
+                  } else {
+                    if (_valid0) {
+                      valid0 = true;
+                      passing0 = 9;
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
   }
   if (!valid0) {
-    const err14 = {
+    const err34 = {
       instancePath,
       schemaPath: "#/oneOf",
       keyword: "oneOf",
@@ -507,9 +1104,9 @@ function validate24(
       message: "must match exactly one schema in oneOf",
     };
     if (vErrors === null) {
-      vErrors = [err14];
+      vErrors = [err34];
     } else {
-      vErrors.push(err14);
+      vErrors.push(err34);
     }
     errors++;
     validate24.errors = vErrors;

@@ -47,6 +47,66 @@
         }
       }
     },
+    "EventDescriptor-microbit-button": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "microbit:button" },
+        "key": {
+          "type": "object",
+          "properties": {
+            "button": { "type": "string" }
+          }
+        }
+      }
+    },
+    "EventDescriptor-microbit-gesture": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "microbit:gesture" },
+        "key": {
+          "type": "object",
+          "properties": {
+            "gesture": { "type": "string" }
+          }
+        }
+      }
+    },
+    "EventDescriptor-microbit-pin_high": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "microbit:pin_high" },
+        "key": {
+          "type": "object",
+          "properties": {
+            "pin": { "type": "string" }
+          }
+        }
+      }
+    },
+    "EventDescriptor-microbit-pin_low": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "microbit:pin_low" },
+        "key": {
+          "type": "object",
+          "properties": {
+            "pin": { "type": "string" }
+          }
+        }
+      }
+    },
+    "EventDescriptor-microbit-sound": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "microbit:sound" },
+        "key": {
+          "type": "object",
+          "properties": {
+            "level": { "type": "string" }
+          }
+        }
+      }
+    },
     "EventDescriptor": {
       "type": "object",
       "oneOf": [
@@ -54,7 +114,12 @@
         { "$ref": "#/$defs/EventDescriptor-key-pressed" },
         { "$ref": "#/$defs/EventDescriptor-message-received" },
         { "$ref": "#/$defs/EventDescriptor-start-as-clone" },
-        { "$ref": "#/$defs/EventDescriptor-clicked" }
+        { "$ref": "#/$defs/EventDescriptor-clicked" },
+        { "$ref": "#/$defs/EventDescriptor-microbit-button" },
+        { "$ref": "#/$defs/EventDescriptor-microbit-gesture" },
+        { "$ref": "#/$defs/EventDescriptor-microbit-pin_high" },
+        { "$ref": "#/$defs/EventDescriptor-microbit-pin_low" },
+        { "$ref": "#/$defs/EventDescriptor-microbit-sound" }
       ]
     },
 
